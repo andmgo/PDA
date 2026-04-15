@@ -118,4 +118,10 @@ public class RegistroVisitanteRepositoryImpl implements RegistroVisitanteReposit
     public Optional<RegistroVisitanteModel> findById(String id) {
         return mongoRepository.findById(id).map(this::toModel);
     }
+
+    @Override
+    public boolean existsById(String id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'existsById'");
+    }
 }

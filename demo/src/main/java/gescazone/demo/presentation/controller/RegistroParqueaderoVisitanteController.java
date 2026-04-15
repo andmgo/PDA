@@ -108,30 +108,24 @@ public class RegistroParqueaderoVisitanteController {
      */
     @PostMapping("/actualizar")
     public String actualizar(@ModelAttribute RegistroParqueaderoVisitanteModel registro,
-                            @RequestParam String idResidente,
-                            @RequestParam String idParqueadero,
-                            @RequestParam(required = false) String idApartamento,
+                            @RequestParam String id,
                             RedirectAttributes redirectAttributes) {
         try {
-            String mensaje = registroService.actualizar(registro, idResidente, idParqueadero, idApartamento);
+            String mensaje = registroService.actualizar(id, registro);
             redirectAttributes.addFlashAttribute("success", mensaje);
             return "redirect:/registro-parqueadero/lista";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/registro-parqueadero/editar/" + idResidente + "/" + idParqueadero;
+            return "redirect:/registro-parqueadero/editar/" + id;
         }
     }
 
-    /**
-     * Registrar salida
-     */
     @PostMapping("/registrar-salida")
-    public String registrarSalida(@RequestParam String idResidente,
-                                  @RequestParam String idParqueadero,
-                                  @RequestParam String fechaHoraSalida,
-                                  RedirectAttributes redirectAttributes) {
+    public String registrarSalida(@RequestParam String id,
+                                @RequestParam String fechaHoraSalida,
+                                RedirectAttributes redirectAttributes) {
         try {
-            String mensaje = registroService.registrarSalida(idResidente, idParqueadero, fechaHoraSalida);
+            String mensaje = registroService.registrarSalida(id, fechaHoraSalida);
             redirectAttributes.addFlashAttribute("success", mensaje);
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -139,15 +133,11 @@ public class RegistroParqueaderoVisitanteController {
         return "redirect:/registro-parqueadero/lista";
     }
 
-    /**
-     * Eliminar registro
-     */
-    @GetMapping("/eliminar/{idResidente}/{idParqueadero}")
-    public String eliminar(@PathVariable String idResidente,
-                          @PathVariable String idParqueadero,
-                          RedirectAttributes redirectAttributes) {
+    @GetMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable String id,
+                        RedirectAttributes redirectAttributes) {
         try {
-            String mensaje = registroService.eliminar(idResidente, idParqueadero);
+            String mensaje = registroService.eliminar(id);
             redirectAttributes.addFlashAttribute("success", mensaje);
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

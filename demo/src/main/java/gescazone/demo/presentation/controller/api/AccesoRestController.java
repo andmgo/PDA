@@ -118,12 +118,11 @@ public class AccesoRestController {
         }
     }
 
-    @PutMapping("/visitante-sin-vehiculo/registrar-salida/{idResidente}/{idApartamento}")
+    @PutMapping("/visitante-sin-vehiculo/registrar-salida/{id}")
     public ResponseEntity<String> registrarSalidaSinVehiculo(
-            @PathVariable String idResidente,
-            @PathVariable String idApartamento) {
+            @PathVariable String id) {
         try {
-            String resultado = registroVisitanteService.registrarSalida(idResidente, idApartamento, ahora());
+            String resultado = registroVisitanteService.registrarSalida(id, ahora());
             return ResponseEntity.ok(resultado);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -238,16 +237,19 @@ public class AccesoRestController {
         }
     }
 
-    @PutMapping("/visitante-vehiculo/registrar-salida/{idResidente}/{idParqueadero}")
+    @PutMapping("/visitante-vehiculo/registrar-salida/{id}")
     public ResponseEntity<String> registrarSalidaVehiculo(
-            @PathVariable String idResidente,
-            @PathVariable String idParqueadero) {
+            @PathVariable String id) {
+
         try {
             String resultado = registroParqueaderoVisitanteService
-                    .registrarSalida(idResidente, idParqueadero, ahora());
+                    .registrarSalida(id, ahora());
+
             return ResponseEntity.ok(resultado);
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

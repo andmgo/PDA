@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RegistroParqueaderoVisitanteService {
@@ -104,69 +105,61 @@ public class RegistroParqueaderoVisitanteService {
         return registroRepository.findActivosByIdApartamento(idApartamento);
     }
 
-    public String registrarSalida(String idResidente, String idParqueadero, String fechaHoraSalida) {
-        if (idResidente == null)
-            throw new IllegalArgumentException("El ID del residente es obligatorio");
-        if (idParqueadero == null)
-            throw new IllegalArgumentException("El ID del parqueadero es obligatorio");
+    public String registrarSalida(String id, String fechaHoraSalida) {
+        if (id == null)
+            throw new IllegalArgumentException("El ID del registro es obligatorio");
+
         if (fechaHoraSalida == null || fechaHoraSalida.trim().isEmpty())
             throw new IllegalArgumentException("La fecha y hora de salida es obligatoria");
 
         RegistroParqueaderoVisitanteModel registro = registroRepository
-                .findByIdResidenteAndIdParqueadero(idResidente, idParqueadero)
+                .findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el registro"));
 
         registro.registrarSalida(fechaHoraSalida);
         registroRepository.save(registro);
+
         return "Salida registrada con éxito";
     }
 
-    public String actualizar(RegistroParqueaderoVisitanteModel registro, String idResidente,
-                             String idParqueadero, String idApartamento) {
+    public String actualizar(String id, RegistroParqueaderoVisitanteModel registro) {
+        if (id == null)
+            throw new IllegalArgumentException("El ID del registro es obligatorio");
+
         if (registro == null)
             throw new IllegalArgumentException("El registro no puede ser nulo");
-        if (idResidente == null || idParqueadero == null)
-            throw new IllegalArgumentException("Los IDs son obligatorios");
 
-        if (!registroRepository.existsByIdResidenteAndIdParqueadero(idResidente, idParqueadero))
-            throw new IllegalArgumentException("No existe un registro con los IDs proporcionados");
+        RegistroParqueaderoVisitanteModel existente = registroRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el registro"));
 
         if (registro.getFechaHoraEntrada() == null || registro.getFechaHoraEntrada().trim().isEmpty())
             throw new IllegalArgumentException("La fecha y hora de entrada es obligatoria");
 
-        residenteRepository.findById(idResidente)
-                .orElseThrow(() -> new IllegalArgumentException("Residente no encontrado"));
-        parqueaderoRepository.findById(idParqueadero)
-                .orElseThrow(() -> new IllegalArgumentException("Parqueadero no encontrado"));
-
-        if (idApartamento != null)
-            apartamentoRepository.findById(idApartamento)
-                    .orElseThrow(() -> new IllegalArgumentException("Apartamento no encontrado"));
-
-        registro.setIdResidente(idResidente);
-        registro.setIdParqueadero(idParqueadero);
-        registro.setIdApartamento(idApartamento);
-        registro.setFechaHoraEntrada(registro.getFechaHoraEntrada().trim());
+        existente.setIdResidente(registro.getIdResidente());
+        existente.setIdParqueadero(registro.getIdParqueadero());
+        existente.setIdApartamento(registro.getIdApartamento());
+        existente.setFechaHoraEntrada(registro.getFechaHoraEntrada().trim());
 
         if (registro.getFechaHoraSalida() != null)
-            registro.setFechaHoraSalida(registro.getFechaHoraSalida().trim());
+            existente.setFechaHoraSalida(registro.getFechaHoraSalida().trim());
 
         if (registro.getPlaca() != null)
-            registro.setPlaca(registro.getPlaca().trim().toUpperCase());
+            existente.setPlaca(registro.getPlaca().trim().toUpperCase());
 
-        registroRepository.save(registro);
+        registroRepository.save(existente);
+
         return "Registro actualizado con éxito";
     }
 
-    public String eliminar(String idResidente, String idParqueadero) {
-        if (idResidente == null || idParqueadero == null)
-            throw new IllegalArgumentException("Los IDs son obligatorios para eliminar");
+    public String eliminar(String id) {
+        if (id == null)
+            throw new IllegalArgumentException("El ID del registro es obligatorio");
 
-        RegistroParqueaderoVisitanteModel registro = registroRepository
-                .findByIdResidenteAndIdParqueadero(idResidente, idParqueadero)
+        RegistroParqueaderoVisitanteModel registro = registroRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el registro"));
 
         registroRepository.deleteById(registro.getId());
+
         return "Registro eliminado con éxito";
     }
 
@@ -196,5 +189,12 @@ public class RegistroParqueaderoVisitanteService {
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el parqueadero con número: " + numero));
 
         return registroRepository.findByIdParqueadero(parqueadero.getId());
+    }
+
+    public Optional<RegistroParqueaderoVisitanteModel> consultarPorId(String id) {
+        if (id == null)
+            throw new IllegalArgumentException("El ID es obligatorio");
+
+        return registroRepository.findById(id);
     }
 }
