@@ -1,6 +1,7 @@
 package gescazone.demo.infrastructure.config;
 
 import gescazone.demo.infrastructure.security.CustomUserDetailsService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,8 +31,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
-    // Dentro de SecurityConfig:
     @Bean
     public HttpSessionEventPublisher httpSessionEventPublisher() {
         return new HttpSessionEventPublisher();
@@ -54,18 +53,30 @@ public class SecurityConfig {
     public AuthenticationSuccessHandler customSuccessHandler() {
         return (request, response, authentication) -> {
 
-            boolean isAdmin = authentication.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMINISTRADOR"));
+            // Obtener rol desde Spring Security
+            String rolCompleto = authentication.getAuthorities().stream()
+                    .findFirst()
+                    .map(a -> a.getAuthority())
+                    .orElse("");
 
-            boolean isFuncionario = authentication.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_FUNCIONARIO"));
+            // Convertir "ROLE_ADMINISTRADOR" → "Administrador" (como espera el HTML)
+            String rolParaVista = switch (rolCompleto) {
+                case "ROLE_ADMINISTRADOR" -> "Administrador";
+                case "ROLE_PROPIETARIO"   -> "Propietario";
+                case "ROLE_FUNCIONARIO"   -> "Funcionario";
+                default                   -> "";
+            };
 
-            if (isAdmin) {
-                response.sendRedirect("/inicio");
-            } else if (isFuncionario) {
+            // Guardar en sesión para que Thymeleaf lo lea con ${session.rolUsuario}
+            HttpSession session = request.getSession();
+            session.setAttribute("rolUsuario", rolParaVista);
+            session.setAttribute("usuarioLogueado", authentication.getName());
+
+            // Redirigir según rol
+            if (rolCompleto.equals("ROLE_FUNCIONARIO")) {
                 response.sendRedirect("/controlDeAccesos");
             } else {
-                response.sendRedirect("/inicio"); // PROPIETARIO u otros
+                response.sendRedirect("/inicio");
             }
         };
     }
@@ -100,12 +111,10 @@ public class SecurityConfig {
                     "/js/**",
                     "/img/**",
                     "/favicon.ico",
-                    "/error"          // evita loops en páginas de error
+                    "/error"
                 ).permitAll()
 
                 // ── Rutas compartidas (todos los roles autenticados) ────────
-                // FIX: /inicio estaba cayendo en anyRequest() sin estar
-                // explícitamente permitido, causando el redirect loop
                 .requestMatchers("/inicio").hasAnyRole("ADMINISTRADOR", "PROPIETARIO", "FUNCIONARIO")
 
                 // ── Solo ADMINISTRADOR ──────────────────────────────────────
@@ -132,7 +141,7 @@ public class SecurityConfig {
 
             .formLogin(form -> form
                 .loginPage("/login")
-                .loginProcessingUrl("/login") // URL donde Spring procesa el POST
+                .loginProcessingUrl("/login")
                 .successHandler(customSuccessHandler())
                 .failureHandler(customFailureHandler())
                 .permitAll()

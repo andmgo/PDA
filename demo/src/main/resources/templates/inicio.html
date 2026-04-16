@@ -436,9 +436,10 @@
         </div>
     </main>
 
-    <script src="../assets/js/plugins/perfect-scrollbar.min.js" async></script>
-    <script src="../assets/js/argon-dashboard-tailwind.js?v=1.0.1" async></script>
+    <!-- ✅ Con rutas Thymeleaf correctas -->
+    <script th:src="@{/js/plugins/perfect-scrollbar.min.js}" async></script>
+    <script th:src="@{/js/argon-dashboard-tailwind.js}" async></script>
 
-    <script th:src="@{/js/inicio.js}"></script>
+    <script th:src="@{/js/inicio.js(v=2)}"></script>
 </body>
 </html>

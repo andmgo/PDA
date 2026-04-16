@@ -1,11 +1,3 @@
-// Verificar autenticación
-window.addEventListener('DOMContentLoaded', function() {
-    const usuario = sessionStorage.getItem('usuario');
-    if (!usuario) {
-        window.location.href = '/login';
-    }
-});
-
 // Actualizar fecha
 function updateDate() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -20,10 +12,7 @@ function confirmarCerrarSesion(event) {
     event.preventDefault();
     
     if (confirm('¿Está seguro que desea cerrar sesión?')) {
-        // Limpiar sessionStorage
         sessionStorage.clear();
-        
-        // Redirigir al logout
         window.location.href = '/logout';
     }
     
