@@ -1,0 +1,7 @@
+.git
+.vscode
+**/.mvn
+**/target
+**/*.class
+**/*.log
+*.md
