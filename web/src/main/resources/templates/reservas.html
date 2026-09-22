@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script>(function(){try{var t=localStorage.getItem('gescazone_tema');if(t==='oscuro'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');}catch(e){}})();</script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="76x76" th:href="@{/img/apple-icon.png}" />
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+    <title>GESCAZONE - Reservas</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/nucleo-icons.css}" rel="stylesheet" />
+    <link th:href="@{/css/nucleo-svg.css}" rel="stylesheet" />
+    <link th:href="@{/css/argon-dashboard-tailwind.css}" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link th:href="@{/css/gescazone-theme.css}" rel="stylesheet" />
+</head>
+
+<body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
+
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar(activo='reservas')}"></div>
+
+    <!-- Main Content -->
+    <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
+        <div th:replace="~{fragments/topbar :: topbar(titulo='Reservas de Salones Sociales')}"></div>
+
+        <div class="w-full px-6 py-6 mx-auto">
+            <!-- Card de Reservas -->
+            <div class="flex flex-wrap -mx-3">
+                <div class="flex-none w-full max-w-full px-3">
+                    <div class="relative flex flex-col min-w-0 break-words bg-white border-0 border-transparent border-solid shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+                        
+                        <!-- Tabs Header -->
+                        <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+                            <div class="flex border-b border-gray-200">
+                                <button class="tab-button active px-6 py-3 text-sm font-semibold text-slate-700 dark:text-white transition-colors" data-tab="calendar">
+                                    <i class="fas fa-calendar-alt mr-2"></i>Calendario de Disponibilidad
+                                </button>
+                                <button class="tab-button px-6 py-3 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:text-white dark:opacity-60 transition-colors" data-tab="new">
+                                    <i class="fas fa-plus mr-2"></i>Realizar Reserva
+                                </button>
+                                <button class="tab-button px-6 py-3 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:text-white dark:opacity-60 transition-colors" data-tab="list" th:if="${session.rolUsuario == 'Administrador'}">
+                                    <i class="fas fa-list mr-2"></i>Historial de Reservas
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Calendario Tab -->
+                        <div class="tab-content active p-6" id="calendar">
+                            <div class="calendar">
+                                <div class="calendar-header">
+                                    <h3 id="currentMonth">Enero 2025</h3>
+                                    <div class="calendar-nav">
+                                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                                    </div>
+                                </div>
+                                
+                                <div class="calendar-weekdays">
+                                    <div class="calendar-weekday">Dom</div>
+                                    <div class="calendar-weekday">Lun</div>
+                                    <div class="calendar-weekday">Mar</div>
+                                    <div class="calendar-weekday">Mié</div>
+                                    <div class="calendar-weekday">Jue</div>
+                                    <div class="calendar-weekday">Vie</div>
+                                    <div class="calendar-weekday">Sáb</div>
+                                </div>
+                                
+                                <div class="calendar-days" id="calendarDays"></div>
+                            </div>
+
+                            <div class="p-4 bg-blue-50 rounded-lg mt-6">
+                                <div class="font-semibold text-slate-700 mb-2"><i class="fas fa-info-circle mr-2"></i>Información</div>
+                                <div class="text-sm text-slate-600 space-y-1">
+                                    <p><i class="fas fa-circle text-xs"></i> Días con disponibilidad completa</p>
+                                    <p><i class="fas fa-circle text-red-600 text-xs"></i> Días con salones ocupados</p>
+                                    <p class="mt-2">Haga clic en cualquier día para ver los horarios disponibles de los salones sociales.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nueva Reserva Tab -->
+                        <div class="tab-content p-6" id="new">
+                            <form id="reservationForm" onsubmit="return submitReserva(event)">
+                                <div class="mb-4">
+                                    <label class="block text-sm font-semibold mb-2 text-slate-700">Número de Salón Social *</label>
+                                    <input type="text" id="numeroSalon" required 
+                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" 
+                                        placeholder="Ej: S-01" maxlength="10" />
+                                    <span id="salonError" class="error-message text-red-500 text-xs mt-1"></span>
+                                    <span id="salonSuccess" class="text-green-600 text-xs mt-1 hidden">
+                                        <i class="fas fa-check-circle"></i> Salón encontrado: <span id="medidasSalonEncontrado"></span>
+                                    </span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="block text-sm font-semibold mb-2 text-slate-700">Fecha y Hora de la Reserva *</label>
+                                    <input type="datetime-local" id="fechaHoraReserva" required 
+                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                                </div>
+
+                                <div class="p-4 bg-blue-50 rounded-lg mb-6">
+                                    <div class="font-semibold text-slate-700 mb-2"><i class="fas fa-info-circle mr-2"></i>Información Importante</div>
+                                    <ul class="text-sm text-slate-600 space-y-1 ml-6">
+                                        <li>• Las reservas deben realizarse con mínimo 48 horas de anticipación</li>
+                                        <li>• La cancelación sin cargo debe hacerse 24 horas antes</li>
+                                        <li>• Los salones deben entregarse en las mismas condiciones</li>
+                                        <li>• Solo los usuarios registrados en el sistema pueden reservar</li>
+                                    </ul>
+                                </div>
+
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" onclick="resetForm()"
+                                        class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" id="btnConfirmarReserva"
+                                        class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">
+                                        <i class="fas fa-check mr-2"></i>Confirmar Reserva
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="mt-4 text-center">
+                                <button type="button" onclick="openSolicitudModal()" class="text-sm font-semibold text-blue-500 hover:text-blue-700">
+                                    <i class="fas fa-calendar-plus mr-1"></i>¿Necesita reservar para otro año? Solicite una excepción
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Historial Tab - Solo Administradores -->
+                        <div class="tab-content p-6" id="list" th:if="${session.rolUsuario == 'Administrador'}" th:remove="${session.rolUsuario != 'Administrador' ? 'all' : 'none'}">
+                            <div class="flex-auto px-0 pt-0 pb-2">
+                                <div class="p-0 overflow-x-auto">
+                                    <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                                        <thead class="align-bottom">
+                                            <tr>
+                                                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">ID Reserva</th>
+                                                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">N° Documento</th>
+                                                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Salón</th>
+                                                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Fecha y Hora</th>
+                                                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reservasTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Confirmación Eliminar -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4">Confirmar Eliminación</h5>
+            <p class="text-slate-500 mb-6" id="deleteMessage"></p>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeDeleteModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">
+                    Cancelar
+                </button>
+                <button onclick="confirmDelete()" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-red-600 to-orange-600 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Solicitud de Reserva Excepcional (otro año) -->
+    <div id="solicitudModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4">Solicitar Reserva para Otro Año</h5>
+            <p class="text-sm text-slate-500 mb-4">
+                Primero ingrese y valide el número de salón en la pestaña
+                "Realizar Reserva". Un administrador revisará esta solicitud.
+            </p>
+            <form id="solicitudForm" onsubmit="return submitSolicitud(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Fecha y Hora Deseada *</label>
+                    <input type="datetime-local" id="fechaSolicitud" required
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Justificación *</label>
+                    <textarea id="justificacionSolicitud" required rows="3"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                        placeholder="Explique el motivo de la solicitud"></textarea>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeSolicitudModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">
+                        <i class="fas fa-paper-plane mr-2"></i>Enviar Solicitud
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Disponibilidad del Día -->
+    <div id="dayModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4">Disponibilidad del Día</h5>
+            <div id="dayModalBody"></div>
+            <div class="flex justify-end gap-2 mt-4">
+                <button onclick="closeDayModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/reservas.js}"></script>
+</body>
+</html>

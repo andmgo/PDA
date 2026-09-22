@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESCAZONE - Iniciar Sesión</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/login.css}" rel="stylesheet" />
+</head>
+<body>
+    <div class="login-container">
+        <div class="brand-panel">
+            <div>
+                <div class="brand">GESCAZONE</div>
+                <div class="tag">Terrazas de Calicanto &middot; Cartagena</div>
+            </div>
+            <svg class="skyline" viewBox="0 0 260 110" width="100%" height="110" preserveAspectRatio="xMidYMax meet">
+                <circle class="sun" cx="205" cy="30" r="20"/>
+                <rect class="bldg" x="18" y="52" width="26" height="50" rx="3"/>
+                <rect class="bldg hi" x="48" y="30" width="30" height="72" rx="3"/>
+                <rect class="bldg" x="82" y="60" width="22" height="42" rx="3"/>
+                <rect class="bldg hi" x="108" y="42" width="28" height="60" rx="3"/>
+                <rect class="bldg" x="140" y="66" width="24" height="36" rx="3"/>
+                <rect class="win" x="56" y="40" width="5" height="5" rx="1"/>
+                <rect class="win" x="66" y="40" width="5" height="5" rx="1"/>
+                <rect class="win" x="56" y="52" width="5" height="5" rx="1"/>
+                <rect class="win" x="66" y="52" width="5" height="5" rx="1"/>
+                <rect class="win" x="115" y="52" width="5" height="5" rx="1"/>
+                <rect class="win" x="125" y="52" width="5" height="5" rx="1"/>
+                <path class="wave" d="M0 102 Q20 96 40 102 T80 102 T120 102 T160 102 T200 102 T240 102 T260 102" />
+                <path class="wave" d="M0 108 Q20 103 40 108 T80 108 T120 108 T160 108 T200 108 T240 108 T260 108" opacity=".6"/>
+            </svg>
+            <div class="quote">
+                &ldquo;Un solo lugar para reservar el salón social, ver la cartera del apartamento y avisar
+                que llegó un paquete.&rdquo;
+                <span class="who">Carlos Propietario &middot; Torre 2, Apto 304</span>
+            </div>
+        </div>
+
+        <div class="login-body">
+            <h2 class="form-title">Bienvenido de nuevo</h2>
+            <p class="form-subtitle">Ingresa con tu número de documento.</p>
+
+            <!-- Mensajes de error según tipo -->
+            <div th:if="${param.error != null}">
+                <div th:switch="${param.error[0]}" class="error-message show">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span th:case="'bad_credentials'">Usuario o contraseña incorrectos.</span>
+                    <span th:case="'user_not_found'">No existe un usuario con ese número de documento.</span>
+                    <span th:case="'disabled'">Tu cuenta está deshabilitada. Contacta al administrador.</span>
+                    <span th:case="'session_limit'">Ya tienes una sesión activa en otro dispositivo.</span>
+                    <span th:case="'session_expired'">Tu sesión ha expirado. Por favor inicia sesión de nuevo.</span>
+                    <span th:case="'access_denied'">No tienes permisos para acceder a esa sección.</span>
+                    <span th:case="'google'">No se pudo iniciar sesión con Google. Intenta de nuevo.</span>
+                    <span th:case="*">Usuario o contraseña incorrectos.</span>
+                </div>
+            </div>
+
+            <!-- Mensaje de logout exitoso -->
+            <div th:if="${param.logout != null}" class="success-message show">
+                <i class="fas fa-check-circle"></i> Has cerrado sesión correctamente.
+            </div>
+
+            <!-- Mensaje de registro exitoso -->
+            <div th:if="${registroExitoso}" class="success-message show">
+                <i class="fas fa-check-circle"></i> <span th:text="${registroExitoso}"></span>
+            </div>
+
+            <!-- Formulario manejado por Spring Security -->
+            <form th:action="@{/login}" method="post" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Número de documento</label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        required
+                        maxlength="15"
+                        placeholder="Ingresa tu número de documento"
+                        autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        placeholder="Ingresa tu contraseña"
+                        autocomplete="current-password">
+                </div>
+
+                <div class="remember-forgot">
+                    <label>
+                        <input type="checkbox" id="recordar">
+                        Recordar mi documento
+                    </label>
+                    <a th:href="@{/registro}" class="forgot-link">¿No tienes cuenta? Regístrate</a>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-cerrar" onclick="cerrarLogin()">Cerrar</button>
+                    <button type="submit" class="btn btn-aceptar">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar sesión
+                    </button>
+                </div>
+            </form>
+
+            <div class="divider">o</div>
+            <a th:href="@{/oauth2/iniciar-login}" class="btn-google">
+                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3c-1.08.72-2.46 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28v-3.1H1.27A12 12 0 0 0 0 12c0 1.94.46 3.77 1.27 5.38z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.59 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0A12 12 0 0 0 1.27 6.62l4 3.1C6.22 6.86 8.87 4.75 12 4.75z"/></svg>
+                Continuar con Google
+            </a>
+        </div>
+    </div>
+
+    <script th:src="@{/js/login.js}"></script>
+</body>
+</html>

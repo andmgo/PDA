@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESCAZONE - Completar registro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/registro.css}" rel="stylesheet" />
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo-container">
+                <img th:src="@{/img/apple-icon.png}" alt="Logo" onerror="this.style.display='none'">
+                <h1>GESCAZONE</h1>
+                <p>Terrazas de Calicanto &middot; Cartagena</p>
+            </div>
+        </div>
+
+        <div class="login-body">
+            <h2 class="form-title">Un último paso</h2>
+
+            <div class="info-message">
+                <i class="fas fa-info-circle"></i>
+                Verificamos tu cuenta de Google. Solo falta tu documento — tu solicitud queda pendiente de revisión, igual que un registro normal.
+            </div>
+
+            <div th:if="${errorDocumento}" class="error-message show" th:text="${errorDocumento}"></div>
+
+            <form th:action="@{/registro/completar-google}" method="post" id="completarGoogleForm">
+
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" th:value="${nombre}" readonly disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Apellido</label>
+                    <input type="text" th:value="${apellido}" readonly disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Correo electrónico</label>
+                    <input type="email" th:value="${correo}" readonly disabled>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de documento</label>
+                    <select name="nombreTipoDocumento" required>
+                        <option value="">-- Selecciona --</option>
+                        <option th:each="tipo : ${tiposDocumento}"
+                                th:value="${tipo}"
+                                th:text="${tipo}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Número de documento</label>
+                    <input type="text" id="numeroDocumento" name="numeroDocumento"
+                           required maxlength="15" placeholder="Ingresa tu número de documento"
+                           autocomplete="off">
+                </div>
+
+                <div class="button-group">
+                    <a th:href="@{/login}" class="btn btn-cerrar">Cancelar</a>
+                    <button type="submit" class="btn btn-aceptar">Enviar solicitud</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:src="@{/js/registroCompletarGoogle.js}"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script>(function(){try{var t=localStorage.getItem('gescazone_tema');if(t==='oscuro'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');}catch(e){}})();</script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="76x76" th:href="@{/img/apple-icon.png}" />
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+    <title>GESCAZONE - Paquetes</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/nucleo-icons.css}" rel="stylesheet" />
+    <link th:href="@{/css/nucleo-svg.css}" rel="stylesheet" />
+    <link th:href="@{/css/argon-dashboard-tailwind.css}" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link th:href="@{/css/gescazone-theme.css}" rel="stylesheet" />
+</head>
+
+<body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
+
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar(activo='paquetes')}"></div>
+
+    <!-- Main Content -->
+    <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
+        <div th:replace="~{fragments/topbar :: topbar(titulo='Paquetes de Recepción')}"></div>
+
+        <div class="w-full px-6 py-6 mx-auto">
+            <div class="flex flex-wrap -mx-3">
+                <div class="flex-none w-full max-w-full px-3">
+                    <div class="relative flex flex-col min-w-0 break-words bg-white border-0 border-transparent border-solid shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+                        <div class="p-6">
+                            <!-- Formulario de registro -->
+                            <form id="paqueteForm" onsubmit="return submitPaquete(event)" class="mb-8">
+                                <h6 class="mb-4 font-bold text-slate-700">Registrar Paquete</h6>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2 text-slate-700">Número de Apartamento *</label>
+                                        <input type="text" id="numeroApartamentoPaquete" required
+                                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                            placeholder="Ej: 101" maxlength="10" />
+                                        <span id="apartamentoPaqueteError" class="error-message text-red-500 text-xs mt-1"></span>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2 text-slate-700">Nombre de quien recibe *</label>
+                                        <input type="text" id="nombreReceptor" required
+                                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                            placeholder="Ej: Juan Pérez" />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold mb-2 text-slate-700">Cédula de quien recibe *</label>
+                                        <input type="text" id="cedulaReceptor" required
+                                            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                            placeholder="Ej: 1234567890" maxlength="15" />
+                                    </div>
+                                </div>
+                                <div class="flex justify-end mt-4">
+                                    <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">
+                                        <i class="fas fa-plus mr-2"></i>Registrar Paquete
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Filtro -->
+                            <div class="flex items-center justify-between mb-4">
+                                <h6 class="font-bold text-slate-700">Paquetes</h6>
+                                <label class="flex items-center gap-2 text-sm text-slate-600">
+                                    <input type="checkbox" id="soloPendientes" checked onchange="cargarPaquetes()" />
+                                    Mostrar solo pendientes de entrega
+                                </label>
+                            </div>
+
+                            <div class="flex-auto px-0 pt-0 pb-2">
+                                <div class="p-0 overflow-x-auto">
+                                    <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                                        <thead class="align-bottom">
+                                            <tr>
+                                                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Apartamento</th>
+                                                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Recibido por</th>
+                                                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Cédula</th>
+                                                <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Llegada</th>
+                                                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Estado</th>
+                                                <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="paquetesTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script th:src="@{/js/paquetes.js}"></script>
+</body>
+</html>

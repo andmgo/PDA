@@ -1,0 +1,307 @@
+/* ============================================================
+   GESCAZONE — sistema visual (azules amigables + Plus Jakarta Sans)
+   Aprobado por el usuario como Artifact antes de aplicarse aquí.
+   Se carga DESPUÉS de argon-dashboard-tailwind.css a propósito,
+   para poder sobreescribir puntualmente sus utilidades.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root {
+    --gsz-bg: #EFF4FC;
+    --gsz-surface: #FFFFFF;
+    --gsz-surface-2: #F7F9FE;
+    --gsz-ink: #1B2A4A;
+    --gsz-ink-muted: #5C6C8C;
+    --gsz-ink-faint: #8C99B8;
+    --gsz-border: #DFE7FA;
+    /* --gsz-blue/--gsz-blue-deep son de MARCA (topbar, botón primario) y no
+       cambian con el tema — solo lo que sigue abajo se redefine en oscuro. */
+    --gsz-blue: #2F6FED;
+    --gsz-blue-deep: #17356E;
+    --gsz-blue-soft: #E7F0FE;
+    --gsz-active-ink: var(--gsz-blue-deep);
+    --gsz-sky: #38BDF8;
+
+    --gsz-violet: #7C5CFC; --gsz-violet-soft: #EFE9FE;
+    --gsz-green:  #1F9463; --gsz-green-soft:  #DFF5EA;
+    --gsz-amber:  #B4791C; --gsz-amber-soft:  #FBF0DC;
+    --gsz-red:    #DD5147; --gsz-red-soft:    #FCE7E5;
+    --gsz-cyan:   #0C8FBF; --gsz-cyan-soft:   #E3F6FE;
+    --gsz-neutral: #647096; --gsz-neutral-soft: #EEF1F8;
+}
+
+/* Modo oscuro — se activa agregando la clase .dark a <html> (ver
+   theme.js / script inline en cada <head>). Solo se redefinen los tokens
+   de superficie/texto/acento "de contenido"; los de marca (--gsz-blue,
+   --gsz-blue-deep) se quedan fijos a propósito. */
+:root.dark {
+    --gsz-bg: #0F1729;
+    --gsz-surface: #17203A;
+    --gsz-surface-2: #1C2745;
+    --gsz-ink: #EAF0FF;
+    --gsz-ink-muted: #A9B6D6;
+    --gsz-ink-faint: #7684AC;
+    --gsz-border: #2A3660;
+    --gsz-blue-soft: #21335F;
+    --gsz-active-ink: #9DBCFB;
+
+    --gsz-violet: #A28CFF; --gsz-violet-soft: #2A2560;
+    --gsz-green:  #4CC796; --gsz-green-soft:  #163A30;
+    --gsz-amber:  #E0A64B; --gsz-amber-soft:  #3C2E12;
+    --gsz-red:    #F08A80; --gsz-red-soft:    #3E2020;
+    --gsz-cyan:   #5FC4EE; --gsz-cyan-soft:   #123244;
+    --gsz-neutral: #A9B6D6; --gsz-neutral-soft: #232E52;
+
+    /* Le dice al navegador que dibuje sus propios widgets nativos (el
+       calendario emergente de <input type="datetime-local">, scrollbars,
+       etc.) con la paleta oscura — sin esto esos popups los pinta el
+       navegador, no esta hoja de estilos, y salían blancos igual aunque
+       el input ya estuviera oscuro (bug real reportado: "en la parte del
+       calendario también sale blanco"). */
+    color-scheme: dark;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif !important;
+}
+
+/* Red de seguridad: el resto de plantillas (fuera de sidebar + Inicio,
+   ver alcance de esta ronda) no tienen dark: definido para su texto por
+   defecto — sin esto el fondo cambiaría a oscuro pero el texto se
+   quedaría oscuro también. */
+.dark body {
+    color: var(--gsz-ink);
+}
+
+/* Bug real reportado: la regla de arriba aclaró el texto general, pero
+   los campos de búsqueda/inputs (ej. gestionDeDatos.html) casi nunca
+   traen su propio color de fondo — se quedan blancos (o heredan el
+   blanco por defecto del navegador) y el texto quedó claro por la regla
+   de arriba → texto ilegible sobre fondo blanco en modo oscuro. Un input
+   con clase de color (.dark input) gana por especificidad a clases como
+   .bg-white (0,1,1 contra 0,1,0) sin necesitar !important. */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+    background-color: var(--gsz-surface-2);
+    color: var(--gsz-ink);
+    border-color: var(--gsz-border);
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: var(--gsz-ink-faint);
+    opacity: 1;
+}
+
+/* Mismo bug, otro caso: botones/links pequeños (lupa de búsqueda, "Agregar
+   varios", etc.) que traen bg-white directo, sin ningún dark: emparejado
+   — se quedan blancos con su texto/ícono encima. Se limita a <button>/<a>
+   a propósito: las tarjetas (<div class="bg-white ... dark:bg-slate-850">)
+   ya tienen su propio dark: correcto y no hay que tocarlas. */
+.dark button.bg-white,
+.dark a.bg-white {
+    background-color: var(--gsz-surface-2) !important;
+    color: var(--gsz-ink) !important;
+    border-color: var(--gsz-border) !important;
+}
+
+/* Mismo bug otra vez: el "Calendario de Disponibilidad" de reservas.html
+   es un widget propio (.calendar/.calendar-day/...), no un <input>. Los
+   días sin reserva ni son "hoy" (reservas.js: dayEl.textContent = day,
+   sin ninguna clase de color) no tenían color de texto propio — heredaban
+   el claro de .dark body sobre el gris/blanco fijo de .calendar-day →
+   número invisible. */
+.dark .calendar {
+    background: var(--gsz-surface);
+}
+.dark .calendar-header h3 {
+    color: var(--gsz-ink);
+}
+.dark .calendar-nav button {
+    background: var(--gsz-surface-2);
+    color: var(--gsz-ink);
+}
+.dark .calendar-nav button:hover {
+    background: var(--gsz-blue);
+    color: #fff;
+}
+.dark .calendar-weekday {
+    color: var(--gsz-ink-muted);
+}
+.dark .calendar-day {
+    background: var(--gsz-surface-2);
+    color: var(--gsz-ink);
+}
+.dark .calendar-day:hover {
+    background: var(--gsz-border);
+}
+.dark .calendar-day.other-month {
+    color: var(--gsz-ink-faint);
+}
+.dark .calendar-day.today {
+    background: var(--gsz-blue-soft);
+    color: var(--gsz-active-ink);
+}
+.dark .calendar-day.has-reservation {
+    background: linear-gradient(135deg, var(--gsz-red) 0%, var(--gsz-amber) 100%);
+    color: #17203A;
+}
+
+/* Cajitas informativas bg-blue-50 (debajo del calendario, formularios de
+   reservas/gestión de datos/roles) — mismo patrón, sin dark: emparejado. */
+.dark .bg-blue-50 {
+    background-color: var(--gsz-blue-soft) !important;
+}
+
+.gsz-mono {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Enlace activo del sidebar (antes bg-blue-500/13) */
+.bg-blue-500\/13 {
+    background: var(--gsz-blue-soft) !important;
+    color: var(--gsz-active-ink) !important;
+}
+
+/* ── Sidebar: todas las opciones deben caber sin scroll interno ──
+   h-sidenav traía un calc(100vh - 360px) heredado de la plantilla Argon
+   original (pensado para un sidebar con menos ítems + una tarjeta extra
+   al final que este proyecto no tiene) — con 7-9 ítems reales sobraba
+   muchísimo menos espacio del que el cálculo reservaba, forzando scroll
+   interno prematuro aunque quedara aside vacío debajo. Se deja que la
+   altura la determine el contenido; el overflow-y-auto del <aside> sigue
+   como red de seguridad en pantallas realmente muy bajas. */
+.h-sidenav {
+    height: auto !important;
+}
+
+/* Ítems del sidebar más compactos (antes py-2.7 = 10.8px por lado) —
+   único uso de esta clase es fragments/sidebar.html. */
+.py-2\.7 {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+/* ── Menú (☰) en pantallas angostas — ver script en fragments/sidebar.html ──
+   Por debajo de xl (1280px) el sidebar vive fuera de pantalla vía la
+   utilidad -translate-x-full de Tailwind; esta clase la gana con
+   !important cuando el botón lo abre. El fondo oscuro de atrás (creado
+   por JS) se puede tocar para cerrar. */
+.gsz-sidebar-open {
+    transform: translateX(0) !important;
+}
+.gsz-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 41, .5);
+    z-index: 980; /* el <aside> usa z-990 — el backdrop queda justo detrás */
+}
+@media (min-width: 1280px) {
+    .gsz-sidebar-backdrop { display: none; }
+}
+
+/* ── Badges de ícono del sidebar (fragments/sidebar.html) ── */
+.gsz-icon-badge {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ic-bg, var(--gsz-neutral-soft));
+    color: var(--ic-fg, var(--gsz-neutral));
+    margin-right: 8px;
+}
+
+.gsz-icon-badge svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+li.mt-0\.5.w-full > a.bg-blue-500\/13 .gsz-icon-badge {
+    background: var(--gsz-surface);
+    box-shadow: 0 2px 6px rgba(23, 53, 110, .12);
+}
+
+/* Variantes de color de los badges del sidebar — reemplazan los
+   --ic-bg/--ic-fg inline que tenía cada <span> (no se pueden sobreescribir
+   por tema desde fuera, al ser un estilo inline por elemento). */
+.gsz-badge-blue    { --ic-bg: var(--gsz-blue-soft);    --ic-fg: var(--gsz-blue); }
+.gsz-badge-violet  { --ic-bg: var(--gsz-violet-soft);  --ic-fg: var(--gsz-violet); }
+.gsz-badge-green   { --ic-bg: var(--gsz-green-soft);   --ic-fg: var(--gsz-green); }
+.gsz-badge-amber   { --ic-bg: var(--gsz-amber-soft);   --ic-fg: var(--gsz-amber); }
+.gsz-badge-red     { --ic-bg: var(--gsz-red-soft);     --ic-fg: var(--gsz-red); }
+.gsz-badge-cyan    { --ic-bg: var(--gsz-cyan-soft);    --ic-fg: var(--gsz-cyan); }
+.gsz-badge-neutral { --ic-bg: var(--gsz-neutral-soft); --ic-fg: var(--gsz-neutral); }
+
+/* ── Interruptor de tema (claro/oscuro) del sidebar ── */
+.gsz-theme-toggle {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    border: 1px solid var(--gsz-border);
+    background: var(--gsz-surface-2);
+    color: var(--gsz-ink-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .15s ease, color .15s ease;
+}
+.gsz-theme-toggle:hover {
+    background: var(--gsz-blue-soft);
+    color: var(--gsz-active-ink);
+}
+.gsz-theme-toggle svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.gsz-theme-toggle .gsz-icon-moon { display: none; }
+.dark .gsz-theme-toggle .gsz-icon-sun { display: none; }
+.dark .gsz-theme-toggle .gsz-icon-moon { display: flex; }
+
+/* Mensajes de validación de campo (modales de Gestión de Datos, etc.) —
+   argon-dashboard-tailwind.css define .error-message dos veces: un texto
+   rojo simple y, al final del archivo, un banner con degradado (pensado
+   para el login original, con !important en todo) que por orden de
+   cascada le gana al primero incluso en páginas que nada tienen que ver
+   con el login. Para un hint bajo un campo de formulario ese banner es
+   demasiado peso visual — se restaura un texto simple aquí, con
+   !important para poder ganarle. */
+.error-message {
+    background: none !important;
+    color: #e53e3e !important;
+    padding: 0 !important;
+    margin: 0.25rem 0 0 !important;
+    font-size: 0.75rem !important;
+    box-shadow: none !important;
+    animation: none !important;
+    border-radius: 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* ── Botón primario con degradado (reemplaza from-blue-500 to-violet-500) ── */
+.gsz-btn-primary {
+    background: linear-gradient(120deg, #3E7EFA, var(--gsz-blue-deep)) !important;
+    box-shadow: 0 10px 20px -10px rgba(47, 111, 237, .55);
+}
+
+.bg-gradient-to-tl.from-blue-500.to-violet-500 {
+    background-image: linear-gradient(120deg, #3E7EFA, var(--gsz-blue-deep)) !important;
+    box-shadow: 0 10px 20px -10px rgba(47, 111, 237, .55);
+}

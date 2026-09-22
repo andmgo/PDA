@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESCAZONE - Registro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/registro.css}" rel="stylesheet" />
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo-container">
+                <img th:src="@{/img/apple-icon.png}" alt="Logo" onerror="this.style.display='none'">
+                <h1>GESCAZONE</h1>
+                <p>Terrazas de Calicanto &middot; Cartagena</p>
+            </div>
+        </div>
+
+        <div class="login-body">
+            <h2 class="form-title">Crear cuenta</h2>
+
+            <div class="info-message">
+                <i class="fas fa-info-circle"></i>
+                Tu solicitud queda pendiente de revisión — un administrador la aprobará y te asignará tu rol antes de que puedas iniciar sesión.
+            </div>
+
+            <div th:if="${errorDocumento}" class="error-message show" th:text="${errorDocumento}"></div>
+
+            <form th:action="@{/registro}" th:object="${usuario}" method="post" id="registroForm">
+
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" th:field="*{nombre}" required maxlength="50"
+                           placeholder="Ingresa tu nombre" autocomplete="given-name">
+                    <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Apellido</label>
+                    <input type="text" th:field="*{apellido}" required maxlength="50"
+                           placeholder="Ingresa tu apellido" autocomplete="family-name">
+                    <span th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}" class="field-error"></span>
+                </div>
+
+                <!-- Tipo de documento -->
+                <div class="form-group">
+                    <label>Tipo de documento</label>
+                    <select name="nombreTipoDocumento" required>
+                        <option value="">-- Selecciona --</option>
+                        <option th:each="tipo : ${tiposDocumento}"
+                                th:value="${tipo}"
+                                th:text="${tipo}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Número de documento</label>
+                    <input type="text" id="numeroDocumento" th:field="*{numeroDocumento}"
+                           required maxlength="15" placeholder="Ingresa tu número de documento"
+                           autocomplete="off">
+                    <span th:if="${#fields.hasErrors('numeroDocumento')}" th:errors="*{numeroDocumento}" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Correo electrónico</label>
+                    <input type="email" th:field="*{correo}" required maxlength="100"
+                           placeholder="Ingresa tu correo electrónico" autocomplete="email">
+                    <span th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="contrasena" th:field="*{contrasena}"
+                           required minlength="6" placeholder="Mínimo 6 caracteres"
+                           autocomplete="new-password">
+                    <span th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirmar contraseña</label>
+                    <input type="password" id="confirmarContrasena" name="confirmarContrasena"
+                           required minlength="6" placeholder="Repite tu contraseña"
+                           autocomplete="new-password">
+                </div>
+
+                <div class="button-group">
+                    <a th:href="@{/login}" class="btn btn-cerrar">Cancelar</a>
+                    <button type="submit" class="btn btn-aceptar">Enviar solicitud</button>
+                </div>
+            </form>
+
+            <div class="divider">o</div>
+            <a th:href="@{/oauth2/iniciar-registro}" class="btn-google">
+                <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3c-1.08.72-2.46 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28v-3.1H1.27A12 12 0 0 0 0 12c0 1.94.46 3.77 1.27 5.38z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.59 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0A12 12 0 0 0 1.27 6.62l4 3.1C6.22 6.86 8.87 4.75 12 4.75z"/></svg>
+                Registrarte con Google
+            </a>
+
+            <div class="login-link">
+                ¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión aquí</a>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/registro.js}"></script>
+</body>
+</html>

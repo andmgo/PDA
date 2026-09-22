@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--/*
+  Cabecera de página, incluida con th:replace="~{fragments/topbar :: topbar(titulo='...')}".
+  Reemplaza la franja azul + <nav> que antes estaba duplicada en las 8 plantillas —
+  el usuario pidió quitar esa franja ("no me gusta la franja azul que tiene de fondo").
+  No se usa en inicio.html (tiene su propio encabezado, .gsz-header).
+*/-->
+<nav th:fragment="topbar(titulo)"
+     class="relative flex flex-wrap items-center justify-between px-0 py-4 mx-6 mb-2 transition-all ease-in duration-250 lg:flex-nowrap lg:justify-start">
+  <div class="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
+    <div>
+      <div class="text-xs mb-1" style="color: var(--gsz-ink-faint);">
+        <span>GESCAZONE</span><span class="mx-1">/</span><span th:text="${titulo}">Página</span>
+      </div>
+      <h1 class="mb-0 font-bold capitalize" style="font-size: 1.35rem; color: var(--gsz-ink);" th:text="${titulo}">Página</h1>
+    </div>
+
+    <div class="flex items-center lg:flex lg:basis-auto">
+      <a href="javascript:;" class="block p-0 text-sm transition-all ease-nav-brand xl:hidden" sidenav-trigger>
+        <div class="w-4.5 overflow-hidden">
+          <i class="ease mb-0.75 relative block h-0.5 rounded-sm transition-all" style="background: var(--gsz-ink);"></i>
+          <i class="ease mb-0.75 relative block h-0.5 rounded-sm transition-all" style="background: var(--gsz-ink);"></i>
+          <i class="ease relative block h-0.5 rounded-sm transition-all" style="background: var(--gsz-ink);"></i>
+        </div>
+      </a>
+    </div>
+  </div>
+</nav>
+
+</body>
+</html>

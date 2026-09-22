@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script>(function(){try{var t=localStorage.getItem('gescazone_tema');if(t==='oscuro'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');}catch(e){}})();</script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="76x76" th:href="@{/img/apple-icon.png}" />
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+    <title>GESCAZONE - Perfil</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/nucleo-icons.css}" rel="stylesheet" />
+    <link th:href="@{/css/nucleo-svg.css}" rel="stylesheet" />
+    <link th:href="@{/css/argon-dashboard-tailwind.css}" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link th:href="@{/css/gescazone-theme.css}" rel="stylesheet" />
+</head>
+
+<body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar(activo='perfil')}"></div>
+    <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
+        <div th:replace="~{fragments/topbar :: topbar(titulo='Perfil')}"></div>
+
+        <div class="w-full px-6 py-6 mx-auto">
+            <!-- Profile Content -->
+            <div class="profile-grid">
+                <!-- Tarjeta de perfil -->
+                <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+                    <div class="p-6 profile-card">
+                        <div class="avatar-section">
+                            <div class="avatar" id="avatarDisplay" th:text="${#strings.substring(usuario.nombre, 0, 1) + #strings.substring(usuario.apellido, 0, 1)}">
+                                AM
+                            </div>
+                            <div class="avatar-upload" onclick="document.getElementById('avatarInput').click()">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                        </div>
+                        
+                        <h2 class="profile-name" th:text="${usuario.nombre + ' ' + usuario.apellido}">Administrador Master</h2>
+                        <p class="profile-role" th:text="${usuario.nombreRol}">Administrador</p>
+                        
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-value"><i class="fas fa-envelope" style="color: #2F6FED;"></i></div>
+                                <div class="stat-label">Email Verificado</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">2026</div>
+                                <div class="stat-label">Año Actual</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value"><i class="fas fa-map-marker-alt" style="color: #DD5147;"></i></div>
+                                <div class="stat-label">Cartagena, CO</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" style="color: #1F9463;">
+                                    <i class="fas fa-check-circle"></i> Activo
+                                </div>
+                                <div class="stat-label">Estado</div>
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <div class="info-box-title">Información</div>
+                                <div class="info-box-text" id="lastAccessTime">
+                                    Último acceso: Cargando...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjetas de información -->
+                <div>
+                    <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+                        <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+                            <div class="flex border-b border-gray-200 overflow-x-auto">
+                                <button class="tab-button active px-6 py-3 text-sm font-semibold text-slate-700 dark:text-white transition-colors whitespace-nowrap" onclick="switchTab(0)">
+                                    <i class="fas fa-user mr-2"></i>Información Personal
+                                </button>
+                                <button class="tab-button px-6 py-3 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:text-white dark:opacity-60 transition-colors whitespace-nowrap" onclick="switchTab(1)">
+                                    <i class="fas fa-lock mr-2"></i>Seguridad
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tab 1: Información Personal -->
+                        <div class="tab-content active">
+                            <div class="p-6">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" th:value="${usuario.nombre}" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Apellido</label>
+                                        <input type="text" class="form-control" th:value="${usuario.apellido}" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Tipo de Documento</label>
+                                        <input type="text" class="form-control" th:value="${usuario.nombreTipoDocumento}" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Número de Documento</label>
+                                        <input type="text" class="form-control" th:value="${usuario.numeroDocumento}" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" th:value="${usuario.correo}" readonly>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Cargo</label>
+                                    <input type="text" class="form-control" th:value="${usuario.nombreRol}" readonly>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Ciudad</label>
+                                        <input type="text" class="form-control" value="Cartagena" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">País</label>
+                                        <input type="text" class="form-control" value="Colombia" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="info-box" style="margin-top: 1.5rem;">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div class="info-box-content">
+                                        <div class="info-box-title">Información de Solo Lectura</div>
+                                        <div class="info-box-text">
+                                            Los datos de perfil son de solo lectura. Para modificarlos, contacte al administrador del sistema.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Seguridad -->
+                        <div class="tab-content">
+                            <div class="p-6">
+                                <div class="info-box" style="margin-bottom: 1.5rem;">
+                                    <i class="fas fa-lock"></i>
+                                    <div class="info-box-content">
+                                        <div class="info-box-title">Contraseña</div>
+                                        <div class="info-box-text">
+                                            Tu contraseña está protegida y no puede ser visualizada. Para cambiar tu contraseña, contacta al administrador del sistema.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <div class="info-box-content">
+                                        <div class="info-box-title">Seguridad de la Cuenta</div>
+                                        <div class="info-box-text">
+                                            • Tu cuenta está protegida con encriptación<br>
+                                            • Nunca compartas tu contraseña con nadie<br>
+                                            • Cierra sesión en dispositivos compartidos<br>
+                                            • Reporta cualquier actividad sospechosa
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../assets/js/plugins/perfect-scrollbar.min.js" async></script>
+    <script src="../assets/js/argon-dashboard-tailwind.js?v=1.0.1" async></script>
+    <script th:src="@{/js/profile.js}"></script>
+</body>
+</html>

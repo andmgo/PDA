@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script>(function(){try{var t=localStorage.getItem('gescazone_tema');if(t==='oscuro'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');}catch(e){}})();</script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="76x76" th:href="@{/img/apple-icon.png}" />
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+    <title>GESCAZONE - Gestión de Datos</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/nucleo-icons.css}" rel="stylesheet" />
+    <link th:href="@{/css/nucleo-svg.css}" rel="stylesheet" />
+    <link th:href="@{/css/argon-dashboard-tailwind.css}" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link th:href="@{/css/gescazone-theme.css}" rel="stylesheet" />
+</head>
+
+<body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
+
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar(activo='gestion')}"></div>
+
+    <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
+        <div th:replace="~{fragments/topbar :: topbar(titulo='Gestión de Datos')}"></div>
+
+        <div class="w-full px-6 py-6 mx-auto">
+            <!-- Tabs Navigation -->
+            <div class="flex flex-wrap -mx-3 mb-6">
+                <div class="flex-none w-full max-w-full px-3">
+                    <div class="relative flex flex-col min-w-0 break-words bg-white border-0 border-transparent border-solid shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+                        <div class="p-6 pb-0 mb-0 border-b-0 border-b-solid rounded-t-2xl border-b-transparent">
+                            <div class="flex border-b border-gray-200 overflow-x-auto">
+                                <button class="tab-button active px-6 py-3 text-sm font-semibold text-slate-700 dark:text-white transition-colors whitespace-nowrap" onclick="openTab(event, 'apartamentos')">
+                                    <i class="fas fa-building mr-2"></i>Apartamentos
+                                </button>
+                                <button class="tab-button px-6 py-3 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:text-white dark:opacity-60 transition-colors whitespace-nowrap" onclick="openTab(event, 'parqueaderos')">
+                                    <i class="fas fa-car mr-2"></i>Parqueaderos
+                                </button>
+                                <button class="tab-button px-6 py-3 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:text-white dark:opacity-60 transition-colors whitespace-nowrap" onclick="openTab(event, 'salones')">
+                                    <i class="fas fa-door-open mr-2"></i>Salones Sociales
+                                </button>
+                                <button class="tab-button px-6 py-3 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:text-white dark:opacity-60 transition-colors whitespace-nowrap" onclick="openTab(event, 'usuarios')">
+                                    <i class="fas fa-users mr-2"></i>Usuarios
+                                </button>
+                                <button class="tab-button px-6 py-3 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:text-white dark:opacity-60 transition-colors whitespace-nowrap" onclick="openTab(event, 'residentes')">
+                                    <i class="fas fa-users-cog mr-2"></i>Residentes
+                                </button>
+                                <button class="tab-button px-6 py-3 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:text-white dark:opacity-60 transition-colors whitespace-nowrap" onclick="openTab(event, 'solicitudes')">
+                                    <i class="fas fa-calendar-week mr-2"></i>Solicitudes
+                                </button>
+                                <button class="tab-button px-6 py-3 text-sm font-semibold text-slate-400 hover:text-slate-700 dark:text-white dark:opacity-60 transition-colors whitespace-nowrap" onclick="openTab(event, 'registros')">
+                                    <i class="fas fa-user-clock mr-2"></i>Registros
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Apartamentos -->
+                        <div id="apartamentos" class="tab-content active">
+                            <div class="p-6">
+                                <div class="flex flex-wrap items-end justify-between gap-4 mb-6 w-full">
+                                    <div class="flex items-end gap-3 flex-grow">
+                                        <div class="flex flex-col flex-1 min-w-[200px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Opción de búsqueda:</label>
+                                            <select id="searchOptionApartamentos" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none bg-white">
+                                                <option value="numeroApto">Número de apartamento</option>
+                                                <option value="tipoOcupacion">Tipo de ocupación</option>
+                                                <option value="estadoCuenta">Estado de cuenta</option>
+                                                <option value="telefono">Teléfono</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex flex-col flex-1 min-w-[250px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Buscar:</label>
+                                            <input type="text" id="searchInputApartamentos" placeholder="Buscar..." class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                                        </div>
+                                        <div class="flex items-center justify-center h-full mt-5">
+                                            <button onclick="buscarApartamentos()" class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:text-blue-600 transition-colors">
+                                                <i class="fas fa-search text-lg text-blue-500"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0 mt-6 flex gap-2">
+                                        <button onclick="openApartamentoMasivoModal()" class="px-6 py-2 font-bold text-blue-600 text-sm rounded-lg bg-white border border-blue-200 shadow-sm hover:bg-blue-50 transition-transform hover:-translate-y-0.5 active:opacity-85 whitespace-nowrap">
+                                            <i class="fas fa-layer-group mr-2"></i>Agregar varios
+                                        </button>
+                                        <button onclick="openApartamentoModal()" class="px-6 py-2 font-bold text-white text-sm rounded-lg bg-gradient-to-tl from-blue-500 to-violet-500 shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5 active:opacity-85 whitespace-nowrap">
+                                            <i class="fas fa-plus mr-2"></i>Nuevo Apartamento
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex-auto px-0 pt-0 pb-2">
+                                    <div class="p-0 overflow-x-auto">
+                                        <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                                            <thead class="align-bottom">
+                                                <tr>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Nº Apartamento</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Tipo Ocupación</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Estado Cuenta</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Medidas (m²)</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Teléfono</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="apartamentosTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Parqueaderos -->
+                        <div id="parqueaderos" class="tab-content">
+                            <div class="p-6">
+                                <div class="flex flex-wrap items-end justify-between gap-4 mb-6 w-full">
+                                    <div class="flex items-end gap-3 flex-grow">
+                                        <div class="flex flex-col flex-1 min-w-[200px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Opción de búsqueda:</label>
+                                            <select id="searchOptionParqueaderos" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none bg-white">
+                                                <option value="numeroParqueadero">Número de parqueadero</option>
+                                                <option value="estado">Estado</option>
+                                                <option value="telefono">Teléfono</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex flex-col flex-1 min-w-[250px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Buscar:</label>
+                                            <input type="text" id="searchInputParqueaderos" placeholder="Buscar..." class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                                        </div>
+                                        <div class="flex items-center justify-center h-full mt-5">
+                                            <button onclick="buscarParqueaderos()" class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:text-blue-600 transition-colors">
+                                                <i class="fas fa-search text-lg text-blue-500"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0 mt-6 flex gap-2">
+                                        <button onclick="openParqueaderoMasivoModal()" class="px-6 py-2 font-bold text-blue-600 text-sm rounded-lg bg-white border border-blue-200 shadow-sm hover:bg-blue-50 transition-transform hover:-translate-y-0.5 active:opacity-85 whitespace-nowrap">
+                                            <i class="fas fa-layer-group mr-2"></i>Agregar varios
+                                        </button>
+                                        <button onclick="openParqueaderoModal()" class="px-6 py-2 font-bold text-white text-sm rounded-lg bg-gradient-to-tl from-blue-500 to-violet-500 shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5 active:opacity-85 whitespace-nowrap">
+                                            <i class="fas fa-plus mr-2"></i>Agregar Parqueadero
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex-auto px-0 pt-0 pb-2">
+                                    <div class="p-0 overflow-x-auto">
+                                        <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                                            <thead class="align-bottom">
+                                                <tr>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Nº Parqueadero</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Estado</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Medidas (m²)</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Teléfono</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="parqueaderosTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Salones -->
+                        <div id="salones" class="tab-content">
+                            <div class="p-6">
+                                <div class="flex flex-wrap items-end justify-between gap-4 mb-6 w-full">
+                                    <div class="flex items-end gap-3 flex-grow">
+                                        <div class="flex flex-col flex-1 min-w-[200px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Opción de búsqueda:</label>
+                                            <select id="searchOptionSalones" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none bg-white">
+                                                <option value="numeroSalonSocial">Número de salón</option>
+                                                <option value="estado">Estado</option>
+                                                <option value="telefono">Teléfono</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex flex-col flex-1 min-w-[250px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Buscar:</label>
+                                            <input type="text" id="searchInputSalones" placeholder="Buscar..." class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                                        </div>
+                                        <div class="flex items-center justify-center h-full mt-5">
+                                            <button onclick="buscarSalones()" class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:text-blue-600 transition-colors">
+                                                <i class="fas fa-search text-lg text-blue-500"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0 mt-6 flex gap-2">
+                                        <button onclick="openSalonMasivoModal()" class="px-6 py-2 font-bold text-blue-600 text-sm rounded-lg bg-white border border-blue-200 shadow-sm hover:bg-blue-50 transition-transform hover:-translate-y-0.5 active:opacity-85 whitespace-nowrap">
+                                            <i class="fas fa-layer-group mr-2"></i>Agregar varios
+                                        </button>
+                                        <button onclick="openSalonModal()" class="px-6 py-2 font-bold text-white text-sm rounded-lg bg-gradient-to-tl from-blue-500 to-violet-500 shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5 active:opacity-85 whitespace-nowrap">
+                                            <i class="fas fa-plus mr-2"></i>Agregar Salón
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex-auto px-0 pt-0 pb-2">
+                                    <div class="p-0 overflow-x-auto">
+                                        <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                                            <thead class="align-bottom">
+                                                <tr>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Nº Salón</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Estado</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Medidas (m²)</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Teléfono</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="salonesTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Usuarios -->
+                        <div id="usuarios" class="tab-content">
+                            <div class="p-6">
+                                <div class="flex flex-wrap items-end justify-between gap-4 mb-6 w-full">
+                                    <div class="flex items-end gap-3 flex-grow">
+                                        <div class="flex flex-col flex-1 min-w-[200px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Opción de búsqueda:</label>
+                                            <select id="searchOptionUsuarios" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none bg-white">
+                                                <option value="numeroDocumento">Número de documento</option>
+                                                <option value="nombres">Nombres</option>
+                                                <option value="apellidos">Apellidos</option>
+                                                <option value="correo">Correo</option>
+                                                <option value="rol">Rol</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex flex-col flex-1 min-w-[250px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Buscar:</label>
+                                            <input type="text" id="searchInputUsuarios" placeholder="Buscar..." class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                                        </div>
+                                        <div class="flex items-center justify-center h-full mt-5">
+                                            <button onclick="buscarUsuarios()" class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:text-blue-600 transition-colors">
+                                                <i class="fas fa-search text-lg text-blue-500"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0 mt-6">
+                                        <button onclick="openUsuarioModal()" class="px-6 py-2 font-bold text-white text-sm rounded-lg bg-gradient-to-tl from-blue-500 to-violet-500 shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5 active:opacity-85 whitespace-nowrap">
+                                            <i class="fas fa-plus mr-2"></i>Agregar Usuario
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex-auto px-0 pt-0 pb-2">
+                                    <div class="p-0 overflow-x-auto">
+                                        <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                                            <thead class="align-bottom">
+                                                <tr>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Tipo Doc.</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Nº Documento</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Nombres</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Apellidos</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Correo</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Rol</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="usuariosTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Residentes -->
+                        <div id="residentes" class="tab-content">
+                            <div class="p-6">
+                                <div class="flex flex-wrap items-end justify-between gap-4 mb-6 w-full">
+                                    <div class="flex items-end gap-3 flex-grow">
+                                        <div class="flex flex-col flex-1 min-w-[200px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Opción de búsqueda:</label>
+                                            <select id="searchOptionResidentes" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none bg-white">
+                                                <option value="documento">Número de documento</option>
+                                                <option value="nombre">Nombre</option>
+                                                <option value="apellido">Apellido</option>
+                                                <option value="tipoDocumento">Tipo de Documento</option>
+                                                <option value="tipoResidente">Tipo de Residente</option>
+                                                <option value="celular">Celular</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex flex-col flex-1 min-w-[250px]">
+                                            <label class="block text-sm font-semibold mb-1 text-slate-600">Buscar:</label>
+                                            <input type="text" id="searchInputResidentes" placeholder="Buscar..." class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                                        </div>
+                                        <div class="flex items-center justify-center h-full mt-5">
+                                            <button onclick="buscarResidentes()" class="w-10 h-10 flex items-center justify-center bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:text-blue-600 transition-colors">
+                                                <i class="fas fa-search text-lg text-blue-500"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0 mt-6">
+                                        <button onclick="openResidenteModal()" class="px-6 py-2 font-bold text-white text-sm rounded-lg bg-gradient-to-tl from-blue-500 to-violet-500 shadow-md hover:shadow-lg transition-transform hover:-translate-y-0.5 active:opacity-85 whitespace-nowrap">
+                                            <i class="fas fa-plus mr-2"></i>Agregar Residente
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex-auto px-0 pt-0 pb-2">
+                                    <div class="p-0 overflow-x-auto">
+                                        <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                                            <thead class="align-bottom">
+                                                <tr>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Tipo Doc.</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Documento</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Nombre</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Apellido</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Celular</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Tipo Residente</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="residentesTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Solicitudes de reserva excepcional -->
+                        <div id="solicitudes" class="tab-content">
+                            <div class="p-6">
+                                <p class="text-sm text-slate-500 mb-4">
+                                    Solicitudes de reserva de salones sociales para años distintos al actual, pendientes de revisión.
+                                </p>
+                                <div class="flex-auto px-0 pt-0 pb-2">
+                                    <div class="p-0 overflow-x-auto">
+                                        <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                                            <thead class="align-bottom">
+                                                <tr>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">N° Documento</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Salón</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Fecha Solicitada</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Justificación</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="solicitudesTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Solicitudes de registro -->
+                        <div id="registros" class="tab-content">
+                            <div class="p-6">
+                                <p class="text-sm text-slate-500 mb-4">
+                                    Personas que se autoregistraron y esperan que un administrador les asigne un rol.
+                                </p>
+                                <div class="flex-auto px-0 pt-0 pb-2">
+                                    <div class="p-0 overflow-x-auto">
+                                        <table class="items-center w-full mb-0 align-top border-collapse dark:border-white/40 text-slate-500">
+                                            <thead class="align-bottom">
+                                                <tr>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">N° Documento</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Nombre</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Correo</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Tipo de Documento</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Fecha</th>
+                                                    <th class="px-6 py-3 font-bold text-left uppercase align-middle bg-transparent border-b text-xxs">Rol a asignar</th>
+                                                    <th class="px-6 py-3 font-bold text-center uppercase align-middle bg-transparent border-b text-xxs">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="registrosTableBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Apartamento -->
+    <div id="apartamentoModal" class="modal">
+    <div class="modal-content">
+        <h5 class="text-lg font-bold mb-4" id="apartamentoModalTitle">Agregar Apartamento</h5>
+        <form id="apartamentoForm" onsubmit="return submitApartamento(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Número de Apartamento *</label>
+                <input type="text" id="numeroApartamento" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: 101" maxlength="10" />
+                <span id="numeroApartamentoError" class="error-message"></span>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Tipo de Ocupación *</label>
+                <select id="tipoOcupacion" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                    <option value="">Seleccionar...</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Estado de Cuenta *</label>
+                <select id="estadoCuenta" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                    <option value="">Seleccionar...</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Medidas (m²) *</label>
+                <input type="text" id="medidasApartamento" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: 65" />
+                <span id="medidasApartamentoError" class="error-message"></span>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Teléfono *</label>
+                <input type="tel" id="telefonoApartamento" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: 3001234567" maxlength="10" />
+                <span id="telefonoApartamentoError" class="error-message"></span>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeApartamentoModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">Cancelar</button>
+                <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <!-- Modal Agregar Varios Apartamentos -->
+    <div id="apartamentoMasivoModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4">Agregar Varios Apartamentos</h5>
+            <form id="apartamentoMasivoForm" onsubmit="return submitApartamentosMasivo(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Cantidad a generar *</label>
+                    <input type="number" id="cantidadApartamentoMasivo" required min="1" max="200" value="10" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Número inicial *</label>
+                    <input type="text" id="numeroInicialApartamentoMasivo" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: 101" />
+                    <span class="text-xs text-slate-500">Se generan consecutivos: 101, 102, 103…</span>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Tipo de Ocupación *</label>
+                    <select id="tipoOcupacionMasivo" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Estado de Cuenta *</label>
+                    <select id="estadoCuentaMasivo" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Medidas (m²)</label>
+                    <input type="text" id="medidasApartamentoMasivo" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Opcional, igual para todos" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Teléfono</label>
+                    <input type="text" id="telefonoApartamentoMasivo" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Opcional, igual para todos" maxlength="10" />
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeApartamentoMasivoModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">Generar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Agregar Varios Parqueaderos -->
+    <div id="parqueaderoMasivoModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4">Agregar Varios Parqueaderos</h5>
+            <form id="parqueaderoMasivoForm" onsubmit="return submitParqueaderosMasivo(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Cantidad a generar *</label>
+                    <input type="number" id="cantidadParqueaderoMasivo" required min="1" max="200" value="10" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Número inicial *</label>
+                    <input type="text" id="numeroInicialParqueaderoMasivo" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: P-01" />
+                    <span class="text-xs text-slate-500">Se generan consecutivos: P-01, P-02, P-03…</span>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Estado *</label>
+                    <select id="estadoParqueaderoMasivo" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Medidas (m²)</label>
+                    <input type="text" id="medidasParqueaderoMasivo" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Opcional, igual para todos" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Teléfono</label>
+                    <input type="text" id="telefonoParqueaderoMasivo" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Opcional, igual para todos" maxlength="10" />
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeParqueaderoMasivoModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">Generar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Agregar Varios Salones Sociales -->
+    <div id="salonMasivoModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4">Agregar Varios Salones Sociales</h5>
+            <form id="salonMasivoForm" onsubmit="return submitSalonesMasivo(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Cantidad a generar *</label>
+                    <input type="number" id="cantidadSalonMasivo" required min="1" max="200" value="5" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Número inicial *</label>
+                    <input type="text" id="numeroInicialSalonMasivo" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: S-01" />
+                    <span class="text-xs text-slate-500">Se generan consecutivos: S-01, S-02, S-03…</span>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Estado *</label>
+                    <select id="estadoSalonMasivo" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Medidas (m²)</label>
+                    <input type="text" id="medidasSalonMasivo" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Opcional, igual para todos" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Teléfono</label>
+                    <input type="text" id="telefonoSalonMasivo" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Opcional, igual para todos" maxlength="10" />
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeSalonMasivoModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">Generar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Parqueadero -->
+    <div id="parqueaderoModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4" id="parqueaderoModalTitle">Agregar Parqueadero</h5>
+            <form id="parqueaderoForm" onsubmit="return submitParqueadero(event)">
+                
+                <!-- ✅ REEMPLAZAR ESTE BLOQUE -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Número de Parqueadero *</label>
+                    <input type="text" 
+                        id="numeroParqueadero" 
+                        required 
+                        pattern="P-\d{2,3}"
+                        title="Formato: P-01, P-02, etc."
+                        placeholder="Ej: P-01"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                    <span id="numeroParqueaderoError" class="error-message"></span>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Estado *</label>
+                    <select id="estadoParqueadero" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                
+                <!-- ✅ REEMPLAZAR ESTE BLOQUE -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Medidas (m²) *</label>
+                    <input type="text" 
+                    id="medidasParqueadero" 
+                    required 
+                    min="1"
+                    step="0.01"
+                    placeholder="Ej: 12.5"
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                    <span id="medidasParqueaderoError" class="error-message"></span>
+                </div>
+                
+                <!-- ✅ REEMPLAZAR ESTE BLOQUE -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Teléfono *</label>
+                    <input type="tel" 
+                        id="telefonoParqueadero" 
+                        required 
+                        pattern="3\d{9}"
+                        title="El teléfono debe ser un número válido"
+                        placeholder="Ej: 3001234567" 
+                        maxlength="10"
+                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                    <span id="telefonoParqueaderoError" class="error-message"></span>
+                </div>
+                
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeParqueaderoModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Salón Social -->
+    <div id="salonModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4" id="salonModalTitle">Agregar Salón Social</h5>
+            <form id="salonForm" onsubmit="return submitSalon(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Número de Salón *</label>
+                    <input type="text" 
+                    id="numeroSalon" 
+                    required 
+                    pattern="S-\d{2,3}"
+                    title="Formato: S-01, S-02, etc."
+                    placeholder="Ej: S-01"
+                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                    <span id="numeroSalonError" class="error-message"></span>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Estado *</label>
+                    <select id="estadoSalon" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Medidas (m²) *</label>
+                    <input type="text" id="medidasSalon" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: 120" />
+                    <span id="medidasSalonError" class="error-message"></span>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Teléfono *</label>
+                    <input type="tel" id="telefonoSalon" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: 3001234567" maxlength="10" />
+                    <span id="telefonoSalonError" class="error-message"></span>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeSalonModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Usuario -->
+    <div id="usuarioModal" class="modal">
+    <div class="modal-content">
+        <h5 class="text-lg font-bold mb-4" id="usuarioModalTitle">Agregar Usuario</h5>
+        <form id="usuarioForm" onsubmit="return submitUsuario(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Tipo de Documento *</label>
+                <select id="tipoDocumentoUsuario" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                    <option value="">Seleccionar...</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Número de Documento *</label>
+                <input type="text" id="numeroDocumento" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: 1234567890" maxlength="15" />
+                <span id="numeroDocumentoError" class="error-message"></span>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Nombres *</label>
+                <input type="text" id="nombresUsuario" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: Juan Carlos" />
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Apellidos *</label>
+                <input type="text" id="apellidosUsuario" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: Pérez García" />
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Correo Electrónico *</label>
+                <input type="email" id="correoUsuario" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: usuario@gmail.com" />
+                <span id="correoUsuarioError" class="error-message"></span>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Rol *</label>
+                <select id="rolUsuario" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                    <option value="">Seleccionar...</option>
+                </select>
+            </div>
+            <div class="mb-4" id="passwordFields">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Contraseña *</label>
+                <input type="password" id="contrasenaUsuario" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="••••••••" />
+            </div>
+            <div class="mb-4" id="confirmPasswordFields">
+                <label class="block text-sm font-semibold mb-2 text-slate-700">Repetir Contraseña *</label>
+                <input type="password" id="repetirContrasena" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="••••••••" />
+                <span id="contrasenaError" class="error-message"></span>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" onclick="closeUsuarioModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">Cancelar</button>
+                <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <!-- Modal Residente -->
+    <div id="residenteModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4" id="residenteModalTitle">Agregar Residente</h5>
+            <form id="residenteForm" onsubmit="return submitResidente(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Tipo de Documento *</label>
+                    <select id="tipoDocumentoResidente" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Documento *</label>
+                    <input type="text" id="documentoResidente" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: 1234567890" maxlength="15" />
+                    <span id="documentoResidenteError" class="error-message"></span>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Nombre *</label>
+                    <input type="text" id="nombreResidente" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: Juan Carlos" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Apellido *</label>
+                    <input type="text" id="apellidoResidente" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: Pérez López" />
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Celular *</label>
+                    <input type="tel" id="celularResidente" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="Ej: 3001234567" maxlength="10" />
+                    <span id="celularResidenteError" class="error-message"></span>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-2 text-slate-700">Tipo de Residente *</label>
+                    <select id="tipoResidente" required class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeResidenteModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación Eliminar -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h5 class="text-lg font-bold mb-4">Confirmar Eliminación</h5>
+            <p class="text-slate-500 mb-6" id="deleteMessage"></p>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeDeleteModal()" class="px-6 py-2.5 text-sm font-bold text-slate-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all">Cancelar</button>
+                <button onclick="confirmDelete()" class="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-tl from-red-600 to-orange-600 rounded-lg hover:shadow-xs hover:-translate-y-px transition-all">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/plugins/perfect-scrollbar.min.js" async></script>
+    <script src="../assets/js/argon-dashboard-tailwind.js?v=1.0.1" async></script>
+    
+    <script th:src="@{/js/gestionDeDatos.js}"></script>
+</body>
+</html>

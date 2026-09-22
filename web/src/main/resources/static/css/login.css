@@ -1,0 +1,142 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #EFF4FC;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-container {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(23, 53, 110, .25);
+    overflow: hidden;
+    max-width: 860px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    animation: slideUp .5s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Panel de marca ── */
+.brand-panel {
+    background: linear-gradient(155deg, #2F6FED 0%, #17356E 78%);
+    color: #EAF1FE;
+    padding: 44px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.brand-panel::after {
+    content: "";
+    position: absolute;
+    right: -70px; bottom: -100px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,189,248,.4), transparent 70%);
+}
+
+.brand-panel .brand { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+.brand-panel .tag { font-size: 13px; opacity: .8; margin-top: 6px; }
+
+.skyline { position: relative; z-index: 1; margin: 18px 0; }
+.skyline .sun { fill: #FFD873; }
+.skyline .wave { fill: none; stroke: rgba(255,255,255,.55); stroke-width: 2.5; stroke-linecap: round; }
+.skyline .bldg { fill: rgba(255,255,255,.16); }
+.skyline .bldg.hi { fill: rgba(255,255,255,.26); }
+.skyline .win { fill: #FFD873; opacity: .85; }
+
+.brand-panel .quote {
+    font-size: 15px; line-height: 1.6; max-width: 30ch;
+    opacity: .96; position: relative; font-weight: 500;
+}
+.brand-panel .quote .who { display: block; margin-top: 10px; font-size: 12.5px; opacity: .7; font-weight: 400; }
+
+/* ── Formulario ── */
+.login-body { padding: 44px 40px; display: flex; flex-direction: column; justify-content: center; }
+.form-title { font-size: 26px; font-weight: 800; color: #1B2A4A; margin-bottom: 6px; }
+.form-subtitle { font-size: 13.5px; color: #5C6C8C; margin-bottom: 24px; }
+
+.success-message, .error-message {
+    padding: 12px 16px; border-radius: 10px; margin-bottom: 18px;
+    font-size: 13.5px; display: none; animation: fadeIn .3s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.success-message { background: #DBF4E7; color: #157A4E; }
+.success-message.show, .error-message.show { display: block; }
+.error-message { background: #FCE7E5; color: #B3261E; }
+
+.form-group { margin-bottom: 18px; }
+.form-group label {
+    display: block; font-size: 12.5px; font-weight: 700; color: #5C6C8C;
+    text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px;
+}
+.form-group input {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid #DFE7FA; border-radius: 11px;
+    font-size: 14.5px; font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: border-color .2s, box-shadow .2s;
+    background: #FBFCFF; color: #1B2A4A;
+}
+.form-group input:focus {
+    outline: none; border-color: #2F6FED;
+    box-shadow: 0 0 0 3px rgba(47,111,237,.12);
+}
+
+.remember-forgot {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 22px; font-size: 13.5px;
+}
+.remember-forgot label { display: flex; align-items: center; gap: 8px; color: #1B2A4A; cursor: pointer; }
+.remember-forgot input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: #2F6FED; }
+.forgot-link { color: #2F6FED; text-decoration: none; font-weight: 700; }
+.forgot-link:hover { text-decoration: underline; }
+
+.button-group { display: flex; gap: 10px; }
+.btn {
+    flex: 1; padding: 13px 20px; border: none; border-radius: 11px;
+    font-size: 14.5px; font-weight: 700; cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif; transition: all .2s;
+}
+.btn-cerrar { background: #EFF4FC; color: #1B2A4A; }
+.btn-cerrar:hover { background: #E2EAF9; }
+.btn-aceptar {
+    background: linear-gradient(120deg, #3E7EFA, #2457C7); color: #fff;
+    box-shadow: 0 12px 22px -10px rgba(47,111,237,.65);
+}
+.btn-aceptar:hover { transform: translateY(-1px); }
+.btn-aceptar:active, .btn-cerrar:active { transform: translateY(0); }
+
+.divider {
+    display: flex; align-items: center; gap: 10px;
+    margin: 20px 0; color: #8C99B8; font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .04em;
+}
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #DFE7FA; }
+.btn-google {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 12px; border: 1.5px solid #DFE7FA; border-radius: 11px;
+    background: #fff; color: #1B2A4A; font-size: 14px; font-weight: 700;
+    font-family: 'Plus Jakarta Sans', sans-serif; text-decoration: none;
+    transition: all .2s;
+}
+.btn-google:hover { background: #F7F9FE; border-color: #C7D4F0; transform: translateY(-1px); }
+.btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+@media (max-width: 720px) {
+    .login-container { grid-template-columns: 1fr; }
+    .brand-panel { padding: 32px; }
+    .login-body { padding: 32px; }
+}
