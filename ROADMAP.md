@@ -1,4 +1,4 @@
-# GESCAZONE — Roadmap del proyecto
+# Aurum Condominios — Roadmap del proyecto
 
 Sistema de gestión administrativa y contable para el conjunto residencial
 **"Terrazas de Calicanto"** (Cartagena, Colombia). Nació como proyecto
