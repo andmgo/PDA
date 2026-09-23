@@ -35,6 +35,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Envío de correo (reseteo de contraseña por admin) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- ═══════════════════════════════════════ -->
         <!--           BASE DE DATOS                 -->
         <!-- ═══════════════════════════════════════ -->

@@ -697,6 +697,7 @@ function mostrarUsuarios(usuarios) {
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${u.nombreRol || 'N/A'}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="editUsuario('${u.numeroDocumento}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
+                <button onclick="resetearContrasenaUsuario('${u.numeroDocumento}', '${u.nombre} ${u.apellido}')" class="text-xs font-semibold text-amber-500 hover:text-amber-700 mr-3"><i class="fas fa-key mr-1"></i>Resetear contraseña</button>
                 <button onclick="openDeleteModal('${u.numeroDocumento}', 'usuario', '${u.nombre} ${u.apellido}')" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Eliminar</button>
             </td></tr>`;
     });
@@ -741,6 +742,18 @@ async function editUsuario(numeroDoc) {
         ['numeroDocumentoError','correoUsuarioError','contrasenaError'].forEach(id => { const s = document.getElementById(id); if(s) s.textContent = ''; });
         document.getElementById('usuarioModal').classList.add('show');
     } catch (error) { alert('Error al cargar el usuario'); }
+}
+
+async function resetearContrasenaUsuario(numeroDoc, nombreCompleto) {
+    if (!confirm(`¿Resetear la contraseña de ${nombreCompleto}? Se va a generar una contraseña nueva y se le va a enviar por correo.`)) return;
+
+    try {
+        const response = await fetch(`/api/usuarios/${numeroDoc}/resetear-contrasena`, { method: 'POST' });
+        const mensaje = await response.text();
+        alert(response.ok ? mensaje : 'Error: ' + mensaje);
+    } catch (error) {
+        alert('Error al resetear la contraseña: ' + error.message);
+    }
 }
 
 function closeUsuarioModal() {

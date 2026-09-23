@@ -129,7 +129,8 @@ public class SecurityConfig {
                     "/api/usuarios/crear",
                     "/api/usuarios/actualizar/**",
                     "/api/usuarios/eliminar/**",
-                    "/api/usuarios/todos"
+                    "/api/usuarios/todos",
+                    "/api/usuarios/*/resetear-contrasena"
                 ).access(permiso("USUARIOS", NivelPermiso.EDITAR))
 
                 // Cambiar la propia contraseña no es "administrar usuarios" — lo

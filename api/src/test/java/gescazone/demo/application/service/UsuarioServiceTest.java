@@ -1,9 +1,12 @@
 package gescazone.demo.application.service;
 
+import gescazone.demo.application.exception.MailEnvioException;
+import gescazone.demo.application.exception.NotFoundException;
 import gescazone.demo.domain.model.RolModel;
 import gescazone.demo.domain.model.TipoDocumentoModel;
 import gescazone.demo.domain.model.UsuarioModel;
 import gescazone.demo.domain.repository.UsuarioRepository;
+import gescazone.demo.infrastructure.mail.MailService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +19,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,6 +31,9 @@ class UsuarioServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private MailService mailService;
 
     @InjectMocks
     private UsuarioService usuarioService;
@@ -169,5 +177,58 @@ class UsuarioServiceTest {
     void usuarioExiste_conDocumentoVacio_retornaFalseSinConsultarRepositorio() {
         assertThat(usuarioService.usuarioExiste("  ")).isFalse();
         verifyNoInteractions(usuarioRepository);
+    }
+
+    // ── resetearContrasena ───────────────────────────────────────────────
+
+    private UsuarioModel usuarioGuardado() {
+        UsuarioModel u = new UsuarioModel();
+        u.setNumeroDocumento("123");
+        u.setNombre("Ana");
+        u.setApellido("Gómez");
+        u.setCorreo("ana@gescazone.com");
+        u.setContrasena("HASH_VIEJO");
+        u.setTipoDocumento(new TipoDocumentoModel("CC"));
+        u.setRol(new RolModel("PROPIETARIO"));
+        return u;
+    }
+
+    @Test
+    void resetearContrasena_usuarioNoExiste_lanzaNotFoundException() {
+        when(usuarioRepository.findByNumeroDocumento("999")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> usuarioService.resetearContrasena("999"))
+                .isInstanceOf(NotFoundException.class);
+
+        verifyNoInteractions(mailService);
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void resetearContrasena_elCorreoFalla_noGuardaLaContrasenaNueva() {
+        UsuarioModel u = usuarioGuardado();
+        when(usuarioRepository.findByNumeroDocumento("123")).thenReturn(Optional.of(u));
+        doThrow(new MailEnvioException("SMTP no configurado"))
+                .when(mailService).enviarContrasenaReseteada(anyString(), anyString(), anyString());
+
+        assertThatThrownBy(() -> usuarioService.resetearContrasena("123"))
+                .isInstanceOf(MailEnvioException.class);
+
+        assertThat(u.getContrasena()).isEqualTo("HASH_VIEJO");
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void resetearContrasena_valido_generaEnviaPorCorreoYGuardaElHash() {
+        UsuarioModel u = usuarioGuardado();
+        when(usuarioRepository.findByNumeroDocumento("123")).thenReturn(Optional.of(u));
+        when(passwordEncoder.encode(anyString())).thenReturn("HASH_NUEVO");
+
+        String resultado = usuarioService.resetearContrasena("123");
+
+        assertThat(resultado).contains("ana@gescazone.com");
+        assertThat(u.getContrasena()).isEqualTo("HASH_NUEVO");
+        verify(mailService).enviarContrasenaReseteada(eq("ana@gescazone.com"), eq("Ana"), anyString());
+        verify(usuarioRepository).save(u);
     }
 }

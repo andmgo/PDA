@@ -1,5 +1,6 @@
 package gescazone.demo.application.service;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +13,23 @@ import gescazone.demo.domain.model.RolModel;
 import gescazone.demo.domain.model.TipoDocumentoModel;
 import gescazone.demo.domain.model.UsuarioModel;
 import gescazone.demo.domain.repository.UsuarioRepository;
+import gescazone.demo.infrastructure.mail.MailService;
 
 @Service
 public class UsuarioService {
+
+    private static final String ALFABETO_CONTRASENA = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    private static final int LARGO_CONTRASENA_GENERADA = 10;
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Autowired
     private UsuarioRepository usuarioRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private MailService mailService;
 
     public List<UsuarioModel> consultarTodos() {
         return usuarioRepository.findAll();
@@ -162,6 +171,39 @@ public class UsuarioService {
         usuario.setContrasena(passwordEncoder.encode(contrasenaNueva));
         usuarioRepository.save(usuario);
         return "Contraseña actualizada exitosamente";
+    }
+
+    /**
+     * Reseteo de contraseña por un administrador (a diferencia de
+     * cambiarContrasena, no pide la contraseña actual — el permiso
+     * USUARIOS-editar en SecurityConfig es la única barrera). Genera una
+     * contraseña aleatoria, la guarda ya hasheada y se la envía por correo
+     * a la persona; si el correo falla, no se guarda el cambio (@Transactional
+     * revierte) para no dejar a alguien con una contraseña que nunca va a
+     * conocer.
+     */
+    @Transactional
+    public String resetearContrasena(String numeroDocumento) {
+        if (numeroDocumento == null || numeroDocumento.trim().isEmpty())
+            throw new IllegalArgumentException("El número de documento es obligatorio");
+
+        UsuarioModel usuario = usuarioRepository.findByNumeroDocumento(numeroDocumento.trim())
+            .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        String contrasenaNueva = generarContrasenaAleatoria();
+        mailService.enviarContrasenaReseteada(usuario.getCorreo(), usuario.getNombre(), contrasenaNueva);
+
+        usuario.setContrasena(passwordEncoder.encode(contrasenaNueva));
+        usuarioRepository.save(usuario);
+        return "Se generó una contraseña nueva y se envió a " + usuario.getCorreo();
+    }
+
+    private String generarContrasenaAleatoria() {
+        StringBuilder sb = new StringBuilder(LARGO_CONTRASENA_GENERADA);
+        for (int i = 0; i < LARGO_CONTRASENA_GENERADA; i++) {
+            sb.append(ALFABETO_CONTRASENA.charAt(RANDOM.nextInt(ALFABETO_CONTRASENA.length())));
+        }
+        return sb.toString();
     }
 
     public List<UsuarioModel> consultarPorTipoDocumento(String nombreTipoDocumento) {

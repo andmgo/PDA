@@ -118,6 +118,12 @@ public class UsuarioRestController {
         return ResponseEntity.ok(usuarioService.cambiarContrasena(numeroDocumento, contrasenaActual, contrasenaNueva));
     }
 
+    /** Reseteo por un administrador — sin pedir la contraseña actual, a diferencia de cambiar-contrasena. */
+    @PostMapping("/{numeroDocumento}/resetear-contrasena")
+    public ResponseEntity<String> resetearContrasena(@PathVariable String numeroDocumento) {
+        return ResponseEntity.ok(usuarioService.resetearContrasena(numeroDocumento));
+    }
+
     private Map<String, Object> convertirAMap(UsuarioModel usuario) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", usuario.getId());
