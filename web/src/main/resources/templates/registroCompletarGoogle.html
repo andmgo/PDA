@@ -25,7 +25,7 @@
 
             <div class="info-message">
                 <i class="fas fa-info-circle"></i>
-                Verificamos tu cuenta de Google. Revisa que tu nombre y apellido estén bien (Google no siempre los entrega completos) y agrega tu documento — tu solicitud queda pendiente de revisión, igual que un registro normal.
+                Verificamos tu cuenta de Google. Revisa que tu nombre y apellido estén bien (Google no siempre los entrega completos), agrega tu documento y elige una contraseña — podrás iniciar sesión con Google o con tu documento y esa contraseña. Tu solicitud queda pendiente de revisión, igual que un registro normal.
             </div>
 
             <div th:if="${errorDocumento}" class="error-message show" th:text="${errorDocumento}"></div>
@@ -63,6 +63,20 @@
                     <input type="text" id="numeroDocumento" name="numeroDocumento"
                            required maxlength="15" placeholder="Ingresa tu número de documento"
                            autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena"
+                           required minlength="6" placeholder="Mínimo 6 caracteres"
+                           autocomplete="new-password">
+                </div>
+
+                <div class="form-group">
+                    <label>Confirmar contraseña</label>
+                    <input type="password" id="confirmarContrasena" name="confirmarContrasena"
+                           required minlength="6" placeholder="Repite tu contraseña"
+                           autocomplete="new-password">
                 </div>
 
                 <div class="button-group">

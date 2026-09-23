@@ -17,7 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Autoregistro público — ya no crea el Usuario directo: llama a
@@ -99,8 +98,11 @@ public class RegistroController {
      * verificó el correo (guardado en sesión por
      * SecurityConfig.oauth2SuccessHandler); nombre/apellido llegan
      * pre-rellenados como sugerencia pero son editables (Google no siempre
-     * entrega el apellido), y solo falta el documento, que Google no
-     * entrega. Termina en la misma cola de aprobación de siempre.
+     * entrega el apellido). También pide documento y una contraseña real
+     * elegida por la persona (igual que /registro) — así la cuenta queda
+     * utilizable tanto con "Continuar con Google" como con documento y
+     * contraseña en el login normal. Termina en la misma cola de
+     * aprobación de siempre.
      */
     @GetMapping("/registro/completar-google")
     public String mostrarCompletarGoogle(HttpSession session, Model model) {
@@ -122,6 +124,8 @@ public class RegistroController {
             @RequestParam String apellido,
             @RequestParam String numeroDocumento,
             @RequestParam(required = false) String nombreTipoDocumento,
+            @RequestParam String contrasena,
+            @RequestParam(required = false) String confirmarContrasena,
             RedirectAttributes redirectAttributes,
             Model model) {
 
@@ -157,6 +161,14 @@ public class RegistroController {
             model.addAttribute("errorDocumento", "Debe seleccionar un tipo de documento.");
             return "registroCompletarGoogle";
         }
+        if (contrasena == null || contrasena.length() < 6) {
+            model.addAttribute("errorDocumento", "La contraseña debe tener al menos 6 caracteres.");
+            return "registroCompletarGoogle";
+        }
+        if (!contrasena.equals(confirmarContrasena)) {
+            model.addAttribute("errorDocumento", "Las contraseñas no coinciden.");
+            return "registroCompletarGoogle";
+        }
 
         try {
             Map<String, String> datos = new LinkedHashMap<>();
@@ -164,11 +176,13 @@ public class RegistroController {
             datos.put("nombre", nombre.trim());
             datos.put("apellido", apellido.trim());
             datos.put("correo", correo);
-            // Contraseña que la persona nunca ve ni usa — siempre entra por
-            // "Continuar con Google". No se re-hashea nada especial: es el
-            // mismo POST /api/solicitudes-registro de siempre, que hashea
-            // con BCrypt como cualquier otra solicitud.
-            datos.put("contrasena", UUID.randomUUID().toString() + UUID.randomUUID());
+            // A diferencia de antes, ya no es una contraseña invisible
+            // generada al azar: la persona la elige acá mismo, así la
+            // cuenta sirve tanto con "Continuar con Google" como con
+            // documento+contraseña en el login normal. Mismo
+            // POST /api/solicitudes-registro de siempre, que hashea con
+            // BCrypt como cualquier otra solicitud.
+            datos.put("contrasena", contrasena);
             datos.put("nombreTipoDocumento", nombreTipoDocumento.trim());
 
             authApiClient.registro(datos);
