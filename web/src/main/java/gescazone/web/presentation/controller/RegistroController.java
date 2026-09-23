@@ -95,10 +95,12 @@ public class RegistroController {
 
     /**
      * Paso final de "Registrarte con Google" (y de "Continuar con Google"
-     * cuando el correo no corresponde a ningún Usuario todavía) — Google ya
-     * verificó nombre/apellido/correo (guardados en sesión por
-     * SecurityConfig.oauth2SuccessHandler); solo falta el documento, que
-     * Google no entrega. Termina en la misma cola de aprobación de siempre.
+     * cuando el correo no corresponde a ningún Usuario todavía) — Google
+     * verificó el correo (guardado en sesión por
+     * SecurityConfig.oauth2SuccessHandler); nombre/apellido llegan
+     * pre-rellenados como sugerencia pero son editables (Google no siempre
+     * entrega el apellido), y solo falta el documento, que Google no
+     * entrega. Termina en la misma cola de aprobación de siempre.
      */
     @GetMapping("/registro/completar-google")
     public String mostrarCompletarGoogle(HttpSession session, Model model) {
@@ -116,14 +118,19 @@ public class RegistroController {
     @PostMapping("/registro/completar-google")
     public String procesarCompletarGoogle(
             HttpSession session,
+            @RequestParam String nombre,
+            @RequestParam String apellido,
             @RequestParam String numeroDocumento,
             @RequestParam(required = false) String nombreTipoDocumento,
             RedirectAttributes redirectAttributes,
             Model model) {
 
+        // El correo sí viene fijo de la sesión: es lo único que Google
+        // realmente verificó. Nombre/apellido los completa/corrige la
+        // persona misma (Google no siempre entrega el apellido), igual que
+        // en el registro normal — la solicitud sigue pasando por el mismo
+        // filtro de aprobación de un administrador.
         String correo = (String) session.getAttribute("googleCorreo");
-        String nombre = (String) session.getAttribute("googleNombre");
-        String apellido = (String) session.getAttribute("googleApellido");
 
         if (correo == null) {
             return "redirect:/registro";
@@ -134,6 +141,14 @@ public class RegistroController {
         model.addAttribute("correo", correo);
         model.addAttribute("tiposDocumento", TIPOS_DOCUMENTO);
 
+        if (nombre == null || nombre.trim().isEmpty()) {
+            model.addAttribute("errorDocumento", "El nombre es obligatorio.");
+            return "registroCompletarGoogle";
+        }
+        if (apellido == null || apellido.trim().isEmpty()) {
+            model.addAttribute("errorDocumento", "El apellido es obligatorio.");
+            return "registroCompletarGoogle";
+        }
         if (numeroDocumento == null || numeroDocumento.trim().isEmpty()) {
             model.addAttribute("errorDocumento", "El número de documento es obligatorio.");
             return "registroCompletarGoogle";
@@ -146,8 +161,8 @@ public class RegistroController {
         try {
             Map<String, String> datos = new LinkedHashMap<>();
             datos.put("numeroDocumento", numeroDocumento.trim());
-            datos.put("nombre", nombre);
-            datos.put("apellido", apellido);
+            datos.put("nombre", nombre.trim());
+            datos.put("apellido", apellido.trim());
             datos.put("correo", correo);
             // Contraseña que la persona nunca ve ni usa — siempre entra por
             // "Continuar con Google". No se re-hashea nada especial: es el
