@@ -8,6 +8,7 @@ public class ApartamentoModel {
     private Long telefono;
     private TipoOcupacionModel tipoOcupacion;
     private EstadoCuentaModel estadoCuenta;
+    private boolean activo = true;
 
     public ApartamentoModel() {}
 
@@ -37,4 +38,7 @@ public class ApartamentoModel {
 
     public EstadoCuentaModel getEstadoCuenta() { return estadoCuenta; }
     public void setEstadoCuenta(EstadoCuentaModel estadoCuenta) { this.estadoCuenta = estadoCuenta; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }

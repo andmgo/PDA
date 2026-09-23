@@ -7,6 +7,7 @@ public class SalonSocialModel {
     private String medidas;
     private Long telefono;
     private EstadoModel estado;
+    private boolean activo = true;
 
     public SalonSocialModel() {}
 
@@ -31,6 +32,9 @@ public class SalonSocialModel {
 
     public EstadoModel getEstado() { return estado; }
     public void setEstado(EstadoModel estado) { this.estado = estado; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 
     public String getIdSalonSocial() { return id; }
     public String getIdSalon() { return id; }

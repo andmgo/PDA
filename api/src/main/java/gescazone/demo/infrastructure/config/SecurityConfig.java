@@ -121,14 +121,16 @@ public class SecurityConfig {
                     "/api/salones/crear",
                     "/api/salones/crear-varios",
                     "/api/salones/actualizar/**",
-                    "/api/salones/eliminar/**",
+                    "/api/salones/desactivar/**",
+                    "/api/salones/activar/**",
                     "/api/salones/cambiar-estado"
                 ).access(permiso("SALONES", NivelPermiso.EDITAR))
 
                 .requestMatchers(
                     "/api/usuarios/crear",
                     "/api/usuarios/actualizar/**",
-                    "/api/usuarios/eliminar/**",
+                    "/api/usuarios/desactivar/**",
+                    "/api/usuarios/activar/**",
                     "/api/usuarios/todos",
                     "/api/usuarios/*/resetear-contrasena"
                 ).access(permiso("USUARIOS", NivelPermiso.EDITAR))

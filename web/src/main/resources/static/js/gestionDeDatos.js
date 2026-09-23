@@ -1,7 +1,8 @@
 // ========== VARIABLES GLOBALES ==========
 let currentEditNumber = null;
-let currentDeleteNumber = null;
-let currentDeleteType = null;
+let currentEstadoNumber = null;
+let currentEstadoType = null;
+let currentEstadoNuevo = null; // true = vamos a activar, false = vamos a desactivar
 
 let apartamentosData = [];
 let parqueaderosData = [];
@@ -281,7 +282,11 @@ function mostrarApartamentos(apartamentos) {
         const tipoOcup = apt.tipoOcupacion || 'N/A';
         const estadoCta = apt.estadoCuenta || 'N/A';
         const statusClass = estadoCta.toLowerCase().includes('día') ? 'from-emerald-500 to-teal-400' : 'from-red-600 to-orange-600';
-        tbody.innerHTML += `<tr>
+        const activo = apt.activo !== false;
+        const btnEstado = activo
+            ? `<button onclick="openEstadoModal('${apt.numero}', 'apartamento', '${apt.numero}', true)" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-ban mr-1"></i>Desactivar</button>`
+            : `<button onclick="openEstadoModal('${apt.numero}', 'apartamento', '${apt.numero}', false)" class="text-xs font-semibold text-emerald-500 hover:text-emerald-700"><i class="fas fa-check mr-1"></i>Activar</button>`;
+        tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${apt.numero}</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs font-semibold">${tipoOcup}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b"><span class="bg-gradient-to-tl ${statusClass} px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">${estadoCta}</span></td>
@@ -289,7 +294,7 @@ function mostrarApartamentos(apartamentos) {
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${apt.telefono}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="editApartamento('${apt.numero}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
-                <button onclick="openDeleteModal('${apt.numero}', 'apartamento', '${apt.numero}')" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Eliminar</button>
+                ${btnEstado}
             </td></tr>`;
     });
 }
@@ -480,14 +485,18 @@ function mostrarParqueaderos(parqueaderos) {
     parqueaderos.forEach(p => {
         const estado = p.estado || 'N/A';
         const statusClass = estado === 'Disponible' ? 'from-emerald-500 to-teal-400' : 'from-red-600 to-orange-600';
-        tbody.innerHTML += `<tr>
+        const activo = p.activo !== false;
+        const btnEstado = activo
+            ? `<button onclick="openEstadoModal('${p.numero}', 'parqueadero', '${p.numero}', true)" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-ban mr-1"></i>Desactivar</button>`
+            : `<button onclick="openEstadoModal('${p.numero}', 'parqueadero', '${p.numero}', false)" class="text-xs font-semibold text-emerald-500 hover:text-emerald-700"><i class="fas fa-check mr-1"></i>Activar</button>`;
+        tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${p.numero}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b"><span class="bg-gradient-to-tl ${statusClass} px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">${estado}</span></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.medidas} m²</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.telefono}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="editParqueadero('${p.numero}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
-                <button onclick="openDeleteModal('${p.numero}', 'parqueadero', '${p.numero}')" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Eliminar</button>
+                ${btnEstado}
             </td></tr>`;
     });
 }
@@ -585,14 +594,18 @@ function mostrarSalones(salones) {
     salones.forEach(s => {
         const estado = s.nombreEstado || 'N/A';
         const statusClass = estado === 'Disponible' ? 'from-emerald-500 to-teal-400' : 'from-red-600 to-orange-600';
-        tbody.innerHTML += `<tr>
+        const activo = s.activo !== false;
+        const btnEstado = activo
+            ? `<button onclick="openEstadoModal('${s.numero}', 'salon', '${s.numero}', true)" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-ban mr-1"></i>Desactivar</button>`
+            : `<button onclick="openEstadoModal('${s.numero}', 'salon', '${s.numero}', false)" class="text-xs font-semibold text-emerald-500 hover:text-emerald-700"><i class="fas fa-check mr-1"></i>Activar</button>`;
+        tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${s.numero}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b"><span class="bg-gradient-to-tl ${statusClass} px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">${estado}</span></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${s.medidas} m²</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${s.telefono}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="editSalon('${s.numero}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
-                <button onclick="openDeleteModal('${s.numero}', 'salon', '${s.numero}')" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Eliminar</button>
+                ${btnEstado}
             </td></tr>`;
     });
 }
@@ -688,7 +701,11 @@ function mostrarUsuarios(usuarios) {
     const tbody = document.getElementById('usuariosTableBody');
     tbody.innerHTML = usuarios.length === 0 ? '<tr><td colspan="7" class="p-8 text-center">No se encontraron usuarios</td></tr>' : '';
     usuarios.forEach(u => {
-        tbody.innerHTML += `<tr>
+        const activo = u.activo !== false;
+        const btnEstado = activo
+            ? `<button onclick="openEstadoModal('${u.numeroDocumento}', 'usuario', '${u.nombre} ${u.apellido}', true)" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-ban mr-1"></i>Desactivar</button>`
+            : `<button onclick="openEstadoModal('${u.numeroDocumento}', 'usuario', '${u.nombre} ${u.apellido}', false)" class="text-xs font-semibold text-emerald-500 hover:text-emerald-700"><i class="fas fa-check mr-1"></i>Activar</button>`;
+        tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs font-semibold">${u.nombreTipoDocumento || 'N/A'}</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs gsz-mono">${u.numeroDocumento}</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${u.nombre}</p></td>
@@ -698,7 +715,7 @@ function mostrarUsuarios(usuarios) {
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="editUsuario('${u.numeroDocumento}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
                 <button onclick="resetearContrasenaUsuario('${u.numeroDocumento}', '${u.nombre} ${u.apellido}')" class="text-xs font-semibold text-amber-500 hover:text-amber-700 mr-3"><i class="fas fa-key mr-1"></i>Resetear contraseña</button>
-                <button onclick="openDeleteModal('${u.numeroDocumento}', 'usuario', '${u.nombre} ${u.apellido}')" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Eliminar</button>
+                ${btnEstado}
             </td></tr>`;
     });
 }
@@ -865,7 +882,11 @@ function mostrarResidentes(residentes) {
         let tipoClass = 'from-green-600 to-emerald-500';
         if (tipoRes === 'Arrendatario') tipoClass = 'from-orange-500 to-yellow-500';
         else if (tipoRes === 'Visitante') tipoClass = 'from-blue-500 to-cyan-500';
-        tbody.innerHTML += `<tr>
+        const activo = r.activo !== false;
+        const btnEstado = activo
+            ? `<button onclick="openEstadoModal('${r.numeroDocumento}', 'residente', '${r.nombre} ${r.apellido}', true)" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-ban mr-1"></i>Desactivar</button>`
+            : `<button onclick="openEstadoModal('${r.numeroDocumento}', 'residente', '${r.nombre} ${r.apellido}', false)" class="text-xs font-semibold text-emerald-500 hover:text-emerald-700"><i class="fas fa-check mr-1"></i>Activar</button>`;
+        tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs font-semibold">${r.nombreTipoDocumento || 'N/A'}</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs gsz-mono">${r.numeroDocumento}</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${r.nombre}</p></td>
@@ -874,7 +895,7 @@ function mostrarResidentes(residentes) {
             <td class="p-2 text-center align-middle bg-transparent border-b"><span class="bg-gradient-to-tl ${tipoClass} px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">${tipoRes}</span></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="editResidente('${r.numeroDocumento}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
-                <button onclick="openDeleteModal('${r.numeroDocumento}', 'residente', '${r.nombre} ${r.apellido}')" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Eliminar</button>
+                ${btnEstado}
             </td></tr>`;
     });
 }
@@ -1089,71 +1110,57 @@ async function rechazarSolicitudRegistro(id) {
     } catch (error) { alert('Error al rechazar la solicitud: ' + error.message); }
 }
 
-// ========== DELETE MODAL ==========
-function openDeleteModal(identificador, type, name) {
-    currentDeleteNumber = identificador;
-    currentDeleteType = type;
+// ========== MODAL ACTIVAR/DESACTIVAR ==========
+// Reemplaza el borrado físico: ya no se elimina nada desde acá, solo se
+// marca activo/inactivo (ver migración V8 y los *Service.cambiarEstado*).
+function openEstadoModal(identificador, type, name, activoActual) {
+    currentEstadoNumber = identificador;
+    currentEstadoType = type;
+    currentEstadoNuevo = !activoActual;
     const tipos = { apartamento: 'el apartamento', parqueadero: 'el parqueadero', salon: 'el salón social', usuario: 'el usuario', residente: 'el residente' };
-    document.getElementById('deleteMessage').innerHTML = `¿Está seguro que desea eliminar ${tipos[type]} <span class="font-bold">${name}</span>? Esta acción no se puede deshacer.`;
+    const accion = currentEstadoNuevo ? 'activar' : 'desactivar';
+    document.getElementById('deleteMessage').innerHTML = `¿Querés ${accion} ${tipos[type]} <span class="font-bold">${name}</span>?`;
     document.getElementById('deleteModal').classList.add('show');
 }
 
-function closeDeleteModal() {
+function closeEstadoModal() {
     document.getElementById('deleteModal').classList.remove('show');
-    currentDeleteNumber = null;
-    currentDeleteType = null;
+    currentEstadoNumber = null;
+    currentEstadoType = null;
+    currentEstadoNuevo = null;
 }
 
-async function confirmDelete() {
-    if (!currentDeleteNumber || !currentDeleteType) return;
-    
-    const urls = { 
-        apartamento: `/api/apartamentos/eliminar/${currentDeleteNumber}`, 
-        parqueadero: `/api/parqueaderos/eliminar/${currentDeleteNumber}`, 
-        salon: `/api/salones/eliminar/${currentDeleteNumber}`, 
-        usuario: `/api/usuarios/eliminar/${currentDeleteNumber}`, 
-        residente: `/api/residentes/eliminar/${currentDeleteNumber}` 
+async function confirmCambiarEstado() {
+    if (!currentEstadoNumber || !currentEstadoType || currentEstadoNuevo === null) return;
+
+    const accion = currentEstadoNuevo ? 'activar' : 'desactivar';
+    const urls = {
+        apartamento: `/api/apartamentos/${accion}/${currentEstadoNumber}`,
+        parqueadero: `/api/parqueaderos/${accion}/${currentEstadoNumber}`,
+        salon: `/api/salones/${accion}/${currentEstadoNumber}`,
+        usuario: `/api/usuarios/${accion}/${currentEstadoNumber}`,
+        residente: `/api/residentes/${accion}/${currentEstadoNumber}`
     };
-    
-    const cargas = { 
-        apartamento: cargarApartamentos, 
-        parqueadero: cargarParqueaderos, 
-        salon: cargarSalones, 
-        usuario: cargarUsuarios, 
-        residente: cargarResidentes 
+
+    const cargas = {
+        apartamento: cargarApartamentos,
+        parqueadero: cargarParqueaderos,
+        salon: cargarSalones,
+        usuario: cargarUsuarios,
+        residente: cargarResidentes
     };
-    
+
     try {
-        const response = await fetch(urls[currentDeleteType], { method: 'DELETE' });
+        const response = await fetch(urls[currentEstadoType], { method: 'PUT' });
         const mensaje = await response.text();
-        
-        if (!response.ok) {
-            // Mejorar el mensaje de error para restricciones de clave foránea
-            if (mensaje.includes('foreign key constraint') || 
-                mensaje.includes('FOREIGN KEY') || 
-                mensaje.includes('registros relacionados')) {
-                
-                const tipoMensajes = {
-                    residente: 'No se puede eliminar el residente porque tiene registros relacionados (parqueaderos, visitantes, etc.). Elimine primero esos registros.',
-                    usuario: 'No se puede eliminar el usuario porque tiene registros relacionados. Elimine primero esos registros.',
-                    apartamento: 'No se puede eliminar el apartamento porque tiene residentes o registros asociados.',
-                    parqueadero: 'No se puede eliminar el parqueadero porque tiene registros asociados.',
-                    salon: 'No se puede eliminar el salón porque tiene reservas asociadas.'
-                };
-                
-                alert(tipoMensajes[currentDeleteType] || 'No se puede eliminar porque tiene registros relacionados.');
-            } else {
-                alert('Error: ' + mensaje);
-            }
-        } else {
-            alert(mensaje);
-            await cargas[currentDeleteType]();
-        }
-        
-        closeDeleteModal();
-    } catch (error) { 
-        alert('Error al eliminar: ' + error.message); 
-        closeDeleteModal(); 
+
+        alert(response.ok ? mensaje : 'Error: ' + mensaje);
+        if (response.ok) await cargas[currentEstadoType]();
+
+        closeEstadoModal();
+    } catch (error) {
+        alert('Error al cambiar el estado: ' + error.message);
+        closeEstadoModal();
     }
 }
 

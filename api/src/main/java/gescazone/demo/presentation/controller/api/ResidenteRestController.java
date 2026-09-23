@@ -104,9 +104,14 @@ public class ResidenteRestController {
         return ResponseEntity.ok(residenteService.actualizar(residente));
     }
 
-    @DeleteMapping("/eliminar/{numeroDocumento}")
-    public ResponseEntity<String> eliminar(@PathVariable Integer numeroDocumento) {
-        return ResponseEntity.ok(residenteService.eliminar(numeroDocumento));
+    @PutMapping("/desactivar/{numeroDocumento}")
+    public ResponseEntity<String> desactivar(@PathVariable Integer numeroDocumento) {
+        return ResponseEntity.ok(residenteService.cambiarEstado(numeroDocumento, false));
+    }
+
+    @PutMapping("/activar/{numeroDocumento}")
+    public ResponseEntity<String> activar(@PathVariable Integer numeroDocumento) {
+        return ResponseEntity.ok(residenteService.cambiarEstado(numeroDocumento, true));
     }
 
     private Map<String, Object> convertirAMap(ResidenteModel res) {
@@ -116,6 +121,7 @@ public class ResidenteRestController {
         map.put("nombre", res.getNombre());
         map.put("apellido", res.getApellido());
         map.put("celular", res.getCelular());
+        map.put("activo", res.isActivo());
         if (res.getTipoDocumento() != null)
             map.put("nombreTipoDocumento", res.getTipoDocumento().getNombreTipoDocumento());
         if (res.getTipoResidente() != null)

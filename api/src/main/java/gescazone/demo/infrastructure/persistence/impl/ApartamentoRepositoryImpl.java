@@ -35,6 +35,7 @@ public class ApartamentoRepositoryImpl implements ApartamentoRepository {
         model.setNumero(entity.getNumero());
         model.setMedidas(entity.getMedidas());
         model.setTelefono(entity.getTelefono());
+        model.setActivo(entity.isActivo());
 
         if (entity.getTipoOcupacion() != null) {
             TipoOcupacionModel to = new TipoOcupacionModel();
@@ -57,6 +58,7 @@ public class ApartamentoRepositoryImpl implements ApartamentoRepository {
         entity.setNumero(model.getNumero());
         entity.setMedidas(model.getMedidas());
         entity.setTelefono(model.getTelefono());
+        entity.setActivo(model.isActivo());
 
         if (model.getTipoOcupacion() != null) {
             String nombre = model.getTipoOcupacion().getNombreTipoOcupacion();
@@ -86,11 +88,6 @@ public class ApartamentoRepositoryImpl implements ApartamentoRepository {
     }
 
     @Override
-    public void deleteByNumero(String numero) {
-        jpaRepository.deleteByNumero(numero);
-    }
-
-    @Override
     public List<ApartamentoModel> findByNombreTipoOcupacion(String nombreTipoOcupacion) {
         return jpaRepository.findByTipoOcupacion_NombreTipoOcupacion(nombreTipoOcupacion)
                 .stream().map(this::toModel).toList();
@@ -105,11 +102,6 @@ public class ApartamentoRepositoryImpl implements ApartamentoRepository {
     @Override
     public ApartamentoModel save(ApartamentoModel apartamento) {
         return toModel(jpaRepository.save(toEntity(apartamento)));
-    }
-
-    @Override
-    public void deleteById(String id) {
-        jpaRepository.deleteById(UUID.fromString(id));
     }
 
     @Override

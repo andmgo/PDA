@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -68,6 +69,8 @@ public class AuthController {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(numeroDocumento, contrasena));
             return respuestaLogin(authentication, numeroDocumento);
+        } catch (DisabledException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Esta cuenta está desactivada. Contacta a un administrador.");
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
         }
@@ -101,6 +104,9 @@ public class AuthController {
 
         try {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(usuario.getNumeroDocumento());
+            if (!userDetails.isEnabled()) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Esta cuenta está desactivada. Contacta a un administrador.");
+            }
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
             return respuestaLogin(authentication, usuario.getNumeroDocumento());

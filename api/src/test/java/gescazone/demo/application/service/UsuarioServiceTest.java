@@ -179,6 +179,28 @@ class UsuarioServiceTest {
         verifyNoInteractions(usuarioRepository);
     }
 
+    // ── cambiarEstadoActivo (activar/desactivar) ────────────────────────
+
+    @Test
+    void cambiarEstadoActivo_noExistente_lanzaExcepcion() {
+        when(usuarioRepository.findByNumeroDocumento("999")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> usuarioService.cambiarEstadoActivo("999", false))
+                .isInstanceOf(NotFoundException.class);
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void cambiarEstadoActivo_desactivar_guardaActivoEnFalse() {
+        UsuarioModel u = usuarioGuardado();
+        when(usuarioRepository.findByNumeroDocumento("123")).thenReturn(Optional.of(u));
+
+        String resultado = usuarioService.cambiarEstadoActivo("123", false);
+
+        assertThat(resultado).isEqualTo("Usuario desactivado exitosamente");
+        assertThat(u.isActivo()).isFalse();
+        verify(usuarioRepository).save(u);
+    }
+
     // ── resetearContrasena ───────────────────────────────────────────────
 
     private UsuarioModel usuarioGuardado() {

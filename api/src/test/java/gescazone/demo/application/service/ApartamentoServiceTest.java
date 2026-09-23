@@ -170,23 +170,40 @@ class ApartamentoServiceTest {
         verify(apartamentoRepository).save(a);
     }
 
-    // ── eliminar ─────────────────────────────────────────────────────────
+    // ── cambiarEstado (activar/desactivar) ──────────────────────────────
 
     @Test
-    void eliminar_noExistente_lanzaExcepcion() {
-        when(apartamentoRepository.existsByNumero("101")).thenReturn(false);
-        assertThatThrownBy(() -> apartamentoService.eliminar("101"))
+    void cambiarEstado_noExistente_lanzaExcepcion() {
+        when(apartamentoRepository.findByNumero("101")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> apartamentoService.cambiarEstado("101", false))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("No existe");
-        verify(apartamentoRepository, never()).deleteByNumero(any());
+        verify(apartamentoRepository, never()).save(any());
     }
 
     @Test
-    void eliminar_existente_eliminaYRetornaMensaje() {
-        when(apartamentoRepository.existsByNumero("101")).thenReturn(true);
-        String resultado = apartamentoService.eliminar("101");
-        assertThat(resultado).isEqualTo("Apartamento eliminado con éxito");
-        verify(apartamentoRepository).deleteByNumero("101");
+    void cambiarEstado_desactivar_guardaActivoEnFalse() {
+        ApartamentoModel a = apartamentoValido();
+        when(apartamentoRepository.findByNumero("101")).thenReturn(Optional.of(a));
+
+        String resultado = apartamentoService.cambiarEstado("101", false);
+
+        assertThat(resultado).isEqualTo("Apartamento desactivado con éxito");
+        assertThat(a.isActivo()).isFalse();
+        verify(apartamentoRepository).save(a);
+    }
+
+    @Test
+    void cambiarEstado_activar_guardaActivoEnTrue() {
+        ApartamentoModel a = apartamentoValido();
+        a.setActivo(false);
+        when(apartamentoRepository.findByNumero("101")).thenReturn(Optional.of(a));
+
+        String resultado = apartamentoService.cambiarEstado("101", true);
+
+        assertThat(resultado).isEqualTo("Apartamento activado con éxito");
+        assertThat(a.isActivo()).isTrue();
+        verify(apartamentoRepository).save(a);
     }
 
     // ── consultas por catálogo ───────────────────────────────────────────

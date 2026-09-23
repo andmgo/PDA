@@ -7,13 +7,11 @@ import java.util.Optional;
 public interface UsuarioRepository {
     Optional<UsuarioModel> findByNumeroDocumento(String numeroDocumento);
     boolean existsByNumeroDocumento(String numeroDocumento);
-    void deleteByNumeroDocumento(String numeroDocumento);
     List<UsuarioModel> findByNombreRol(String nombreRol);
     List<UsuarioModel> findByNombreTipoDocumento(String nombreTipoDocumento);
     Optional<UsuarioModel> findByCorreo(String correo);
     boolean existsByCorreo(String correo);
     UsuarioModel save(UsuarioModel usuario);
-    void deleteById(String id);
     Optional<UsuarioModel> findById(String id);
     List<UsuarioModel> findAll();
 }

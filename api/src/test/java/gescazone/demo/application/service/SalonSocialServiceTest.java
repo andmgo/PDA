@@ -83,10 +83,22 @@ class SalonSocialServiceTest {
     }
 
     @Test
-    void eliminar_existente_eliminaYRetornaMensaje() {
-        when(salonSocialRepository.existsByNumero("S-01")).thenReturn(true);
-        String resultado = salonSocialService.eliminar("S-01");
-        assertThat(resultado).isEqualTo("Salón social eliminado con éxito");
-        verify(salonSocialRepository).deleteByNumero("S-01");
+    void cambiarEstadoActivo_noExistente_lanzaExcepcion() {
+        when(salonSocialRepository.findByNumero("S-01")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> salonSocialService.cambiarEstadoActivo("S-01", false))
+                .isInstanceOf(NotFoundException.class);
+        verify(salonSocialRepository, never()).save(any());
+    }
+
+    @Test
+    void cambiarEstadoActivo_valido_actualizaYGuarda() {
+        SalonSocialModel s = salonValido();
+        when(salonSocialRepository.findByNumero("S-01")).thenReturn(Optional.of(s));
+
+        String resultado = salonSocialService.cambiarEstadoActivo("S-01", false);
+
+        assertThat(resultado).isEqualTo("Salón social desactivado con éxito");
+        assertThat(s.isActivo()).isFalse();
+        verify(salonSocialRepository).save(s);
     }
 }

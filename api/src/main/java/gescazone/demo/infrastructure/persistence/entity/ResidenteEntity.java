@@ -41,6 +41,9 @@ public class ResidenteEntity {
     @JoinColumn(name = "tipo_residente_id")
     private TipoResidenteEntity tipoResidente;
 
+    @Column(nullable = false)
+    private boolean activo = true;
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
@@ -61,4 +64,7 @@ public class ResidenteEntity {
 
     public TipoResidenteEntity getTipoResidente() { return tipoResidente; }
     public void setTipoResidente(TipoResidenteEntity tipoResidente) { this.tipoResidente = tipoResidente; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }

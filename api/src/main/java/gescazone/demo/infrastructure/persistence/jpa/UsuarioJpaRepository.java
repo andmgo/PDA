@@ -10,7 +10,6 @@ import java.util.UUID;
 public interface UsuarioJpaRepository extends JpaRepository<UsuarioEntity, UUID> {
     Optional<UsuarioEntity> findByNumeroDocumento(String numeroDocumento);
     boolean existsByNumeroDocumento(String numeroDocumento);
-    void deleteByNumeroDocumento(String numeroDocumento);
     List<UsuarioEntity> findByRol_NombreRol(String nombreRol);
     List<UsuarioEntity> findByTipoDocumento_NombreTipoDocumento(String nombreTipoDocumento);
     Optional<UsuarioEntity> findByCorreo(String correo);

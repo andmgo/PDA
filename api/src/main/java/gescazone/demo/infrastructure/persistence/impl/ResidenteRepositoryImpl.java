@@ -36,6 +36,7 @@ public class ResidenteRepositoryImpl implements ResidenteRepository {
         model.setNombre(entity.getNombre());
         model.setApellido(entity.getApellido());
         model.setCelular(entity.getCelular());
+        model.setActivo(entity.isActivo());
 
         if (entity.getTipoDocumento() != null) {
             TipoDocumentoModel td = new TipoDocumentoModel();
@@ -59,6 +60,7 @@ public class ResidenteRepositoryImpl implements ResidenteRepository {
         entity.setNombre(model.getNombre());
         entity.setApellido(model.getApellido());
         entity.setCelular(model.getCelular());
+        entity.setActivo(model.isActivo());
 
         if (model.getTipoDocumento() != null) {
             String nombre = model.getTipoDocumento().getNombreTipoDocumento();
@@ -85,11 +87,6 @@ public class ResidenteRepositoryImpl implements ResidenteRepository {
     @Override
     public boolean existsByNumeroDocumento(Integer numeroDocumento) {
         return jpaRepository.existsByNumeroDocumento(numeroDocumento);
-    }
-
-    @Override
-    public void deleteByNumeroDocumento(Integer numeroDocumento) {
-        jpaRepository.deleteByNumeroDocumento(numeroDocumento);
     }
 
     @Override
@@ -125,11 +122,6 @@ public class ResidenteRepositoryImpl implements ResidenteRepository {
     @Override
     public ResidenteModel save(ResidenteModel residente) {
         return toModel(jpaRepository.save(toEntity(residente)));
-    }
-
-    @Override
-    public void deleteById(String id) {
-        jpaRepository.deleteById(UUID.fromString(id));
     }
 
     @Override

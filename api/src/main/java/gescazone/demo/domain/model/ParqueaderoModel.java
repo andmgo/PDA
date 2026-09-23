@@ -7,6 +7,7 @@ public class ParqueaderoModel {
     private String medidas;
     private Long telefono;
     private EstadoModel estado;
+    private boolean activo = true;
 
     public ParqueaderoModel() {}
 
@@ -31,4 +32,7 @@ public class ParqueaderoModel {
 
     public EstadoModel getEstado() { return estado; }
     public void setEstado(EstadoModel estado) { this.estado = estado; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }

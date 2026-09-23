@@ -10,7 +10,6 @@ import java.util.UUID;
 public interface ParqueaderoJpaRepository extends JpaRepository<ParqueaderoEntity, UUID> {
     Optional<ParqueaderoEntity> findByNumero(String numero);
     boolean existsByNumero(String numero);
-    void deleteByNumero(String numero);
     List<ParqueaderoEntity> findByEstado_NombreEstado(String nombreEstado);
     List<ParqueaderoEntity> findByMedidas(String medidas);
 }

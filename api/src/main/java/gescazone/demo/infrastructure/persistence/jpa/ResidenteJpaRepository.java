@@ -10,7 +10,6 @@ import java.util.UUID;
 public interface ResidenteJpaRepository extends JpaRepository<ResidenteEntity, UUID> {
     Optional<ResidenteEntity> findByNumeroDocumento(Integer numeroDocumento);
     boolean existsByNumeroDocumento(Integer numeroDocumento);
-    void deleteByNumeroDocumento(Integer numeroDocumento);
     List<ResidenteEntity> findByTipoResidente_NombreTipoResidente(String nombreTipoResidente);
     List<ResidenteEntity> findByTipoDocumento_NombreTipoDocumento(String nombreTipoDocumento);
     List<ResidenteEntity> findByNombreContainingIgnoreCase(String nombre);

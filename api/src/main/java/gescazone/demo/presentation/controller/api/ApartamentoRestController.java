@@ -33,6 +33,7 @@ public class ApartamentoRestController {
             map.put("numero", apt.getNumero());
             map.put("medidas", apt.getMedidas());
             map.put("telefono", apt.getTelefono());
+            map.put("activo", apt.isActivo());
 
             if (apt.getTipoOcupacion() != null) {
                 map.put("tipoOcupacion", apt.getTipoOcupacion().getNombreTipoOcupacion());
@@ -59,6 +60,7 @@ public class ApartamentoRestController {
         response.put("numero", apartamento.getNumero());
         response.put("medidas", apartamento.getMedidas());
         response.put("telefono", apartamento.getTelefono());
+        response.put("activo", apartamento.isActivo());
 
         if (apartamento.getTipoOcupacion() != null) {
             response.put("tipoOcupacion", apartamento.getTipoOcupacion().getNombreTipoOcupacion());
@@ -230,13 +232,14 @@ public class ApartamentoRestController {
         return ResponseEntity.ok(resultado);
     }
 
-    @DeleteMapping("/eliminar/{numero}")
-    public ResponseEntity<String> eliminar(@PathVariable String numero) {
-        if (numero == null || numero.trim().isEmpty())
-            return ResponseEntity.badRequest().body("El número de apartamento es obligatorio");
+    @PutMapping("/desactivar/{numero}")
+    public ResponseEntity<String> desactivar(@PathVariable String numero) {
+        return ResponseEntity.ok(apartamentoService.cambiarEstado(numero, false));
+    }
 
-        String resultado = apartamentoService.eliminar(numero.trim());
-        return ResponseEntity.ok(resultado);
+    @PutMapping("/activar/{numero}")
+    public ResponseEntity<String> activar(@PathVariable String numero) {
+        return ResponseEntity.ok(apartamentoService.cambiarEstado(numero, true));
     }
 
     @GetMapping("/tipo-ocupacion/{nombre}")

@@ -28,6 +28,7 @@ public class UsuarioModel {
 
     private RolModel rol;
     private TipoDocumentoModel tipoDocumento;
+    private boolean activo = true;
 
     public UsuarioModel() {}
 
@@ -58,4 +59,6 @@ public class UsuarioModel {
     public void setRol(RolModel rol) { this.rol = rol; }
     public TipoDocumentoModel getTipoDocumento() { return tipoDocumento; }
     public void setTipoDocumento(TipoDocumentoModel tipoDocumento) { this.tipoDocumento = tipoDocumento; }
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }

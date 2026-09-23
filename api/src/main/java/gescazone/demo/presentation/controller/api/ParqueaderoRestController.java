@@ -32,6 +32,7 @@ public class ParqueaderoRestController {
             map.put("numero", parq.getNumero());
             map.put("medidas", parq.getMedidas());
             map.put("telefono", parq.getTelefono());
+            map.put("activo", parq.isActivo());
 
             if (parq.getEstado() != null) {
                 map.put("estado", parq.getEstado().getNombreEstado());
@@ -54,6 +55,7 @@ public class ParqueaderoRestController {
         response.put("numero", parqueadero.getNumero());
         response.put("medidas", parqueadero.getMedidas());
         response.put("telefono", parqueadero.getTelefono());
+        response.put("activo", parqueadero.isActivo());
 
         if (parqueadero.getEstado() != null) {
             response.put("estado", parqueadero.getEstado().getNombreEstado());
@@ -237,13 +239,14 @@ public class ParqueaderoRestController {
         return ResponseEntity.ok(resultado);
     }
 
-    @DeleteMapping("/eliminar/{numero}")
-    public ResponseEntity<String> eliminar(@PathVariable String numero) {
-        if (numero == null || numero.trim().isEmpty())
-            return ResponseEntity.badRequest().body("El número del parqueadero es obligatorio");
+    @PutMapping("/desactivar/{numero}")
+    public ResponseEntity<String> desactivar(@PathVariable String numero) {
+        return ResponseEntity.ok(parqueaderoService.cambiarEstadoActivo(numero, false));
+    }
 
-        String resultado = parqueaderoService.eliminar(numero.trim());
-        return ResponseEntity.ok(resultado);
+    @PutMapping("/activar/{numero}")
+    public ResponseEntity<String> activar(@PathVariable String numero) {
+        return ResponseEntity.ok(parqueaderoService.cambiarEstadoActivo(numero, true));
     }
 
     @PostMapping("/cambiar-estado")

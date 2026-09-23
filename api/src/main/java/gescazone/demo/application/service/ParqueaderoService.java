@@ -78,15 +78,16 @@ public class ParqueaderoService {
         return "Parqueadero actualizado con éxito";
     }
 
-    public String eliminar(String numero) {
+    public String cambiarEstadoActivo(String numero, boolean activo) {
         if (numero == null || numero.trim().isEmpty())
-            throw new IllegalArgumentException("El número del parqueadero es obligatorio para eliminar");
+            throw new IllegalArgumentException("El número del parqueadero es obligatorio");
 
-        if (!parqueaderoRepository.existsByNumero(numero.trim()))
-            throw new NotFoundException("No existe un parqueadero con el número: " + numero);
+        ParqueaderoModel parqueadero = parqueaderoRepository.findByNumero(numero.trim())
+                .orElseThrow(() -> new NotFoundException("No existe un parqueadero con el número: " + numero));
 
-        parqueaderoRepository.deleteByNumero(numero.trim());
-        return "Parqueadero eliminado con éxito";
+        parqueadero.setActivo(activo);
+        parqueaderoRepository.save(parqueadero);
+        return activo ? "Parqueadero activado con éxito" : "Parqueadero desactivado con éxito";
     }
 
     public boolean parqueaderoExistente(String numero) {

@@ -144,13 +144,16 @@ public class UsuarioService {
     }
 
     @Transactional
-    public String eliminar(String numeroDocumento) {
+    public String cambiarEstadoActivo(String numeroDocumento, boolean activo) {
         if (numeroDocumento == null || numeroDocumento.trim().isEmpty())
             throw new IllegalArgumentException("El número de documento es obligatorio");
-        if (!usuarioRepository.existsByNumeroDocumento(numeroDocumento.trim()))
-            throw new NotFoundException("No existe un usuario con el documento: " + numeroDocumento);
-        usuarioRepository.deleteByNumeroDocumento(numeroDocumento.trim());
-        return "Usuario eliminado exitosamente";
+
+        UsuarioModel usuario = usuarioRepository.findByNumeroDocumento(numeroDocumento.trim())
+                .orElseThrow(() -> new NotFoundException("No existe un usuario con el documento: " + numeroDocumento));
+
+        usuario.setActivo(activo);
+        usuarioRepository.save(usuario);
+        return activo ? "Usuario activado exitosamente" : "Usuario desactivado exitosamente";
     }
 
     @Transactional

@@ -9,6 +9,7 @@ public class ResidenteModel {
     private Long celular;
     private TipoDocumentoModel tipoDocumento;
     private TipoResidenteModel tipoResidente;
+    private boolean activo = true;
 
     public ResidenteModel() {}
 
@@ -42,4 +43,7 @@ public class ResidenteModel {
 
     public TipoResidenteModel getTipoResidente() { return tipoResidente; }
     public void setTipoResidente(TipoResidenteModel tipoResidente) { this.tipoResidente = tipoResidente; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }

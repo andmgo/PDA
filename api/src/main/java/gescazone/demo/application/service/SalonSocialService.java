@@ -68,13 +68,16 @@ public class SalonSocialService {
         return "Salón social actualizado con éxito";
     }
 
-    public String eliminar(String numero) {
+    public String cambiarEstadoActivo(String numero, boolean activo) {
         if (numero == null || numero.trim().isEmpty())
-            throw new IllegalArgumentException("El número del salón social es obligatorio para eliminar");
-        if (!salonSocialRepository.existsByNumero(numero.trim()))
-            throw new NotFoundException("No existe un salón social con el número: " + numero);
-        salonSocialRepository.deleteByNumero(numero.trim());
-        return "Salón social eliminado con éxito";
+            throw new IllegalArgumentException("El número del salón social es obligatorio");
+
+        SalonSocialModel salon = salonSocialRepository.findByNumero(numero.trim())
+                .orElseThrow(() -> new NotFoundException("No existe un salón social con el número: " + numero));
+
+        salon.setActivo(activo);
+        salonSocialRepository.save(salon);
+        return activo ? "Salón social activado con éxito" : "Salón social desactivado con éxito";
     }
 
     public boolean salonSocialExistente(String numero) {

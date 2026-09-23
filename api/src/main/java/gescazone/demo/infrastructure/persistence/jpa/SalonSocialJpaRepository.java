@@ -10,7 +10,6 @@ import java.util.UUID;
 public interface SalonSocialJpaRepository extends JpaRepository<SalonSocialEntity, UUID> {
     Optional<SalonSocialEntity> findByNumero(String numero);
     boolean existsByNumero(String numero);
-    void deleteByNumero(String numero);
     List<SalonSocialEntity> findByEstado_NombreEstado(String nombreEstado);
     List<SalonSocialEntity> findByMedidas(String medidas);
 }

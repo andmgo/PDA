@@ -64,10 +64,23 @@ class ParqueaderoServiceTest {
     }
 
     @Test
-    void eliminar_noExistente_lanzaExcepcion() {
-        when(parqueaderoRepository.existsByNumero("P-01")).thenReturn(false);
-        assertThatThrownBy(() -> parqueaderoService.eliminar("P-01"))
+    void cambiarEstadoActivo_noExistente_lanzaExcepcion() {
+        when(parqueaderoRepository.findByNumero("P-01")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> parqueaderoService.cambiarEstadoActivo("P-01", false))
                 .isInstanceOf(NotFoundException.class);
+        verify(parqueaderoRepository, never()).save(any());
+    }
+
+    @Test
+    void cambiarEstadoActivo_valido_actualizaYGuarda() {
+        ParqueaderoModel p = parqueaderoValido();
+        when(parqueaderoRepository.findByNumero("P-01")).thenReturn(Optional.of(p));
+
+        String resultado = parqueaderoService.cambiarEstadoActivo("P-01", false);
+
+        assertThat(resultado).isEqualTo("Parqueadero desactivado con éxito");
+        assertThat(p.isActivo()).isFalse();
+        verify(parqueaderoRepository).save(p);
     }
 
     @Test

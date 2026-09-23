@@ -33,6 +33,9 @@ public class ParqueaderoEntity {
     @JoinColumn(name = "estado_id")
     private EstadoEntity estado;
 
+    @Column(nullable = false)
+    private boolean activo = true;
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
@@ -47,4 +50,7 @@ public class ParqueaderoEntity {
 
     public EstadoEntity getEstado() { return estado; }
     public void setEstado(EstadoEntity estado) { this.estado = estado; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }

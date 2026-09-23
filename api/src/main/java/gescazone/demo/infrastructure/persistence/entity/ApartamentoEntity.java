@@ -39,6 +39,9 @@ public class ApartamentoEntity {
     @JoinColumn(name = "estado_cuenta_id")
     private EstadoCuentaEntity estadoCuenta;
 
+    @Column(nullable = false)
+    private boolean activo = true;
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
@@ -56,4 +59,7 @@ public class ApartamentoEntity {
 
     public EstadoCuentaEntity getEstadoCuenta() { return estadoCuenta; }
     public void setEstadoCuenta(EstadoCuentaEntity estadoCuenta) { this.estadoCuenta = estadoCuenta; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }

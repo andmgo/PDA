@@ -83,15 +83,16 @@ public class ApartamentoService {
         return "Apartamento actualizado con éxito";
     }
 
-    public String eliminar(String numero) {
+    public String cambiarEstado(String numero, boolean activo) {
         if (numero == null || numero.trim().isEmpty())
-            throw new IllegalArgumentException("El número del apartamento es obligatorio para eliminar");
+            throw new IllegalArgumentException("El número del apartamento es obligatorio");
 
-        if (!apartamentoRepository.existsByNumero(numero.trim()))
-            throw new NotFoundException("No existe un apartamento con el número: " + numero);
+        ApartamentoModel apartamento = apartamentoRepository.findByNumero(numero.trim())
+                .orElseThrow(() -> new NotFoundException("No existe un apartamento con el número: " + numero));
 
-        apartamentoRepository.deleteByNumero(numero.trim());
-        return "Apartamento eliminado con éxito";
+        apartamento.setActivo(activo);
+        apartamentoRepository.save(apartamento);
+        return activo ? "Apartamento activado con éxito" : "Apartamento desactivado con éxito";
     }
 
     public boolean apartamentoExistente(String numeroApto) {

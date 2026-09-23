@@ -29,6 +29,7 @@ public class ParqueaderoRepositoryImpl implements ParqueaderoRepository {
         model.setNumero(entity.getNumero());
         model.setMedidas(entity.getMedidas());
         model.setTelefono(entity.getTelefono());
+        model.setActivo(entity.isActivo());
 
         if (entity.getEstado() != null) {
             EstadoModel estado = new EstadoModel();
@@ -45,6 +46,7 @@ public class ParqueaderoRepositoryImpl implements ParqueaderoRepository {
         entity.setNumero(model.getNumero());
         entity.setMedidas(model.getMedidas());
         entity.setTelefono(model.getTelefono());
+        entity.setActivo(model.isActivo());
 
         if (model.getEstado() != null) {
             String nombre = model.getEstado().getNombreEstado();
@@ -67,11 +69,6 @@ public class ParqueaderoRepositoryImpl implements ParqueaderoRepository {
     }
 
     @Override
-    public void deleteByNumero(String numero) {
-        jpaRepository.deleteByNumero(numero);
-    }
-
-    @Override
     public List<ParqueaderoModel> findByNombreEstado(String nombreEstado) {
         return jpaRepository.findByEstado_NombreEstado(nombreEstado)
                 .stream().map(this::toModel).toList();
@@ -86,11 +83,6 @@ public class ParqueaderoRepositoryImpl implements ParqueaderoRepository {
     @Override
     public ParqueaderoModel save(ParqueaderoModel parqueadero) {
         return toModel(jpaRepository.save(toEntity(parqueadero)));
-    }
-
-    @Override
-    public void deleteById(String id) {
-        jpaRepository.deleteById(UUID.fromString(id));
     }
 
     @Override

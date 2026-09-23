@@ -90,9 +90,14 @@ public class UsuarioRestController {
         return ResponseEntity.ok(usuarioService.actualizar(usuario));
     }
 
-    @DeleteMapping("/eliminar/{numeroDocumento}")
-    public ResponseEntity<String> eliminar(@PathVariable String numeroDocumento) {
-        return ResponseEntity.ok(usuarioService.eliminar(numeroDocumento));
+    @PutMapping("/desactivar/{numeroDocumento}")
+    public ResponseEntity<String> desactivar(@PathVariable String numeroDocumento) {
+        return ResponseEntity.ok(usuarioService.cambiarEstadoActivo(numeroDocumento, false));
+    }
+
+    @PutMapping("/activar/{numeroDocumento}")
+    public ResponseEntity<String> activar(@PathVariable String numeroDocumento) {
+        return ResponseEntity.ok(usuarioService.cambiarEstadoActivo(numeroDocumento, true));
     }
 
     @PostMapping("/cambiar-contrasena")
@@ -135,6 +140,7 @@ public class UsuarioRestController {
             map.put("nombreRol", usuario.getRol().getNombreRol());
         if (usuario.getTipoDocumento() != null)
             map.put("nombreTipoDocumento", usuario.getTipoDocumento().getNombreTipoDocumento());
+        map.put("activo", usuario.isActivo());
         return map;
     }
 }

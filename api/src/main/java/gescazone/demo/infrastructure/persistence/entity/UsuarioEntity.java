@@ -46,6 +46,9 @@ public class UsuarioEntity {
     @JoinColumn(name = "tipo_documento_id")
     private TipoDocumentoEntity tipoDocumento;
 
+    @Column(nullable = false)
+    private boolean activo = true;
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
@@ -69,4 +72,7 @@ public class UsuarioEntity {
 
     public TipoDocumentoEntity getTipoDocumento() { return tipoDocumento; }
     public void setTipoDocumento(TipoDocumentoEntity tipoDocumento) { this.tipoDocumento = tipoDocumento; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 }

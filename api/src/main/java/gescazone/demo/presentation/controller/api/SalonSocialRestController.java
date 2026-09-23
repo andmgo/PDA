@@ -156,9 +156,14 @@ public class SalonSocialRestController {
         return ResponseEntity.ok(salonSocialService.actualizar(salon));
     }
 
-    @DeleteMapping("/eliminar/{numero}")
-    public ResponseEntity<String> eliminar(@PathVariable String numero) {
-        return ResponseEntity.ok(salonSocialService.eliminar(numero));
+    @PutMapping("/desactivar/{numero}")
+    public ResponseEntity<String> desactivar(@PathVariable String numero) {
+        return ResponseEntity.ok(salonSocialService.cambiarEstadoActivo(numero, false));
+    }
+
+    @PutMapping("/activar/{numero}")
+    public ResponseEntity<String> activar(@PathVariable String numero) {
+        return ResponseEntity.ok(salonSocialService.cambiarEstadoActivo(numero, true));
     }
 
     @PostMapping("/cambiar-estado")
@@ -205,6 +210,7 @@ public class SalonSocialRestController {
         map.put("numero", salon.getNumero());
         map.put("medidas", salon.getMedidas());
         map.put("telefono", salon.getTelefono());
+        map.put("activo", salon.isActivo());
         if (salon.getEstado() != null)
             map.put("nombreEstado", salon.getEstado().getNombreEstado());
         return map;

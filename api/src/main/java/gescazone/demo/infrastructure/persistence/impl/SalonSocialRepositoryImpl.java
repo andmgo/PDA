@@ -29,6 +29,7 @@ public class SalonSocialRepositoryImpl implements SalonSocialRepository {
         model.setNumero(entity.getNumero());
         model.setMedidas(entity.getMedidas());
         model.setTelefono(entity.getTelefono());
+        model.setActivo(entity.isActivo());
 
         if (entity.getEstado() != null) {
             EstadoModel estado = new EstadoModel();
@@ -45,6 +46,7 @@ public class SalonSocialRepositoryImpl implements SalonSocialRepository {
         entity.setNumero(model.getNumero());
         entity.setMedidas(model.getMedidas());
         entity.setTelefono(model.getTelefono());
+        entity.setActivo(model.isActivo());
 
         if (model.getEstado() != null) {
             String nombre = model.getEstado().getNombreEstado();
@@ -67,11 +69,6 @@ public class SalonSocialRepositoryImpl implements SalonSocialRepository {
     }
 
     @Override
-    public void deleteByNumero(String numero) {
-        jpaRepository.deleteByNumero(numero);
-    }
-
-    @Override
     public List<SalonSocialModel> findByNombreEstado(String nombreEstado) {
         return jpaRepository.findByEstado_NombreEstado(nombreEstado)
                 .stream().map(this::toModel).toList();
@@ -86,11 +83,6 @@ public class SalonSocialRepositoryImpl implements SalonSocialRepository {
     @Override
     public SalonSocialModel save(SalonSocialModel salon) {
         return toModel(jpaRepository.save(toEntity(salon)));
-    }
-
-    @Override
-    public void deleteById(String id) {
-        jpaRepository.deleteById(UUID.fromString(id));
     }
 
     @Override

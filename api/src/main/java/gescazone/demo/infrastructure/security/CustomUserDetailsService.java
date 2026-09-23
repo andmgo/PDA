@@ -28,24 +28,21 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Usuario no encontrado: " + numeroDocumento));
 
-        // 2. Validar que el usuario esté activo (si tu modelo tiene ese campo)
-        //    Descomenta si UsuarioModel tiene un campo 'activo' o 'habilitado':
-        // if (!usuario.isActivo()) {
-        //     throw new DisabledException("Usuario deshabilitado: " + numeroDocumento);
-        // }
-
-        // 3. Construir el rol con prefijo ROLE_ (requerido por Spring Security)
+        // 2. Construir el rol con prefijo ROLE_ (requerido por Spring Security)
         String roleName = RolNombre.toAuthority(usuario.getRol().getNombreRol());
 
-        // 4. Retornar UserDetails con toda la información necesaria
+        // 3. Retornar UserDetails con toda la información necesaria. disabled
+        //    en true hace que DaoAuthenticationProvider (usado por /api/auth/login
+        //    vía AuthenticationManager) rechace el login con DisabledException
+        //    automáticamente — ver AuthController. login-google NO pasa por el
+        //    AuthenticationManager, así que ese endpoint repite el chequeo a mano.
         return User.builder()
                 .username(usuario.getNumeroDocumento())
                 .password(usuario.getContrasena())
                 .authorities(Collections.singletonList(new SimpleGrantedAuthority(roleName)))
-                // accountExpired, credentialsExpired, accountLocked todos en false = cuenta válida
                 .accountExpired(false)
                 .credentialsExpired(false)
-                .disabled(false)
+                .disabled(!usuario.isActivo())
                 .build();
     }
 }

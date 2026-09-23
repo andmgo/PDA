@@ -37,6 +37,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
         model.setApellido(entity.getApellido());
         model.setCorreo(entity.getCorreo());
         model.setContrasena(entity.getContrasena());
+        model.setActivo(entity.isActivo());
 
         if (entity.getRol() != null) {
             RolModel rol = new RolModel();
@@ -61,6 +62,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
         entity.setApellido(model.getApellido());
         entity.setCorreo(model.getCorreo());
         entity.setContrasena(model.getContrasena());
+        entity.setActivo(model.isActivo());
 
         if (model.getRol() != null) {
             String nombre = model.getRol().getNombreRol();
@@ -90,11 +92,6 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     }
 
     @Override
-    public void deleteByNumeroDocumento(String numeroDocumento) {
-        jpaRepository.deleteByNumeroDocumento(numeroDocumento);
-    }
-
-    @Override
     public List<UsuarioModel> findByNombreRol(String nombreRol) {
         return jpaRepository.findByRol_NombreRol(nombreRol)
                 .stream().map(this::toModel).toList();
@@ -119,11 +116,6 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     @Override
     public UsuarioModel save(UsuarioModel usuario) {
         return toModel(jpaRepository.save(toEntity(usuario)));
-    }
-
-    @Override
-    public void deleteById(String id) {
-        jpaRepository.deleteById(UUID.fromString(id));
     }
 
     @Override

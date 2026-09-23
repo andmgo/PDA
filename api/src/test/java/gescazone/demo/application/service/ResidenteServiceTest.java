@@ -96,10 +96,23 @@ class ResidenteServiceTest {
     }
 
     @Test
-    void eliminar_noExistente_lanzaExcepcion() {
-        when(residenteRepository.existsByNumeroDocumento(123456)).thenReturn(false);
-        assertThatThrownBy(() -> residenteService.eliminar(123456))
+    void cambiarEstado_noExistente_lanzaExcepcion() {
+        when(residenteRepository.findByNumeroDocumento(123456)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> residenteService.cambiarEstado(123456, false))
                 .isInstanceOf(NotFoundException.class);
+        verify(residenteRepository, never()).save(any());
+    }
+
+    @Test
+    void cambiarEstado_valido_actualizaYGuarda() {
+        ResidenteModel r = residenteValido();
+        when(residenteRepository.findByNumeroDocumento(123456)).thenReturn(Optional.of(r));
+
+        String resultado = residenteService.cambiarEstado(123456, false);
+
+        assertThat(resultado).isEqualTo("Residente desactivado con éxito");
+        assertThat(r.isActivo()).isFalse();
+        verify(residenteRepository).save(r);
     }
 
     @Test

@@ -95,13 +95,16 @@ public class ResidenteService {
     return "Residente actualizado con éxito";
 }
 
-    public String eliminar(Integer numeroDocumento) {
+    public String cambiarEstado(Integer numeroDocumento, boolean activo) {
         if (numeroDocumento == null)
-            throw new IllegalArgumentException("El número de documento es obligatorio para eliminar");
-        if (!residenteRepository.existsByNumeroDocumento(numeroDocumento))
-            throw new NotFoundException("No existe un residente con el documento: " + numeroDocumento);
-        residenteRepository.deleteByNumeroDocumento(numeroDocumento);
-        return "Residente eliminado con éxito";
+            throw new IllegalArgumentException("El número de documento es obligatorio");
+
+        ResidenteModel residente = residenteRepository.findByNumeroDocumento(numeroDocumento)
+                .orElseThrow(() -> new NotFoundException("No existe un residente con el documento: " + numeroDocumento));
+
+        residente.setActivo(activo);
+        residenteRepository.save(residente);
+        return activo ? "Residente activado con éxito" : "Residente desactivado con éxito";
     }
 
     public boolean residenteExistente(Integer numeroDocumento) {

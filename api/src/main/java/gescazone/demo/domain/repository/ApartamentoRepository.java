@@ -8,11 +8,9 @@ public interface ApartamentoRepository {
 
     Optional<ApartamentoModel> findByNumero(String numero);
     boolean existsByNumero(String numero);
-    void deleteByNumero(String numero);
     List<ApartamentoModel> findByNombreTipoOcupacion(String nombreTipoOcupacion);
     List<ApartamentoModel> findByNombreEstadoCuenta(String nombreEstadoCuenta);
     ApartamentoModel save(ApartamentoModel apartamento);
-    void deleteById(String id);
     Optional<ApartamentoModel> findById(String id);
     List<ApartamentoModel> findAll();
 }
