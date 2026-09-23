@@ -21,4 +21,11 @@ public interface RolPermisoRepository {
 
     /** Marca/desmarca ver y editar para una celda (rol, permiso) puntual. */
     void guardarPermiso(String nombreRol, String codigoPermiso, boolean puedeVer, boolean puedeEditar);
+
+    /**
+     * Elimina un rol. Falla si no existe, si todavía tiene usuarios asignados,
+     * o si es el último rol con permiso para administrar roles y permisos
+     * (dejaría la pantalla sin nadie que pueda volver a abrirla).
+     */
+    void eliminarRol(String nombreRol);
 }

@@ -67,4 +67,11 @@ public class RolPermisoRestController {
         permisoService.invalidarCache();
         return ResponseEntity.ok("Permiso actualizado exitosamente");
     }
+
+    @DeleteMapping("/roles/{nombreRol}")
+    public ResponseEntity<String> eliminarRol(@PathVariable String nombreRol) {
+        rolPermisoRepository.eliminarRol(nombreRol);
+        permisoService.invalidarCache();
+        return ResponseEntity.ok("Rol eliminado exitosamente");
+    }
 }
