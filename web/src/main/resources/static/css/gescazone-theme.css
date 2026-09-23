@@ -106,6 +106,36 @@ body {
     border-color: var(--gsz-border) !important;
 }
 
+/* Roles y Permisos: pastillas de rol seleccionable y botón "Eliminar rol".
+   NO usar dark:bg-slate-800/dark:text-slate-300/dark:hover:* aquí —
+   argon-dashboard-tailwind.css es un bundle de Tailwind pre-compilado y
+   estático (no se regenera al arrancar la app), así que solo trae las
+   variantes dark: que ya estaban en uso en el resto del proyecto; una
+   combinación nueva como esas simplemente no existe en el CSS servido y
+   no hace nada (bug real reportado: "en roles y permisos [botones] salen
+   blancos"). Usando los tokens --gsz-* de abajo en vez de utilidades
+   dark: inventadas, el claro/oscuro sale gratis porque el token ya
+   cambia de valor solo con :root.dark. */
+.gsz-role-pill {
+    background-color: var(--gsz-surface-2);
+    color: var(--gsz-ink-muted);
+}
+.gsz-role-pill:hover {
+    background-color: var(--gsz-blue-soft);
+}
+.gsz-role-pill.activo {
+    background-color: var(--gsz-blue);
+    color: #fff;
+}
+
+.gsz-btn-peligro {
+    color: var(--gsz-red);
+    border-color: var(--gsz-red-soft);
+}
+.gsz-btn-peligro:hover {
+    background-color: var(--gsz-red-soft);
+}
+
 /* Mismo bug otra vez: el "Calendario de Disponibilidad" de reservas.html
    es un widget propio (.calendar/.calendar-day/...), no un <input>. Los
    días sin reserva ni son "hoy" (reservas.js: dayEl.textContent = day,
