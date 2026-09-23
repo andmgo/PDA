@@ -8,6 +8,7 @@ import gescazone.demo.application.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -95,14 +96,18 @@ public class UsuarioRestController {
     }
 
     @PostMapping("/cambiar-contrasena")
-    public ResponseEntity<String> cambiarContrasena(@RequestBody Map<String, String> datos) {
-        String numeroDocumento = datos.get("numeroDocumento");
+    public ResponseEntity<String> cambiarContrasena(@RequestBody Map<String, String> datos,
+                                                     Authentication authentication) {
+        // El número de documento sale del JWT, nunca del body — si viniera del
+        // cliente, cualquier usuario autenticado podría intentar cambiar la
+        // contraseña de otro con solo adivinar/conocer su contraseña actual
+        // (mismo tipo de IDOR que ReservaSalonSocialRestController.crearPropia
+        // ya corrigió para reservas).
+        String numeroDocumento = authentication.getName();
         String contrasenaActual = datos.get("contrasenaActual");
         String contrasenaNueva = datos.get("contrasenaNueva");
         String confirmarContrasena = datos.get("confirmarContrasena");
 
-        if (numeroDocumento == null || numeroDocumento.trim().isEmpty())
-            return ResponseEntity.badRequest().body("El número de documento es obligatorio");
         if (contrasenaActual == null || contrasenaActual.trim().isEmpty())
             return ResponseEntity.badRequest().body("La contraseña actual es obligatoria");
         if (contrasenaNueva == null || contrasenaNueva.trim().isEmpty())

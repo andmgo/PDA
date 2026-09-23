@@ -129,9 +129,15 @@ public class SecurityConfig {
                     "/api/usuarios/crear",
                     "/api/usuarios/actualizar/**",
                     "/api/usuarios/eliminar/**",
-                    "/api/usuarios/todos",
-                    "/api/usuarios/cambiar-contrasena"
+                    "/api/usuarios/todos"
                 ).access(permiso("USUARIOS", NivelPermiso.EDITAR))
+
+                // Cambiar la propia contraseña no es "administrar usuarios" — lo
+                // puede hacer cualquiera autenticado, tenga o no el permiso
+                // USUARIOS-editar (que hoy solo tiene ADMINISTRADOR). El propio
+                // controller ya limita la acción a la cuenta del JWT y exige la
+                // contraseña actual.
+                .requestMatchers("/api/usuarios/cambiar-contrasena").authenticated()
 
                 .requestMatchers("/api/roles-permisos/**")
                     .access(permiso("GESTION_DATOS", NivelPermiso.EDITAR))

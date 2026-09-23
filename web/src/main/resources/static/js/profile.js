@@ -38,6 +38,48 @@ document.getElementById('avatarInput').addEventListener('change', function(e) {
     }
 });
 
+// Cambio de contraseña — llama directo a /api/usuarios/cambiar-contrasena
+// (proxied por ApiProxyController, que adjunta el JWT). El número de
+// documento lo resuelve la Api desde ese JWT, nunca se manda desde acá.
+document.getElementById('formCambiarContrasena').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const contrasenaActual = document.getElementById('contrasenaActual').value;
+    const contrasenaNueva = document.getElementById('contrasenaNueva').value;
+    const confirmarContrasenaNueva = document.getElementById('confirmarContrasenaNueva').value;
+
+    if (contrasenaNueva.length < 6) {
+        mostrarMensajeContrasena('La contraseña nueva debe tener al menos 6 caracteres.', true);
+        return;
+    }
+    if (contrasenaNueva !== confirmarContrasenaNueva) {
+        mostrarMensajeContrasena('Las contraseñas nuevas no coinciden.', true);
+        return;
+    }
+
+    const resp = await fetch('/api/usuarios/cambiar-contrasena', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contrasenaActual, contrasenaNueva, confirmarContrasena: confirmarContrasenaNueva })
+    });
+
+    if (resp.ok) {
+        mostrarMensajeContrasena('Contraseña actualizada correctamente.', false);
+        this.reset();
+    } else {
+        const texto = await resp.text();
+        mostrarMensajeContrasena(texto || 'No se pudo cambiar la contraseña.', true);
+    }
+});
+
+function mostrarMensajeContrasena(texto, esError) {
+    const el = document.getElementById('mensajeContrasena');
+    el.textContent = texto;
+    el.className = 'mb-4 px-4 py-2 rounded-lg text-sm ' +
+        (esError ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600');
+    setTimeout(() => { el.className = 'hidden mb-4 px-4 py-2 rounded-lg text-sm'; }, 4000);
+}
+
 // Actualizar último acceso
 function updateLastAccess() {
     const now = new Date();

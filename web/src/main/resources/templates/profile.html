@@ -150,15 +150,32 @@
                         <!-- Tab 2: Seguridad -->
                         <div class="tab-content">
                             <div class="p-6">
-                                <div class="info-box" style="margin-bottom: 1.5rem;">
-                                    <i class="fas fa-lock"></i>
-                                    <div class="info-box-content">
-                                        <div class="info-box-title">Contraseña</div>
-                                        <div class="info-box-text">
-                                            Tu contraseña está protegida y no puede ser visualizada. Para cambiar tu contraseña, contacta al administrador del sistema.
+                                <div id="mensajeContrasena" class="hidden mb-4 px-4 py-2 rounded-lg text-sm"></div>
+
+                                <form id="formCambiarContrasena" style="margin-bottom: 1.5rem;">
+                                    <div class="form-group">
+                                        <label class="form-label">Contraseña actual</label>
+                                        <input type="password" id="contrasenaActual" class="form-control"
+                                               required autocomplete="current-password">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Contraseña nueva</label>
+                                            <input type="password" id="contrasenaNueva" class="form-control"
+                                                   required minlength="6" placeholder="Mínimo 6 caracteres"
+                                                   autocomplete="new-password">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Confirmar contraseña nueva</label>
+                                            <input type="password" id="confirmarContrasenaNueva" class="form-control"
+                                                   required minlength="6" placeholder="Repite la contraseña nueva"
+                                                   autocomplete="new-password">
                                         </div>
                                     </div>
-                                </div>
+                                    <button type="submit" class="btn-primary">
+                                        <i class="fas fa-key mr-2"></i>Cambiar contraseña
+                                    </button>
+                                </form>
 
                                 <div class="info-box">
                                     <i class="fas fa-shield-alt"></i>
