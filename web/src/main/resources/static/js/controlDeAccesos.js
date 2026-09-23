@@ -133,12 +133,12 @@ function openTab(evt, tabName) {
     }
     const tabButtons = document.getElementsByClassName('tab-button');
     for (let i = 0; i < tabButtons.length; i++) {
-        tabButtons[i].classList.remove('active');
-        tabButtons[i].style.color = '#94a3b8';
+        tabButtons[i].classList.remove('active', 'text-slate-700');
+        tabButtons[i].classList.add('text-slate-400');
     }
     document.getElementById(tabName).classList.add('active');
-    evt.currentTarget.classList.add('active');
-    evt.currentTarget.style.color = '#334155';
+    evt.currentTarget.classList.add('active', 'text-slate-700');
+    evt.currentTarget.classList.remove('text-slate-400');
 }
 
 function formatFecha(fechaStr) {
