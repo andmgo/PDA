@@ -36,13 +36,12 @@
             <div class="quote">
                 &ldquo;Un solo lugar para reservar el salón social, ver la cartera del apartamento y avisar
                 que llegó un paquete.&rdquo;
-                <span class="who">Carlos Propietario &middot; Torre 2, Apto 304</span>
             </div>
         </div>
 
         <div class="login-body">
             <h2 class="form-title">Bienvenido de nuevo</h2>
-            <p class="form-subtitle">Ingresa con tu número de documento.</p>
+            <p class="form-subtitle">Ingresa con tu número de documento o tu correo.</p>
 
             <!-- Mensajes de error según tipo -->
             <div th:if="${param.error != null}">
@@ -72,14 +71,14 @@
             <!-- Formulario manejado por Spring Security -->
             <form th:action="@{/login}" method="post" id="loginForm">
                 <div class="form-group">
-                    <label for="username">Número de documento</label>
+                    <label for="username">Documento o correo</label>
                     <input
                         type="text"
                         id="username"
                         name="username"
                         required
-                        maxlength="15"
-                        placeholder="Ingresa tu número de documento"
+                        maxlength="100"
+                        placeholder="Número de documento o correo electrónico"
                         autocomplete="username">
                 </div>
 
@@ -97,7 +96,7 @@
                 <div class="remember-forgot">
                     <label>
                         <input type="checkbox" id="recordar">
-                        Recordar mi documento
+                        Recordar mi usuario
                     </label>
                     <a th:href="@{/registro}" class="forgot-link">¿No tienes cuenta? Regístrate</a>
                 </div>

@@ -10,29 +10,25 @@
 
 const CLAVE_DOCUMENTO_RECORDADO = 'gescazone_documento';
 
-document.getElementById('username').addEventListener('input', function () {
-    this.value = this.value.replace(/\D/g, '');
-});
-
 document.getElementById('loginForm').addEventListener('submit', function (e) {
-    const numeroDocumento = document.getElementById('username').value;
+    const identificador = document.getElementById('username').value.trim();
     const contrasena = document.getElementById('password').value;
 
-    if (!numeroDocumento || !contrasena) {
+    if (!identificador || !contrasena) {
         e.preventDefault();
         mostrarError('Por favor, completa todos los campos.');
         return;
     }
 
-    if (numeroDocumento.length < 6) {
+    if (identificador.length < 6) {
         e.preventDefault();
-        mostrarError('El número de documento debe tener al menos 6 dígitos.');
+        mostrarError('Ingresa tu número de documento o tu correo completo.');
         return;
     }
 
     try {
         if (document.getElementById('recordar').checked) {
-            localStorage.setItem(CLAVE_DOCUMENTO_RECORDADO, numeroDocumento);
+            localStorage.setItem(CLAVE_DOCUMENTO_RECORDADO, identificador);
         } else {
             localStorage.removeItem(CLAVE_DOCUMENTO_RECORDADO);
         }

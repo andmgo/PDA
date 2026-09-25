@@ -272,6 +272,18 @@ li.mt-0\.5.w-full > a.bg-blue-500\/13 .gsz-icon-badge {
 .gsz-badge-cyan    { --ic-bg: var(--gsz-cyan-soft);    --ic-fg: var(--gsz-cyan); }
 .gsz-badge-neutral { --ic-bg: var(--gsz-neutral-soft); --ic-fg: var(--gsz-neutral); }
 
+/* Cabecera del sidebar: antes usaba la utilidad h-19 (altura FIJA de
+   4.75rem) — con "GESCAZONE" entraba justo en una sola línea, pero
+   "Aurum Condominios" no entra en el ancho disponible (256px de sidebar
+   menos el padding y el botón de tema) y quedaba cortado. Se saca el
+   whitespace-nowrap del renglón (ver sidebar.html) para que el texto
+   pueda pasar a una segunda línea, y esta clase reemplaza la altura fija
+   por un mínimo — así crece sola si el texto ocupa dos líneas. */
+.gsz-sidebar-header {
+    min-height: 4.75rem;
+    height: auto;
+}
+
 /* ── Interruptor de tema (claro/oscuro) del sidebar ── */
 .gsz-theme-toggle {
     width: 30px;

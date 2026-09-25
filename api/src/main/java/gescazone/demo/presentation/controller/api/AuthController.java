@@ -68,7 +68,10 @@ public class AuthController {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(numeroDocumento, contrasena));
-            return respuestaLogin(authentication, numeroDocumento);
+            // authentication.getName() es siempre el número de documento real
+            // (ver CustomUserDetailsService), aunque lo escrito por la persona
+            // haya sido su correo — respuestaLogin() busca por documento.
+            return respuestaLogin(authentication, authentication.getName());
         } catch (DisabledException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Esta cuenta está desactivada. Contacta a un administrador.");
         } catch (BadCredentialsException e) {

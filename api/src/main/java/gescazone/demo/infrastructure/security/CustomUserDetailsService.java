@@ -21,12 +21,15 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String numeroDocumento) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String identificador) throws UsernameNotFoundException {
 
-        // 1. Buscar usuario por número de documento
-        UsuarioModel usuario = usuarioRepository.findByNumeroDocumento(numeroDocumento)
+        // 1. Buscar por número de documento y, si no coincide con ninguno,
+        //    probar por correo — así el login acepta cualquiera de los dos
+        //    sin que el llamador (AuthenticationManager) tenga que saber cuál es.
+        UsuarioModel usuario = usuarioRepository.findByNumeroDocumento(identificador)
+                .or(() -> usuarioRepository.findByCorreo(identificador))
                 .orElseThrow(() -> new UsernameNotFoundException(
-                        "Usuario no encontrado: " + numeroDocumento));
+                        "Usuario no encontrado: " + identificador));
 
         // 2. Construir el rol con prefijo ROLE_ (requerido por Spring Security)
         String roleName = RolNombre.toAuthority(usuario.getRol().getNombreRol());

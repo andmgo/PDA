@@ -62,9 +62,27 @@ class CustomUserDetailsServiceTest {
     @Test
     void loadUserByUsername_usuarioInexistente_lanzaUsernameNotFoundException() {
         when(usuarioRepository.findByNumeroDocumento("999")).thenReturn(Optional.empty());
+        when(usuarioRepository.findByCorreo("999")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername("999"))
                 .isInstanceOf(UsernameNotFoundException.class)
                 .hasMessageContaining("999");
+    }
+
+    @Test
+    void loadUserByUsername_conCorreoEnVezDeDocumento_loEncuentraPorCorreo() {
+        UsuarioModel usuario = new UsuarioModel();
+        usuario.setNumeroDocumento("123456");
+        usuario.setContrasena("hash-bcrypt");
+        usuario.setRol(new RolModel("propietario"));
+        when(usuarioRepository.findByNumeroDocumento("ana@aurumcondominios.com")).thenReturn(Optional.empty());
+        when(usuarioRepository.findByCorreo("ana@aurumcondominios.com")).thenReturn(Optional.of(usuario));
+
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername("ana@aurumcondominios.com");
+
+        // El "username" de Spring Security queda como el documento real, no
+        // el correo que se usó para encontrarlo — así una sesión iniciada
+        // con correo es idéntica a una iniciada con documento.
+        assertThat(userDetails.getUsername()).isEqualTo("123456");
     }
 }

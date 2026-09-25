@@ -31,23 +31,29 @@ public class ApiAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String numeroDocumento = authentication.getName();
+        // Lo que haya escrito la persona — documento o correo, la Api acepta
+        // cualquiera de los dos (ver CustomUserDetailsService.loadUserByUsername).
+        String identificador = authentication.getName();
         String contrasena = String.valueOf(authentication.getCredentials());
 
         LoginResultado resultado;
         try {
-            resultado = authApiClient.login(numeroDocumento, contrasena);
+            resultado = authApiClient.login(identificador, contrasena);
         } catch (HttpClientErrorException.Unauthorized e) {
-            throw new BadCredentialsException("Documento o contraseña incorrectos");
+            throw new BadCredentialsException("Documento/correo o contraseña incorrectos");
         } catch (Exception e) {
             throw new BadCredentialsException("No se pudo validar las credenciales. Intenta de nuevo.");
         }
 
         sesionUsuario.iniciarSesion(resultado);
 
+        // El nombre autenticado de la sesión SIEMPRE es el número de documento
+        // real que devolvió la Api — nunca lo que la persona haya tecleado —
+        // para que una sesión iniciada con correo quede igual que una iniciada
+        // con documento.
         String authority = "ROLE_" + resultado.nombreRol().toUpperCase();
         return new UsernamePasswordAuthenticationToken(
-                numeroDocumento, null, Collections.singletonList(new SimpleGrantedAuthority(authority)));
+                resultado.numeroDocumento(), null, Collections.singletonList(new SimpleGrantedAuthority(authority)));
     }
 
     @Override
