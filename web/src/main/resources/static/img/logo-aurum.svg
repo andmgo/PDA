@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Aurum Condominios">
+  <defs>
+    <linearGradient id="aurumGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7CA6FA"/>
+      <stop offset="55%" stop-color="#3E7EFA"/>
+      <stop offset="100%" stop-color="#17356E"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="200" cy="182" r="142" fill="none" stroke="url(#aurumGrad)" stroke-width="10" stroke-linecap="round"/>
+
+  <g fill="none" stroke="url(#aurumGrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <!-- torre lateral izquierda -->
+    <rect x="66" y="228" width="44" height="112" rx="4"/>
+    <!-- torre lateral derecha -->
+    <rect x="290" y="228" width="44" height="112" rx="4"/>
+    <!-- torre central con techo en punta (remite a la "A" de Aurum) -->
+    <path d="M126 340 V206 L200 130 L274 206 V340" />
+    <line x1="126" y1="340" x2="126" y2="206"/>
+    <line x1="274" y1="340" x2="274" y2="206"/>
+  </g>
+
+  <!-- linea de base -->
+  <line x1="52" y1="340" x2="348" y2="340" stroke="url(#aurumGrad)" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- ventanas de la torre central -->
+  <g fill="url(#aurumGrad)">
+    <rect x="172" y="196" width="12" height="12" rx="2"/>
+    <rect x="216" y="196" width="12" height="12" rx="2"/>
+    <rect x="172" y="230" width="12" height="12" rx="2"/>
+    <rect x="216" y="230" width="12" height="12" rx="2"/>
+  </g>
+
+  <!-- destellos -->
+  <g fill="url(#aurumGrad)">
+    <path d="M96 150 l7 17 17 7 -17 7 -7 17 -7 -17 -17 -7 17 -7 z"/>
+    <path d="M304 150 l7 17 17 7 -17 7 -7 17 -7 -17 -17 -7 17 -7 z"/>
+  </g>
+</svg>
