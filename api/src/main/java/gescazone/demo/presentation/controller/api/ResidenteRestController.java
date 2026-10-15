@@ -28,7 +28,7 @@ public class ResidenteRestController {
     }
 
     @GetMapping("/{numeroDocumento}")
-    public ResponseEntity<Map<String, Object>> obtenerPorDocumento(@PathVariable Integer numeroDocumento) {
+    public ResponseEntity<Map<String, Object>> obtenerPorDocumento(@PathVariable String numeroDocumento) {
         ResidenteModel residente = residenteService.consultar(numeroDocumento);
         if (residente == null)
             return ResponseEntity.notFound().build();
@@ -72,7 +72,7 @@ public class ResidenteRestController {
             return ResponseEntity.badRequest().body("El tipo de residente es obligatorio");
 
         ResidenteModel residente = new ResidenteModel();
-        residente.setNumeroDocumento(((Number) datos.get("numeroDocumento")).intValue());
+        residente.setNumeroDocumento(ResidenteModel.normalizarDocumento(datos.get("numeroDocumento")));
         residente.setNombre((String) datos.get("nombre"));
         residente.setApellido((String) datos.get("apellido"));
         if (datos.containsKey("celular") && datos.get("celular") != null)
@@ -84,7 +84,7 @@ public class ResidenteRestController {
     }
 
     @PutMapping("/actualizar/{numeroDocumento}")
-    public ResponseEntity<String> actualizar(@PathVariable Integer numeroDocumento,
+    public ResponseEntity<String> actualizar(@PathVariable String numeroDocumento,
                                              @RequestBody Map<String, Object> datos) {
         ResidenteModel residente = residenteService.consultar(numeroDocumento);
         if (residente == null)
@@ -105,12 +105,12 @@ public class ResidenteRestController {
     }
 
     @PutMapping("/desactivar/{numeroDocumento}")
-    public ResponseEntity<String> desactivar(@PathVariable Integer numeroDocumento) {
+    public ResponseEntity<String> desactivar(@PathVariable String numeroDocumento) {
         return ResponseEntity.ok(residenteService.cambiarEstado(numeroDocumento, false));
     }
 
     @PutMapping("/activar/{numeroDocumento}")
-    public ResponseEntity<String> activar(@PathVariable Integer numeroDocumento) {
+    public ResponseEntity<String> activar(@PathVariable String numeroDocumento) {
         return ResponseEntity.ok(residenteService.cambiarEstado(numeroDocumento, true));
     }
 

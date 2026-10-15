@@ -63,7 +63,7 @@ class VisitaServiceTest {
     private ResidenteModel visitante(String id, boolean activo) {
         ResidenteModel r = new ResidenteModel();
         r.setId(id);
-        r.setNumeroDocumento(1001);
+        r.setNumeroDocumento("1001");
         r.setNombre("Luis");
         r.setApellido("Gómez");
         r.setActivo(activo);
@@ -85,20 +85,20 @@ class VisitaServiceTest {
 
     @Test
     void ingreso_documentoNuevo_creaElVisitanteYRegistraEnUnSoloPaso() {
-        when(residenteRepository.findByNumeroDocumento(1001)).thenReturn(Optional.empty());
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.empty());
 
         String resultado = visitaService.registrarIngreso(aPie("1.001", "Luis", "Gómez"));
 
         assertThat(resultado).contains("Luis Gómez").contains("301");
         verify(residenteRepository).save(argThat(r ->
-                r.getNumeroDocumento() == 1001 && r.getTipoResidente().getNombreTipoResidente().equals("Visitante")));
+                "1001".equals(r.getNumeroDocumento()) && r.getTipoResidente().getNombreTipoResidente().equals("Visitante")));
         verify(registroVisitanteRepository).save(argThat(r ->
                 r.getIdResidente().equals("res-nuevo") && r.getIdApartamento().equals("apto-1")));
     }
 
     @Test
     void ingreso_documentoNuevoSinNombre_pideNombre() {
-        when(residenteRepository.findByNumeroDocumento(1001)).thenReturn(Optional.empty());
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> visitaService.registrarIngreso(aPie("1001", "", null)))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -109,7 +109,7 @@ class VisitaServiceTest {
     @Test
     void ingreso_visitanteQueYaVinoAntesYSalio_puedeVolverAEntrar() {
         // Antes esto fallaba: "Ya existe un registro para este residente en este apartamento"
-        when(residenteRepository.findByNumeroDocumento(1001)).thenReturn(Optional.of(visitante("res-1", true)));
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.of(visitante("res-1", true)));
         when(registroVisitanteRepository.findByIdResidenteAndFechaHoraSalidaIsNull("res-1")).thenReturn(List.of());
         when(registroParqueaderoRepository.findByIdResidenteAndFechaHoraSalidaIsNull("res-1")).thenReturn(List.of());
 
@@ -121,7 +121,7 @@ class VisitaServiceTest {
 
     @Test
     void ingreso_visitanteQueYaEstaAdentro_rechaza() {
-        when(residenteRepository.findByNumeroDocumento(1001)).thenReturn(Optional.of(visitante("res-1", true)));
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.of(visitante("res-1", true)));
         when(registroVisitanteRepository.findByIdResidenteAndFechaHoraSalidaIsNull("res-1"))
                 .thenReturn(List.of(new RegistroVisitanteModel("res-1", "apto-2", "2026-10-15 08:00:00")));
 
@@ -132,7 +132,7 @@ class VisitaServiceTest {
 
     @Test
     void ingreso_visitanteBloqueado_rechaza() {
-        when(residenteRepository.findByNumeroDocumento(1001)).thenReturn(Optional.of(visitante("res-1", false)));
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.of(visitante("res-1", false)));
 
         assertThatThrownBy(() -> visitaService.registrarIngreso(aPie("1001", null, null)))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -150,7 +150,7 @@ class VisitaServiceTest {
 
     @Test
     void ingresoEnVehiculo_sinParqueadero_asignaElPrimeroLibreQueNoSeaDeUnResidente() {
-        when(residenteRepository.findByNumeroDocumento(1001)).thenReturn(Optional.of(visitante("res-1", true)));
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.of(visitante("res-1", true)));
         ParqueaderoModel p1 = parqueadero("p-1", "P-01", "Disponible");   // asignado a un residente
         ParqueaderoModel p2 = parqueadero("p-2", "P-02", "Mantenimiento");
         ParqueaderoModel p3 = parqueadero("p-3", "P-03", "Disponible");   // ← el que debe tocar
@@ -169,7 +169,7 @@ class VisitaServiceTest {
 
     @Test
     void ingresoEnVehiculo_sinParqueaderosLibres_rechaza() {
-        when(residenteRepository.findByNumeroDocumento(1001)).thenReturn(Optional.of(visitante("res-1", true)));
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.of(visitante("res-1", true)));
         when(parqueaderoRepository.findAll()).thenReturn(List.of(parqueadero("p-1", "P-01", "Ocupado")));
         when(vehiculoRepository.findIdsParqueaderoAsignados()).thenReturn(List.of());
         when(registroParqueaderoRepository.findByFechaHoraSalidaIsNull()).thenReturn(List.of());
@@ -182,7 +182,7 @@ class VisitaServiceTest {
 
     @Test
     void ingresoEnVehiculo_placaYaAdentro_rechaza() {
-        when(residenteRepository.findByNumeroDocumento(1001)).thenReturn(Optional.of(visitante("res-1", true)));
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.of(visitante("res-1", true)));
         RegistroParqueaderoVisitanteModel adentro =
                 new RegistroParqueaderoVisitanteModel("res-9", "p-1", "2026-10-15 08:00:00", "ABC123");
         when(registroParqueaderoRepository.findByFechaHoraSalidaIsNull()).thenReturn(List.of(adentro));
@@ -194,10 +194,20 @@ class VisitaServiceTest {
     }
 
     @Test
-    void ingreso_documentoDemasiadoLargo_mensajeClaro() {
-        assertThatThrownBy(() -> visitaService.registrarIngreso(aPie("99999999999", "Luis", "Gómez")))
+    void ingreso_documentoLargoOConLetras_ahoraSeAcepta() {
+        // Antes residentes.numero_documento era INTEGER: 11 dígitos o un pasaporte fallaban.
+        when(residenteRepository.findByNumeroDocumento("AB12345678901")).thenReturn(Optional.empty());
+
+        visitaService.registrarIngreso(aPie("ab-1234567.8901", "Luis", "Gómez"));
+
+        verify(residenteRepository).save(argThat(r -> "AB12345678901".equals(r.getNumeroDocumento())));
+    }
+
+    @Test
+    void ingreso_documentoMuyCorto_rechaza() {
+        assertThatThrownBy(() -> visitaService.registrarIngreso(aPie("12", "Luis", "Gómez")))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("demasiado largo");
+                .hasMessageContaining("entre 4 y 20");
     }
 
     @Test

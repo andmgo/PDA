@@ -91,7 +91,7 @@ function estadoVisitante(html, clase) {
 /** Al escribir el documento: si ya vino antes, autocompleta. */
 function alEscribirDocumento() {
     clearTimeout(busquedaVisitante);
-    const doc = document.getElementById('docVisitante').value.replace(/\D/g, '');
+    const doc = document.getElementById('docVisitante').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (doc.length < 5) { estadoVisitante(''); return; }
     busquedaVisitante = setTimeout(async () => {
         try {
@@ -244,7 +244,7 @@ async function registrarPiscina(event) {
     const form = event.target;
     try {
         const mensaje = await enviarJson('/api/accesos/piscina/registrar', 'POST', {
-            numeroDocumento: document.getElementById('documentoPiscina').value.replace(/\D/g, ''),
+            numeroDocumento: document.getElementById('documentoPiscina').value.toUpperCase().replace(/[^A-Z0-9]/g, ''),
             numeroApartamento: document.getElementById('apartamentoPiscina').value.trim().toUpperCase()
         });
         aviso('piscinaAviso', mensaje, false);
@@ -272,7 +272,7 @@ async function guardarPiscina(event) {
     event.preventDefault();
     try {
         const mensaje = await enviarJson(`/api/accesos/piscina/modificar/${document.getElementById('idAccesoModificar').value}`, 'PUT', {
-            numeroDocumento: document.getElementById('documentoPiscinaModificar').value.replace(/\D/g, ''),
+            numeroDocumento: document.getElementById('documentoPiscinaModificar').value.toUpperCase().replace(/[^A-Z0-9]/g, ''),
             numeroApartamento: document.getElementById('apartamentoPiscinaModificar').value.trim().toUpperCase()
         });
         cerrarModificarPiscina();

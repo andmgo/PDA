@@ -1,5 +1,6 @@
 package gescazone.demo.presentation.controller.api;
 
+import gescazone.demo.domain.model.ResidenteModel;
 import gescazone.demo.application.service.RegistroAccesoPiscinaService;
 import gescazone.demo.domain.model.RegistroAccesoPiscinaModel;
 import org.springframework.http.HttpStatus;
@@ -53,7 +54,7 @@ public class RegistroAccesoPiscinaRestController {
 
     // numeroDocumento ahora es String, no Integer
     @GetMapping("/residente/{numeroDocumento}")
-    public ResponseEntity<List<Map<String, Object>>> obtenerPorResidente(@PathVariable Integer numeroDocumento) {
+    public ResponseEntity<List<Map<String, Object>>> obtenerPorResidente(@PathVariable String numeroDocumento) {
         List<Map<String, Object>> response = registroService.consultarPorResidente(numeroDocumento)
                 .stream().map(this::convertirAMap).toList();
         return ResponseEntity.ok(response);
@@ -81,7 +82,7 @@ public class RegistroAccesoPiscinaRestController {
         if (docObj == null)
             return ResponseEntity.badRequest().body("El número de documento es obligatorio");
 
-        Integer numeroDocumento = ((Number) docObj).intValue();
+        String numeroDocumento = ResidenteModel.normalizarDocumento(docObj);
 
         String resultado = registroService.registrarIngreso(numeroApartamento, numeroDocumento);
         return ResponseEntity.status(HttpStatus.CREATED).body(resultado);

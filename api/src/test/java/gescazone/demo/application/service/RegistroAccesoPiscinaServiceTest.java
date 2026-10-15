@@ -38,7 +38,7 @@ class RegistroAccesoPiscinaServiceTest {
     void registrarIngreso_apartamentoInexistente_lanzaExcepcion() {
         when(apartamentoRepository.findByNumero("101")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> registroAccesoPiscinaService.registrarIngreso("101", 123))
+        assertThatThrownBy(() -> registroAccesoPiscinaService.registrarIngreso("101", "123"))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("No existe el apartamento");
 
@@ -51,9 +51,9 @@ class RegistroAccesoPiscinaServiceTest {
         ApartamentoModel apto = new ApartamentoModel();
         apto.setId("apto-1");
         when(apartamentoRepository.findByNumero("101")).thenReturn(Optional.of(apto));
-        when(residenteRepository.findByNumeroDocumento(123)).thenReturn(Optional.empty());
+        when(residenteRepository.findByNumeroDocumento("123")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> registroAccesoPiscinaService.registrarIngreso("101", 123))
+        assertThatThrownBy(() -> registroAccesoPiscinaService.registrarIngreso("101", "123"))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("No existe el residente");
     }
@@ -66,9 +66,9 @@ class RegistroAccesoPiscinaServiceTest {
         residente.setId("res-1");
 
         when(apartamentoRepository.findByNumero("101")).thenReturn(Optional.of(apto));
-        when(residenteRepository.findByNumeroDocumento(123)).thenReturn(Optional.of(residente));
+        when(residenteRepository.findByNumeroDocumento("123")).thenReturn(Optional.of(residente));
 
-        String resultado = registroAccesoPiscinaService.registrarIngreso("101", 123);
+        String resultado = registroAccesoPiscinaService.registrarIngreso("101", "123");
 
         assertThat(resultado).contains("101");
         verify(registroRepository).save(argThat(r ->

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface RegistroAccesoPiscinaJpaRepository extends JpaRepository<RegistroAccesoPiscinaEntity, UUID> {
     List<RegistroAccesoPiscinaEntity> findByApartamento_Numero(String numero);
-    List<RegistroAccesoPiscinaEntity> findByResidente_NumeroDocumento(Integer numeroDocumento);
+    List<RegistroAccesoPiscinaEntity> findByResidente_NumeroDocumento(String numeroDocumento);
     List<RegistroAccesoPiscinaEntity> findByFechaHoraBetween(LocalDateTime inicio, LocalDateTime fin);
     List<RegistroAccesoPiscinaEntity> findAllByOrderByFechaHoraDesc();
 }

@@ -81,12 +81,12 @@ public class ResidenteRepositoryImpl implements ResidenteRepository {
     }
 
     @Override
-    public Optional<ResidenteModel> findByNumeroDocumento(Integer numeroDocumento) {
+    public Optional<ResidenteModel> findByNumeroDocumento(String numeroDocumento) {
         return jpaRepository.findByNumeroDocumento(numeroDocumento).map(this::toModel);
     }
 
     @Override
-    public boolean existsByNumeroDocumento(Integer numeroDocumento) {
+    public boolean existsByNumeroDocumento(String numeroDocumento) {
         return jpaRepository.existsByNumeroDocumento(numeroDocumento);
     }
 

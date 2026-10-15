@@ -895,7 +895,7 @@ function mostrarResidentes(residentes) {
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs gsz-mono">${r.numeroDocumento}</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${r.nombre}</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${r.apellido}</p></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${r.celular}</p></td>
+            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${r.celular ?? "—"}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b"><span class="bg-gradient-to-tl ${tipoClass} px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">${tipoRes}</span></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="editResidente('${r.numeroDocumento}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
@@ -906,7 +906,7 @@ function mostrarResidentes(residentes) {
 
 function buscarResidentes() {
     const texto = document.getElementById('searchInputResidentes').value.toLowerCase();
-    mostrarResidentes(residentesData.filter(r => r.numeroDocumento.toString().includes(texto) || r.nombre.toLowerCase().includes(texto) || r.apellido.toLowerCase().includes(texto) || r.celular.toString().includes(texto) || (r.tipoDocumento?.nombre||'').toLowerCase().includes(texto) || (r.tipoResidente?.nombre||'').toLowerCase().includes(texto)));
+    mostrarResidentes(residentesData.filter(r => r.numeroDocumento.toString().includes(texto) || r.nombre.toLowerCase().includes(texto) || r.apellido.toLowerCase().includes(texto) || (r.celular ?? "").toString().includes(texto) || (r.tipoDocumento?.nombre||'').toLowerCase().includes(texto) || (r.tipoResidente?.nombre||'').toLowerCase().includes(texto)));
 }
 
 function openResidenteModal() {
@@ -965,7 +965,7 @@ async function submitResidente(event) {
 
     const data = {
         nombreTipoDocumento: document.getElementById('tipoDocumentoResidente').value,
-        numeroDocumento: parseInt(documento),
+        numeroDocumento: documento,
         nombre: document.getElementById('nombreResidente').value,
         apellido: document.getElementById('apellidoResidente').value,
         celular: parseInt(celular),

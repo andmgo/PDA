@@ -77,7 +77,7 @@ public class AccesoRestController {
 
     @PostMapping("/visitante-sin-vehiculo/registrar-entrada")
     public ResponseEntity<String> registrarEntradaSinVehiculo(@RequestBody Map<String, Object> datos) {
-        Integer numeroDocumento = parsearDocumento(datos.get("numeroDocumento"));
+        String numeroDocumento = parsearDocumento(datos.get("numeroDocumento"));
         String numeroApartamento = (String) datos.get("numeroApartamento");
 
         if (numeroDocumento == null || numeroApartamento == null)
@@ -151,7 +151,7 @@ public class AccesoRestController {
 
     @PostMapping("/visitante-vehiculo/registrar-entrada")
     public ResponseEntity<String> registrarEntradaVehiculo(@RequestBody Map<String, Object> datos) {
-        Integer numeroDocumento = parsearDocumento(datos.get("numeroDocumento"));
+        String numeroDocumento = parsearDocumento(datos.get("numeroDocumento"));
         String numeroApartamento = (String) datos.get("numeroApartamento");
         String numeroParqueadero = (String) datos.get("numeroParqueadero");
         String placa = (String) datos.get("placa");
@@ -232,7 +232,7 @@ public class AccesoRestController {
 
     @PostMapping("/piscina/registrar")
     public ResponseEntity<String> registrarAccesoPiscina(@RequestBody Map<String, Object> datos) {
-        Integer numeroDocumento = parsearDocumento(datos.get("numeroDocumento"));
+        String numeroDocumento = parsearDocumento(datos.get("numeroDocumento"));
         String numeroApartamento = (String) datos.get("numeroApartamento");
 
         if (numeroDocumento == null || numeroApartamento == null)
@@ -261,7 +261,7 @@ public class AccesoRestController {
     public ResponseEntity<String> modificarAccesoPiscina(
             @PathVariable String id,
             @RequestBody Map<String, Object> datos) {
-        Integer numeroDocumento = parsearDocumento(datos.get("numeroDocumento"));
+        String numeroDocumento = parsearDocumento(datos.get("numeroDocumento"));
         String numeroApartamento = (String) datos.get("numeroApartamento");
 
         if (numeroDocumento == null || numeroApartamento == null)
@@ -281,11 +281,8 @@ public class AccesoRestController {
 
     // ===== HELPERS PRIVADOS =====
 
-    private Integer parsearDocumento(Object docObj) {
-        if (docObj instanceof String) return Integer.parseInt((String) docObj);
-        if (docObj instanceof Integer) return (Integer) docObj;
-        if (docObj instanceof Number) return ((Number) docObj).intValue();
-        return null;
+    private String parsearDocumento(Object docObj) {
+        return ResidenteModel.normalizarDocumento(docObj);
     }
 
     /**

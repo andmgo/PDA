@@ -24,7 +24,7 @@ public class RegistroAccesoPiscinaService {
     @Autowired
     private ResidenteRepository residenteRepository;
 
-    public String registrarIngreso(String numeroApartamento, Integer numeroDocumento) {
+    public String registrarIngreso(String numeroApartamento, String numeroDocumento) {
         ApartamentoModel apartamento = RequiereActivo.apartamento(apartamentoRepository.findByNumero(numeroApartamento)
                 .orElseThrow(() -> new NotFoundException("No existe el apartamento: " + numeroApartamento)));
 
@@ -50,7 +50,7 @@ public class RegistroAccesoPiscinaService {
         return registroRepository.findByApartamentoNumero(numeroApartamento);
     }
 
-    public List<RegistroAccesoPiscinaModel> consultarPorResidente(Integer numeroDocumento) {
+    public List<RegistroAccesoPiscinaModel> consultarPorResidente(String numeroDocumento) {
         return registroRepository.findByResidenteNumeroDocumento(numeroDocumento);
     }
 

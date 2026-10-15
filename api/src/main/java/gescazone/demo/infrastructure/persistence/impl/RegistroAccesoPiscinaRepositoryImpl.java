@@ -52,7 +52,7 @@ public class RegistroAccesoPiscinaRepositoryImpl implements RegistroAccesoPiscin
     }
 
     @Override
-    public List<RegistroAccesoPiscinaModel> findByResidenteNumeroDocumento(Integer numeroDocumento) {
+    public List<RegistroAccesoPiscinaModel> findByResidenteNumeroDocumento(String numeroDocumento) {
         return jpaRepository.findByResidente_NumeroDocumento(numeroDocumento)
                 .stream().map(this::toModel).toList();
     }

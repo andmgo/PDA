@@ -3,7 +3,7 @@ package gescazone.demo.domain.model;
 public class ResidenteModel {
 
     private String id;
-    private Integer numeroDocumento;
+    private String numeroDocumento;
     private String nombre;
     private String apellido;
     private Long celular;
@@ -13,7 +13,19 @@ public class ResidenteModel {
 
     public ResidenteModel() {}
 
-    public ResidenteModel(Integer numeroDocumento, String nombre, String apellido,
+    /**
+     * Forma en que se guarda y se busca un documento: mayúsculas, sin puntos,
+     * guiones ni espacios ("1.234.567" → "1234567", "ab 123" → "AB123").
+     * Antes era INTEGER: no cabían documentos de más de 10 dígitos ni
+     * pasaportes con letras. Devuelve null si queda vacío.
+     */
+    public static String normalizarDocumento(Object valor) {
+        if (valor == null) return null;
+        String limpio = valor.toString().toUpperCase().replaceAll("[^A-Z0-9]", "");
+        return limpio.isEmpty() ? null : limpio;
+    }
+
+    public ResidenteModel(String numeroDocumento, String nombre, String apellido,
                          Long celular, TipoDocumentoModel tipoDocumento, TipoResidenteModel tipoResidente) {
         this.numeroDocumento = numeroDocumento;
         this.nombre = nombre;
@@ -26,8 +38,8 @@ public class ResidenteModel {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    public Integer getNumeroDocumento() { return numeroDocumento; }
-    public void setNumeroDocumento(Integer numeroDocumento) { this.numeroDocumento = numeroDocumento; }
+    public String getNumeroDocumento() { return numeroDocumento; }
+    public void setNumeroDocumento(String numeroDocumento) { this.numeroDocumento = numeroDocumento; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

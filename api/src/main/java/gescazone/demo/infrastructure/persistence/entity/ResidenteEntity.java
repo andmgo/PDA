@@ -22,7 +22,7 @@ public class ResidenteEntity {
     private UUID id;
 
     @Column(name = "numero_documento", nullable = false, unique = true)
-    private Integer numeroDocumento;
+    private String numeroDocumento;
 
     @Column(nullable = false)
     private String nombre;
@@ -47,8 +47,8 @@ public class ResidenteEntity {
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
-    public Integer getNumeroDocumento() { return numeroDocumento; }
-    public void setNumeroDocumento(Integer numeroDocumento) { this.numeroDocumento = numeroDocumento; }
+    public String getNumeroDocumento() { return numeroDocumento; }
+    public void setNumeroDocumento(String numeroDocumento) { this.numeroDocumento = numeroDocumento; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

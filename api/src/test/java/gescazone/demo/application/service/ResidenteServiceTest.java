@@ -29,7 +29,7 @@ class ResidenteServiceTest {
 
     private ResidenteModel residenteValido() {
         ResidenteModel r = new ResidenteModel();
-        r.setNumeroDocumento(123456);
+        r.setNumeroDocumento("123456");
         r.setNombre(" Juan ");
         r.setApellido(" Pérez ");
         r.setCelular(3001234567L);
@@ -59,7 +59,7 @@ class ResidenteServiceTest {
     @Test
     void crear_documentoDuplicado_lanzaExcepcion() {
         ResidenteModel r = residenteValido();
-        when(residenteRepository.existsByNumeroDocumento(123456)).thenReturn(true);
+        when(residenteRepository.existsByNumeroDocumento("123456")).thenReturn(true);
         assertThatThrownBy(() -> residenteService.crear(r))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Ya existe");
@@ -69,7 +69,7 @@ class ResidenteServiceTest {
     @Test
     void crear_valido_recortaCamposYGuarda() {
         ResidenteModel r = residenteValido();
-        when(residenteRepository.existsByNumeroDocumento(123456)).thenReturn(false);
+        when(residenteRepository.existsByNumeroDocumento("123456")).thenReturn(false);
 
         String resultado = residenteService.crear(r);
 
@@ -88,7 +88,7 @@ class ResidenteServiceTest {
 
         ResidenteModel otro = residenteValido();
         otro.setId("id-2");
-        when(residenteRepository.findByNumeroDocumento(123456)).thenReturn(Optional.of(otro));
+        when(residenteRepository.findByNumeroDocumento("123456")).thenReturn(Optional.of(otro));
 
         assertThatThrownBy(() -> residenteService.actualizar(r))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -97,8 +97,8 @@ class ResidenteServiceTest {
 
     @Test
     void cambiarEstado_noExistente_lanzaExcepcion() {
-        when(residenteRepository.findByNumeroDocumento(123456)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> residenteService.cambiarEstado(123456, false))
+        when(residenteRepository.findByNumeroDocumento("123456")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> residenteService.cambiarEstado("123456", false))
                 .isInstanceOf(NotFoundException.class);
         verify(residenteRepository, never()).save(any());
     }
@@ -106,9 +106,9 @@ class ResidenteServiceTest {
     @Test
     void cambiarEstado_valido_actualizaYGuarda() {
         ResidenteModel r = residenteValido();
-        when(residenteRepository.findByNumeroDocumento(123456)).thenReturn(Optional.of(r));
+        when(residenteRepository.findByNumeroDocumento("123456")).thenReturn(Optional.of(r));
 
-        String resultado = residenteService.cambiarEstado(123456, false);
+        String resultado = residenteService.cambiarEstado("123456", false);
 
         assertThat(resultado).isEqualTo("Residente desactivado con éxito");
         assertThat(r.isActivo()).isFalse();

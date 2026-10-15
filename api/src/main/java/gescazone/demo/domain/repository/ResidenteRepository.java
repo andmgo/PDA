@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ResidenteRepository {
-    Optional<ResidenteModel> findByNumeroDocumento(Integer numeroDocumento);
-    boolean existsByNumeroDocumento(Integer numeroDocumento);
+    Optional<ResidenteModel> findByNumeroDocumento(String numeroDocumento);
+    boolean existsByNumeroDocumento(String numeroDocumento);
     List<ResidenteModel> findByNombreTipoResidente(String nombreTipoResidente);
     List<ResidenteModel> findByNombreTipoDocumento(String nombreTipoDocumento);
     List<ResidenteModel> findByNombreContainingIgnoreCase(String nombre);

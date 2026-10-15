@@ -50,12 +50,12 @@ public class VisitaService {
     public enum Tipo { PEATON, VEHICULO }
 
     /** Una visita (peatonal o en vehículo) tal como la ve portería. */
-    public record Visita(String id, Tipo tipo, Integer numeroDocumento, String nombreCompleto,
+    public record Visita(String id, Tipo tipo, String numeroDocumento, String nombreCompleto,
                          String numeroApartamento, String placa, String numeroParqueadero,
                          String entrada, String salida) {}
 
     /** Datos de un visitante que ya vino antes, para autocompletar el formulario. */
-    public record Visitante(Integer numeroDocumento, String nombre, String apellido, Long celular,
+    public record Visitante(String numeroDocumento, String nombre, String apellido, Long celular,
                             boolean bloqueado, String ultimaPlaca, int visitasPrevias) {}
 
     public record Ingreso(String numeroDocumento, String nombre, String apellido, String celular,
@@ -78,7 +78,7 @@ public class VisitaService {
     // ── Consultas ──────────────────────────────────────────────────────────
 
     public Visitante buscarVisitante(String numeroDocumento) {
-        Integer documento = documento(numeroDocumento);
+        String documento = documento(numeroDocumento);
         ResidenteModel residente = residenteRepository.findByNumeroDocumento(documento)
                 .orElseThrow(() -> new NotFoundException("No hay visitas previas con el documento " + documento));
         List<RegistroParqueaderoVisitanteModel> conVehiculo = registroParqueaderoRepository.findByIdResidente(residente.getId());
@@ -139,7 +139,7 @@ public class VisitaService {
     @Transactional
     public String registrarIngreso(Ingreso datos) {
         if (datos == null) throw new ValidationException("Faltan los datos del visitante");
-        Integer documento = documento(datos.numeroDocumento());
+        String documento = documento(datos.numeroDocumento());
 
         if (datos.numeroApartamento() == null || datos.numeroApartamento().isBlank())
             throw new ValidationException("Indica a qué apartamento va el visitante");
@@ -202,19 +202,16 @@ public class VisitaService {
 
     // ── Apoyo ──────────────────────────────────────────────────────────────
 
-    private Integer documento(String valor) {
-        String limpio = valor == null ? "" : valor.replaceAll("[^0-9]", "");
-        if (limpio.isEmpty())
-            throw new ValidationException("El número de documento es obligatorio (solo números)");
-        try {
-            return Integer.valueOf(limpio);
-        } catch (NumberFormatException e) {
-            // residentes.numero_documento es INTEGER desde el esquema original.
-            throw new ValidationException("Ese número de documento es demasiado largo para el sistema actual");
-        }
+    private String documento(String valor) {
+        String documento = ResidenteModel.normalizarDocumento(valor);
+        if (documento == null)
+            throw new ValidationException("El número de documento es obligatorio");
+        if (documento.length() < 4 || documento.length() > 20)
+            throw new ValidationException("El número de documento debe tener entre 4 y 20 caracteres");
+        return documento;
     }
 
-    private ResidenteModel crearVisitante(Integer documento, Ingreso datos) {
+    private ResidenteModel crearVisitante(String documento, Ingreso datos) {
         if (datos.nombre() == null || datos.nombre().isBlank() || datos.apellido() == null || datos.apellido().isBlank())
             throw new ValidationException("Es la primera visita de este documento: escribe su nombre y apellido");
         Long celular = null;

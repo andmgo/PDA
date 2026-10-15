@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface RegistroAccesoPiscinaRepository {
     List<RegistroAccesoPiscinaModel> findByApartamentoNumero(String numero);
-    List<RegistroAccesoPiscinaModel> findByResidenteNumeroDocumento(Integer numeroDocumento);
+    List<RegistroAccesoPiscinaModel> findByResidenteNumeroDocumento(String numeroDocumento);
     List<RegistroAccesoPiscinaModel> findRegistrosHoy();
     List<RegistroAccesoPiscinaModel> findByFechaHoraBetween(LocalDateTime inicio, LocalDateTime fin);
     List<RegistroAccesoPiscinaModel> findAllOrderByFechaHoraDesc();

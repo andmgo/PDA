@@ -44,7 +44,7 @@ public class ResidenteService {
     residenteRepository.save(residente);
     return "Residente registrado con éxito";
 }
-    public ResidenteModel consultar(Integer numeroDocumento) {
+    public ResidenteModel consultar(String numeroDocumento) {
         if (numeroDocumento == null)
             throw new IllegalArgumentException("El número de documento es obligatorio para la consulta");
         return residenteRepository.findByNumeroDocumento(numeroDocumento).orElse(null);
@@ -95,7 +95,7 @@ public class ResidenteService {
     return "Residente actualizado con éxito";
 }
 
-    public String cambiarEstado(Integer numeroDocumento, boolean activo) {
+    public String cambiarEstado(String numeroDocumento, boolean activo) {
         if (numeroDocumento == null)
             throw new IllegalArgumentException("El número de documento es obligatorio");
 
@@ -107,7 +107,7 @@ public class ResidenteService {
         return activo ? "Residente activado con éxito" : "Residente desactivado con éxito";
     }
 
-    public boolean residenteExistente(Integer numeroDocumento) {
+    public boolean residenteExistente(String numeroDocumento) {
         if (numeroDocumento == null) return false;
         return residenteRepository.existsByNumeroDocumento(numeroDocumento);
     }
