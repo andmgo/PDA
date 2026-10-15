@@ -100,8 +100,10 @@ class _PantallaInicioState extends State<PantallaInicio> {
                 pie: Row(children: [
                   const Icon(Icons.calendar_today_outlined, size: 15, color: Aurum.oroClaro),
                   const SizedBox(width: 8),
-                  Text(_hoy(),
-                      style: GoogleFonts.montserrat(fontSize: 13, color: Aurum.blanco.withValues(alpha: .65))),
+                  Flexible(
+                    child: Text(_hoy(),
+                        style: GoogleFonts.montserrat(fontSize: 13, color: Aurum.blanco.withValues(alpha: .65))),
+                  ),
                 ]),
               ),
               const SizedBox(height: 16),

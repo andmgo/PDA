@@ -209,17 +209,28 @@ class TarjetaAccion extends StatelessWidget {
                     ),
                     child: Icon(icono, size: 22, color: oscuro ? Aurum.oroClaro : Aurum.oroTexto),
                   ),
-                  const Spacer(),
+                  const SizedBox(width: 8),
+                  // Flexible + scaleDown: en celulares angostos la tarjeta mide
+                  // ~150 px y ícono + etiqueta no cabían ("right overflowed").
                   if (deshabilitada)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: tema.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(99),
-                        border: Border.all(color: tema.colorScheme.outline),
+                    Flexible(
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: tema.colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(99),
+                              border: Border.all(color: tema.colorScheme.outline),
+                            ),
+                            child: Text('Próximamente',
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 10, fontWeight: FontWeight.w700, color: Aurum.grisTenue)),
+                          ),
+                        ),
                       ),
-                      child: Text('Próximamente',
-                          style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w700, color: Aurum.grisTenue)),
                     ),
                 ],
               ),
@@ -258,9 +269,11 @@ class SeccionAurum extends StatelessWidget {
             Rotulo(rotulo),
             const SizedBox(height: 4),
             Row(children: [
-              Text(titulo,
-                  style: GoogleFonts.montserrat(
-                      fontSize: 18, fontWeight: FontWeight.w800, color: tema.colorScheme.onSurface)),
+              Flexible(
+                child: Text(titulo,
+                    style: GoogleFonts.montserrat(
+                        fontSize: 18, fontWeight: FontWeight.w800, color: tema.colorScheme.onSurface)),
+              ),
               if (contador != null) ...[const SizedBox(width: 8), contador!],
             ]),
             const SizedBox(height: 14),

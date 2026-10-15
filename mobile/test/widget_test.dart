@@ -125,6 +125,26 @@ void main() {
     expect(find.text('Hay 2 paquetes esperando entrega.'), findsOneWidget);
   });
 
+  // Reportado en un Samsung A55: "right overflowed by 2.7 pixels" en las
+  // tarjetas de Accesos. Flutter hace fallar el test si algo se desborda.
+  for (final ancho in [320.0, 360.0, 412.0]) {
+    testWidgets('inicio sin desbordes en pantalla de ${ancho.toInt()} px de ancho', (tester) async {
+      tester.view.physicalSize = Size(ancho * 3, 800 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+
+      final sesion = Sesion.desdeJson(
+          loginJson(rol: 'ADMINISTRADOR', permisosVer: ['CONTROL_ACCESOS', 'PAQUETES', 'RESERVAS']));
+      final api = Api(cliente: MockClient((r) async => json([])))..sesion = sesion;
+
+      await tester.pumpWidget(envolver(PantallaInicio(api: api, sesion: sesion, alCerrarSesion: () {})));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Lector de placas'), findsOneWidget);
+    });
+  }
+
   test('cuenta desactivada: el API avisa a la app para cerrar la sesión', () async {
     SesionTerminada? recibido;
     final api = Api(cliente: MockClient((r) async => http.Response('CUENTA_DESACTIVADA', 401)))
