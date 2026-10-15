@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="apple-touch-icon" sizes="76x76" th:href="@{/img/apple-icon.png}" />
-    <link rel="icon" type="image/svg+xml" th:href="@{/img/logo-aurum.svg}" />
+    <link rel="icon" type="image/png" th:href="@{/img/aurum-isotipo.png}" />
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
     <title>Aurum Condominios - Gestión de Datos</title>
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
@@ -420,6 +420,48 @@
     </div>
 </div>
 
+    <!-- Modal Propietarios y vehículos de un apartamento (Fase 2, ver propiedad.js) -->
+    <div id="propiedadModal" class="modal">
+        <div class="modal-content gsz-propiedad">
+            <div class="gsz-propiedad-head">
+                <div>
+                    <p class="gsz-propiedad-kicker">Apartamento</p>
+                    <h5 id="propiedadTitulo" class="text-lg font-bold">—</h5>
+                </div>
+                <button type="button" onclick="closePropiedadModal()" class="gsz-propiedad-cerrar" aria-label="Cerrar">&times;</button>
+            </div>
+
+            <div id="propiedadMensaje" class="gsz-propiedad-msg" role="status"></div>
+
+            <section class="gsz-propiedad-seccion">
+                <h6>Propietarios</h6>
+                <ul id="propiedadPropietarios" class="gsz-propiedad-lista"></ul>
+                <form class="gsz-propiedad-form" onsubmit="return submitPropietario(event)">
+                    <input type="text" id="propietarioIdentificador" required maxlength="100"
+                           placeholder="Documento o correo del usuario" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                    <button type="submit" class="px-4 py-2 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg">Vincular</button>
+                </form>
+                <p class="gsz-propiedad-ayuda">La persona debe tener cuenta aprobada en Aurum.</p>
+            </section>
+
+            <section class="gsz-propiedad-seccion">
+                <h6>Vehículos</h6>
+                <ul id="propiedadVehiculos" class="gsz-propiedad-lista"></ul>
+                <form class="gsz-propiedad-form gsz-propiedad-form-vehiculo" onsubmit="return submitVehiculo(event)">
+                    <input type="text" id="vehiculoPlaca" required maxlength="10" placeholder="Placa (ABC123)" class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none gsz-mono" />
+                    <select id="vehiculoTipo" required class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <option value="CARRO">Carro</option>
+                        <option value="MOTO">Moto</option>
+                    </select>
+                    <input type="text" id="vehiculoMarca" maxlength="40" placeholder="Marca (opcional)" class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                    <input type="text" id="vehiculoColor" maxlength="30" placeholder="Color (opcional)" class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                    <input type="text" id="vehiculoParqueadero" maxlength="10" placeholder="Parqueadero (opcional)" class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" />
+                    <button type="submit" class="px-4 py-2 text-sm font-bold text-white bg-gradient-to-tl from-blue-500 to-violet-500 rounded-lg">Registrar</button>
+                </form>
+            </section>
+        </div>
+    </div>
+
     <!-- Modal Agregar Varios Apartamentos -->
     <div id="apartamentoMasivoModal" class="modal">
         <div class="modal-content">
@@ -746,5 +788,6 @@
     <script src="../assets/js/argon-dashboard-tailwind.js?v=1.0.1" async></script>
     
     <script th:src="@{/js/gestionDeDatos.js}"></script>
+    <script th:src="@{/js/propiedad.js}"></script>
 </body>
 </html>

@@ -170,6 +170,17 @@ public class SecurityConfig {
                 .requestMatchers("/api/paquetes/**")
                     .access(permiso("PAQUETES", NivelPermiso.VER))
 
+                // Propietarios y vehículos (Fase 2). Orden: específico → general.
+                // /mia siempre opera sobre la cuenta del JWT; la búsqueda por
+                // placa es para portería; el resto es administración.
+                .requestMatchers(HttpMethod.GET, "/api/propiedad/mia").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/propiedad/vehiculos/placa/**")
+                    .access(permiso("CONTROL_ACCESOS", NivelPermiso.VER))
+                .requestMatchers(HttpMethod.GET, "/api/propiedad/**")
+                    .access(permiso("APARTAMENTOS_PARQUEADEROS_RESIDENTES", NivelPermiso.VER))
+                .requestMatchers("/api/propiedad/**")
+                    .access(permiso("APARTAMENTOS_PARQUEADEROS_RESIDENTES", NivelPermiso.EDITAR))
+
                 .requestMatchers("/api/catalogos/**").authenticated()
 
                 .anyRequest().authenticated()

@@ -281,7 +281,10 @@ function mostrarApartamentos(apartamentos) {
     apartamentos.forEach(apt => {
         const tipoOcup = apt.tipoOcupacion || 'N/A';
         const estadoCta = apt.estadoCuenta || 'N/A';
-        const statusClass = estadoCta.toLowerCase().includes('día') ? 'from-emerald-500 to-teal-400' : 'from-red-600 to-orange-600';
+        // Sin tildes al comparar: el catálogo real dice "Al dia" (sin tilde) y
+        // antes se buscaba 'día', así que todo salía con el color de mora.
+        const alDia = estadoCta.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes('al dia');
+        const statusClass = alDia ? 'gsz-estado-ok' : 'gsz-estado-alerta';
         const activo = apt.activo !== false;
         const btnEstado = activo
             ? `<button onclick="openEstadoModal('${apt.numero}', 'apartamento', '${apt.numero}', true)" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-ban mr-1"></i>Desactivar</button>`
@@ -289,10 +292,11 @@ function mostrarApartamentos(apartamentos) {
         tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${apt.numero}</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs font-semibold">${tipoOcup}</p></td>
-            <td class="p-2 text-center align-middle bg-transparent border-b"><span class="bg-gradient-to-tl ${statusClass} px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">${estadoCta}</span></td>
+            <td class="p-2 text-center align-middle bg-transparent border-b"><span class="gsz-estado ${statusClass}">${estadoCta}</span></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${apt.medidas} m²</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${apt.telefono}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
+                <button onclick="openPropiedadModal('${apt.id}', '${apt.numero}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-users mr-1"></i>Propietarios y vehículos</button>
                 <button onclick="editApartamento('${apt.numero}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
                 ${btnEstado}
             </td></tr>`;
@@ -484,14 +488,14 @@ function mostrarParqueaderos(parqueaderos) {
     tbody.innerHTML = parqueaderos.length === 0 ? '<tr><td colspan="5" class="p-8 text-center">No se encontraron parqueaderos</td></tr>' : '';
     parqueaderos.forEach(p => {
         const estado = p.estado || 'N/A';
-        const statusClass = estado === 'Disponible' ? 'from-emerald-500 to-teal-400' : 'from-red-600 to-orange-600';
+        const statusClass = estado === 'Disponible' ? 'gsz-estado-ok' : 'gsz-estado-alerta';
         const activo = p.activo !== false;
         const btnEstado = activo
             ? `<button onclick="openEstadoModal('${p.numero}', 'parqueadero', '${p.numero}', true)" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-ban mr-1"></i>Desactivar</button>`
             : `<button onclick="openEstadoModal('${p.numero}', 'parqueadero', '${p.numero}', false)" class="text-xs font-semibold text-emerald-500 hover:text-emerald-700"><i class="fas fa-check mr-1"></i>Activar</button>`;
         tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${p.numero}</p></td>
-            <td class="p-2 text-center align-middle bg-transparent border-b"><span class="bg-gradient-to-tl ${statusClass} px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">${estado}</span></td>
+            <td class="p-2 text-center align-middle bg-transparent border-b"><span class="gsz-estado ${statusClass}">${estado}</span></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.medidas} m²</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.telefono}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
@@ -593,14 +597,14 @@ function mostrarSalones(salones) {
     tbody.innerHTML = salones.length === 0 ? '<tr><td colspan="5" class="p-8 text-center">No se encontraron salones</td></tr>' : '';
     salones.forEach(s => {
         const estado = s.nombreEstado || 'N/A';
-        const statusClass = estado === 'Disponible' ? 'from-emerald-500 to-teal-400' : 'from-red-600 to-orange-600';
+        const statusClass = estado === 'Disponible' ? 'gsz-estado-ok' : 'gsz-estado-alerta';
         const activo = s.activo !== false;
         const btnEstado = activo
             ? `<button onclick="openEstadoModal('${s.numero}', 'salon', '${s.numero}', true)" class="text-xs font-semibold text-red-500 hover:text-red-700"><i class="fas fa-ban mr-1"></i>Desactivar</button>`
             : `<button onclick="openEstadoModal('${s.numero}', 'salon', '${s.numero}', false)" class="text-xs font-semibold text-emerald-500 hover:text-emerald-700"><i class="fas fa-check mr-1"></i>Activar</button>`;
         tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${s.numero}</p></td>
-            <td class="p-2 text-center align-middle bg-transparent border-b"><span class="bg-gradient-to-tl ${statusClass} px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">${estado}</span></td>
+            <td class="p-2 text-center align-middle bg-transparent border-b"><span class="gsz-estado ${statusClass}">${estado}</span></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${s.medidas} m²</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${s.telefono}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
