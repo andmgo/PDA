@@ -264,25 +264,8 @@ class _PantallaInicioState extends State<PantallaInicio> {
   Widget _dato(String t) => Text(t, style: GoogleFonts.montserrat(fontSize: 12.5, color: Aurum.grisTenue));
 
   Widget _accesos() {
+    // Mismo orden y nombres que el menú de la web: Mi hogar → Portería → Comunidad.
     final tarjetas = <Widget>[
-      if (_porteria) ...[
-        TarjetaAccion(
-            icono: Icons.how_to_reg_outlined,
-            titulo: 'Registrar ingreso',
-            subtitulo: 'Visitantes y esperados',
-            alTocar: () => _abrir(PantallaPorteria(api: widget.api))),
-        const TarjetaAccion(
-            icono: Icons.document_scanner_outlined,
-            titulo: 'Lector de placas',
-            subtitulo: 'Con la cámara',
-            proximamente: 'Fase 8'),
-      ],
-      if (_paquetes)
-        TarjetaAccion(
-            icono: Icons.inventory_2_outlined,
-            titulo: 'Paquetes',
-            subtitulo: 'Recepción',
-            alTocar: () => _abrir(PantallaPaquetes(api: widget.api))),
       if (_visitas)
         TarjetaAccion(
             icono: Icons.event_available_outlined,
@@ -295,6 +278,24 @@ class _PantallaInicioState extends State<PantallaInicio> {
             titulo: 'Mis paquetes',
             subtitulo: 'Por recoger',
             alTocar: () => _abrir(PantallaMisPaquetes(api: widget.api))),
+      if (_porteria) ...[
+        TarjetaAccion(
+            icono: Icons.how_to_reg_outlined,
+            titulo: 'Control de accesos',
+            subtitulo: 'Ingreso de visitantes',
+            alTocar: () => _abrir(PantallaPorteria(api: widget.api))),
+        const TarjetaAccion(
+            icono: Icons.document_scanner_outlined,
+            titulo: 'Lector de placas',
+            subtitulo: 'Con la cámara',
+            proximamente: 'Fase 8'),
+      ],
+      if (_paquetes)
+        TarjetaAccion(
+            icono: Icons.inventory_2_outlined,
+            titulo: 'Recepción de paquetes',
+            subtitulo: 'Portería',
+            alTocar: () => _abrir(PantallaPaquetes(api: widget.api))),
       if (_s.puedeVer('RESERVAS'))
         const TarjetaAccion(
             icono: Icons.calendar_month_outlined,

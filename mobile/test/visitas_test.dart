@@ -316,8 +316,8 @@ void main() {
     Navigator.of(tester.element(find.text('Próximas'))).pop();
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Registrar ingreso'));
+    await tester.tap(find.text('Control de accesos'));
     await tester.pumpAndSettle();
-    expect(find.text('Portería'), findsOneWidget);
+    expect(find.text('Ingreso'), findsOneWidget); // pestañas de portería
   });
 }

@@ -41,7 +41,8 @@
 /* ── Accesos rápidos ── */
 .gsz-quick-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    /* 190px: con 8 accesos (administrador) a 150px los nombres se partían palabra por palabra */
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
     gap: 12px;
 }
 .gsz-quick-tile {
@@ -188,3 +189,7 @@
 .gsz-contact-row .badge svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .gsz-contact-row .cn { font-size: 13px; font-weight: 700; color: var(--gsz-ink); }
 .gsz-contact-row .cd { font-size: 11.5px; color: var(--gsz-ink-muted); }
+/* En celular, dos accesos por fila (con 190px quedaba uno solo). */
+@media (max-width: 520px) {
+    .gsz-quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

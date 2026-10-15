@@ -4,7 +4,7 @@
 
 <!--/*
   Sidebar único, incluido con th:replace="~{fragments/sidebar :: sidebar(activo='inicio')}"
-  (valores de activo: inicio, gestion, roles, pagos, reservas, accesos, paquetes, perfil).
+  (valores de activo: inicio, visitas, misPaquetes, accesos, paquetes, reservas, pagos, gestion, roles, perfil).
   Antes esta barra estaba duplicada, casi idéntica, en 8 plantillas — Bloque G la unificó
   aquí para poder cambiar navegación/íconos en un solo lugar.
 */-->
@@ -34,9 +34,22 @@
   <hr class="h-px mt-0 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent dark:bg-gradient-to-r dark:from-transparent dark:via-white dark:to-transparent" />
 
   <div class="items-center block w-auto max-h-screen overflow-auto h-sidenav grow basis-full">
-    <ul class="flex flex-col pl-0 mb-0">
+    <!--/* Menú por secciones. Cada opción depende del PERMISO del rol (Roles y
+         permisos), igual que la regla de su ruta en SecurityConfig, así un
+         rol nuevo ve exactamente lo que puede abrir. Una sección solo aparece
+         si el usuario ve alguna de sus opciones. Orden: lo del día a día de
+         cada rol primero (Mi hogar / Portería), luego Comunidad,
+         Administración y Cuenta. */-->
+    <ul class="flex flex-col pl-0 mb-0"
+        th:with="pVisitas=${@sesionUsuario.tienePermiso('VISITAS', false)},
+                 pMisPaquetes=${@sesionUsuario.tienePermiso('MIS_PAQUETES', false)},
+                 pAccesos=${@sesionUsuario.tienePermiso('CONTROL_ACCESOS', false)},
+                 pPaquetes=${@sesionUsuario.tienePermiso('PAQUETES', false)},
+                 pReservas=${@sesionUsuario.tienePermiso('RESERVAS', false)},
+                 pPagos=${@sesionUsuario.tienePermiso('PAGOS_Y_CARTERA', false)},
+                 pGestion=${@sesionUsuario.tienePermiso('GESTION_DATOS', false)},
+                 pRoles=${@sesionUsuario.tienePermiso('GESTION_DATOS', true)}">
 
-      <!-- INICIO - TODOS -->
       <li class="mt-0.5 w-full">
         <a th:href="@{/inicio}"
            th:class="${activo == 'inicio'}
@@ -47,52 +60,10 @@
         </a>
       </li>
 
-      <!-- GESTIÓN DE DATOS - SOLO ADMINISTRADOR -->
-      <li class="mt-0.5 w-full" th:if="${session.rolUsuario == 'Administrador'}">
-        <a th:href="@{/gestionDeDatos}"
-           th:class="${activo == 'gestion'}
-               ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
-               : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
-          <span class="gsz-icon-badge gsz-badge-violet"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>
-          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Gestión de Datos</span>
-        </a>
+      <li class="gsz-nav-section w-full mt-4" th:if="${pVisitas or pMisPaquetes}">
+        <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">Mi hogar</h6>
       </li>
-
-      <!-- ROLES Y PERMISOS - SOLO ADMINISTRADOR -->
-      <li class="mt-0.5 w-full" th:if="${session.rolUsuario == 'Administrador'}">
-        <a th:href="@{/rolesYPermisos}"
-           th:class="${activo == 'roles'}
-               ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
-               : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
-          <span class="gsz-icon-badge gsz-badge-red"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></span>
-          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Roles y Permisos</span>
-        </a>
-      </li>
-
-      <!-- PAGOS Y CARTERA - ADMINISTRADOR Y PROPIETARIO -->
-      <li class="mt-0.5 w-full" th:if="${session.rolUsuario == 'Administrador' || session.rolUsuario == 'Propietario'}">
-        <a th:href="@{/pagosYCartera}"
-           th:class="${activo == 'pagos'}
-               ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
-               : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
-          <span class="gsz-icon-badge gsz-badge-green"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="17" cy="14" r="1.4" fill="currentColor" stroke="none"/></svg></span>
-          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Pagos y Cartera</span>
-        </a>
-      </li>
-
-      <!-- RESERVAS - TODOS -->
-      <li class="mt-0.5 w-full">
-        <a th:href="@{/reservas}"
-           th:class="${activo == 'reservas'}
-               ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
-               : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
-          <span class="gsz-icon-badge gsz-badge-cyan"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/><path d="M8.5 14l2 2 4-4"/></svg></span>
-          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Reservas</span>
-        </a>
-      </li>
-
-      <!-- MIS VISITAS - quien tenga el permiso VISITAS (propietarios por defecto) -->
-      <li class="mt-0.5 w-full" th:if="${@sesionUsuario.tienePermiso('VISITAS', false)}">
+      <li class="mt-0.5 w-full" th:if="${pVisitas}">
         <a th:href="@{/misVisitas}"
            th:class="${activo == 'visitas'}
                ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
@@ -101,9 +72,7 @@
           <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Mis visitas</span>
         </a>
       </li>
-
-      <!-- MIS PAQUETES - quien tenga el permiso MIS_PAQUETES (propietarios por defecto) -->
-      <li class="mt-0.5 w-full" th:if="${@sesionUsuario.tienePermiso('MIS_PAQUETES', false)}">
+      <li class="mt-0.5 w-full" th:if="${pMisPaquetes}">
         <a th:href="@{/misPaquetes}"
            th:class="${activo == 'misPaquetes'}
                ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
@@ -113,40 +82,82 @@
         </a>
       </li>
 
-      <!-- CONTROL DE ACCESOS - ADMINISTRADOR Y FUNCIONARIO -->
-      <li class="mt-0.5 w-full" th:if="${session.rolUsuario == 'Administrador' || session.rolUsuario == 'Funcionario'}">
+      <li class="gsz-nav-section w-full mt-4" th:if="${pAccesos or pPaquetes}">
+        <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">Portería</h6>
+      </li>
+      <li class="mt-0.5 w-full" th:if="${pAccesos}">
         <a th:href="@{/controlDeAccesos}"
            th:class="${activo == 'accesos'}
                ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
                : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
           <span class="gsz-icon-badge gsz-badge-red"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></span>
-          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Control de Accesos</span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Control de accesos</span>
         </a>
       </li>
-
-      <!-- PAQUETES - ADMINISTRADOR Y FUNCIONARIO -->
-      <li class="mt-0.5 w-full" th:if="${session.rolUsuario == 'Administrador' || session.rolUsuario == 'Funcionario'}">
+      <li class="mt-0.5 w-full" th:if="${pPaquetes}">
         <a th:href="@{/paquetes}"
            th:class="${activo == 'paquetes'}
                ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
                : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
-          <span class="gsz-icon-badge gsz-badge-amber"><svg viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4-8.5 4-8.5-4z"/><path d="M3.5 8v8l8.5 4 8.5-4V8"/><path d="M12 12v8"/></svg></span>
-          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Paquetes</span>
+          <span class="gsz-icon-badge gsz-badge-amber"><svg viewBox="0 0 24 24"><path d="M3.5 9 12 5l8.5 4v8l-8.5 4-8.5-4z"/><path d="M12 13v8"/><path d="M3.5 9 12 13l8.5-4"/><path d="M12 1.5v5"/><path d="M10 4.5l2 2 2-2"/></svg></span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Recepción de paquetes</span>
+        </a>
+      </li>
+
+      <li class="gsz-nav-section w-full mt-4" th:if="${pReservas or pPagos}">
+        <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">Comunidad</h6>
+      </li>
+      <li class="mt-0.5 w-full" th:if="${pReservas}">
+        <a th:href="@{/reservas}"
+           th:class="${activo == 'reservas'}
+               ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
+               : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
+          <span class="gsz-icon-badge gsz-badge-cyan"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/><path d="M8.5 14l2 2 4-4"/></svg></span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Reservas</span>
+        </a>
+      </li>
+      <li class="mt-0.5 w-full" th:if="${pPagos}">
+        <a th:href="@{/pagosYCartera}"
+           th:class="${activo == 'pagos'}
+               ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
+               : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
+          <span class="gsz-icon-badge gsz-badge-green"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="17" cy="14" r="1.4" fill="currentColor" stroke="none"/></svg></span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Pagos y cartera</span>
+        </a>
+      </li>
+
+      <li class="gsz-nav-section w-full mt-4" th:if="${pGestion or pRoles}">
+        <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">Administración</h6>
+      </li>
+      <li class="mt-0.5 w-full" th:if="${pGestion}">
+        <a th:href="@{/gestionDeDatos}"
+           th:class="${activo == 'gestion'}
+               ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
+               : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
+          <span class="gsz-icon-badge gsz-badge-violet"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Gestión de datos</span>
+        </a>
+      </li>
+      <li class="mt-0.5 w-full" th:if="${pRoles}">
+        <a th:href="@{/rolesYPermisos}"
+           th:class="${activo == 'roles'}
+               ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
+               : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
+          <span class="gsz-icon-badge gsz-badge-red"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 19 4"/><path d="M16 7l2.5 2.5"/><path d="M14 9l2 2"/></svg></span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Roles y permisos</span>
         </a>
       </li>
 
       <li class="gsz-nav-section w-full mt-4">
         <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">Cuenta</h6>
       </li>
-
-      <!-- PERFIL - TODOS -->
       <li class="mt-0.5 w-full">
         <a th:href="@{/profile}"
            th:class="${activo == 'perfil'}
                ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
                : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
           <span class="gsz-icon-badge gsz-badge-neutral"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.3"/><path d="M5 20c1-3.8 4-5.8 7-5.8s6 2 7 5.8"/></svg></span>
-          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Perfil</span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Mi perfil</span>
         </a>
       </li>
 
@@ -156,7 +167,7 @@
             onclick="return confirmarCerrarSesion(event)"
             class="dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors hover:bg-red-50">
           <span class="gsz-icon-badge gsz-badge-neutral"><svg viewBox="0 0 24 24"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M14 8l4 4-4 4"/><path d="M18 12H9"/></svg></span>
-          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Cerrar Sesión</span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Cerrar sesión</span>
         </a>
       </li>
     </ul>

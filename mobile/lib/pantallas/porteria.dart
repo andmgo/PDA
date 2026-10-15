@@ -234,7 +234,7 @@ class _PantallaPorteriaState extends State<PantallaPorteria> with SingleTickerPr
     final pendientes = (_esperados ?? const []).where((a) => (a['ingresos'] ?? 0) == 0).length;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Portería'),
+        title: const Text('Control de accesos'),
         bottom: TabBar(
           controller: _pestanas,
           indicatorColor: Aurum.oro,

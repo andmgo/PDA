@@ -265,7 +265,7 @@ class _PantallaPaquetesState extends State<PantallaPaquetes> with SingleTickerPr
     final entregados = _todos?.where((p) => p['entregado'] == true).take(50).toList();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Paquetes'),
+        title: const Text('Recepción de paquetes'),
         bottom: TabBar(
           controller: _pestanas,
           indicatorColor: Aurum.oro,
