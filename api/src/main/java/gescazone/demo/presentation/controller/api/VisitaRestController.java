@@ -1,10 +1,12 @@
 package gescazone.demo.presentation.controller.api;
 
 import gescazone.demo.application.exception.ValidationException;
+import gescazone.demo.application.service.VisitaAutorizadaService;
 import gescazone.demo.application.service.VisitaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +22,25 @@ public class VisitaRestController {
 
     @Autowired
     private VisitaService visitaService;
+
+    @Autowired
+    private VisitaAutorizadaService visitaAutorizadaService;
+
+    /** Visitas que los propietarios autorizaron para hoy (Fase 6). */
+    @GetMapping("/esperadas")
+    public ResponseEntity<List<VisitaAutorizadaService.Autorizacion>> esperadas() {
+        return ResponseEntity.ok(visitaAutorizadaService.esperadasHoy());
+    }
+
+    /** ¿Este documento tiene una visita autorizada para hoy? (aviso al escribirlo en portería) */
+    @GetMapping("/autorizada/{numeroDocumento}")
+    public ResponseEntity<?> autorizada(@PathVariable String numeroDocumento) {
+        return visitaAutorizadaService.vigenteParaDocumento(numeroDocumento, null)
+                .map(v -> visitaAutorizadaService.esperadasHoy().stream()
+                        .filter(a -> a.id().equals(v.getId())).findFirst().orElse(null))
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
 
     @GetMapping("/dentro")
     public ResponseEntity<List<VisitaService.Visita>> dentro() {
@@ -42,12 +63,13 @@ public class VisitaRestController {
     }
 
     @PostMapping("/ingreso")
-    public ResponseEntity<String> ingreso(@RequestBody Map<String, Object> datos) {
+    public ResponseEntity<String> ingreso(@RequestBody Map<String, Object> datos, Authentication authentication) {
         VisitaService.Ingreso ingreso = new VisitaService.Ingreso(
                 texto(datos, "numeroDocumento"), texto(datos, "nombre"), texto(datos, "apellido"),
                 texto(datos, "celular"), texto(datos, "numeroApartamento"),
                 Boolean.TRUE.equals(datos.get("conVehiculo")),
-                texto(datos, "placa"), texto(datos, "numeroParqueadero"));
+                texto(datos, "placa"), texto(datos, "numeroParqueadero"),
+                texto(datos, "idAutorizacion"), authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(visitaService.registrarIngreso(ingreso));
     }
 

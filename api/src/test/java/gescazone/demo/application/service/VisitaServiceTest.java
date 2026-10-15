@@ -40,6 +40,8 @@ class VisitaServiceTest {
     @Mock private RegistroVisitanteRepository registroVisitanteRepository;
     @Mock private RegistroParqueaderoVisitanteRepository registroParqueaderoRepository;
     @Mock private VehiculoRepository vehiculoRepository;
+    @Mock private VisitaAutorizadaService visitaAutorizadaService;
+    @Mock private gescazone.demo.domain.repository.UsuarioRepository usuarioRepository;
 
     @InjectMocks
     private VisitaService visitaService;
@@ -208,6 +210,60 @@ class VisitaServiceTest {
         assertThatThrownBy(() -> visitaService.registrarIngreso(aPie("12", "Luis", "Gómez")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("entre 4 y 20");
+    }
+
+    // ── Fase 6: con autorización del propietario ──
+
+    private gescazone.demo.domain.model.VisitaAutorizadaModel autorizacion() {
+        var a = new gescazone.demo.domain.model.VisitaAutorizadaModel();
+        a.setId("aut-1");
+        a.setIdApartamento("apto-1");
+        a.setNombreVisitante("Carla");
+        a.setApellidoVisitante("Mejía");
+        a.setNumeroDocumento("5551234");
+        return a;
+    }
+
+    @Test
+    void ingresoConAutorizacion_usaSusDatos_yGuardaAutorizacionYQuienRegistro() {
+        when(visitaAutorizadaService.vigenteParaIngreso("aut-1")).thenReturn(autorizacion());
+        when(apartamentoRepository.findById("apto-1")).thenReturn(Optional.of(apto301));
+        when(residenteRepository.findByNumeroDocumento("5551234")).thenReturn(Optional.empty());
+        var funcionario = new gescazone.demo.domain.model.UsuarioModel();
+        funcionario.setId("func-1");
+        when(usuarioRepository.findByNumeroDocumento("200000001")).thenReturn(Optional.of(funcionario));
+        when(visitaAutorizadaService.nombreAutor("aut-1")).thenReturn("Elena Vásquez");
+
+        // Portería no escribe nada: solo elige la autorización
+        String resultado = visitaService.registrarIngreso(new VisitaService.Ingreso(
+                null, null, null, null, null, false, null, null, "aut-1", "200000001"));
+
+        assertThat(resultado).contains("Carla Mejía").contains("301").contains("autorizado por Elena Vásquez");
+        verify(residenteRepository).save(argThat(r -> "5551234".equals(r.getNumeroDocumento())));
+        verify(registroVisitanteRepository).save(argThat(r ->
+                "aut-1".equals(r.getIdVisitaAutorizada()) && "func-1".equals(r.getIdRegistradoPor())));
+    }
+
+    @Test
+    void ingresoConAutorizacionSinDocumento_pideElDocumento() {
+        var sinDocumento = autorizacion();
+        sinDocumento.setNumeroDocumento(null);
+        when(visitaAutorizadaService.vigenteParaIngreso("aut-1")).thenReturn(sinDocumento);
+
+        assertThatThrownBy(() -> visitaService.registrarIngreso(new VisitaService.Ingreso(
+                null, null, null, null, null, false, null, null, "aut-1", null)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("pídeselo");
+    }
+
+    @Test
+    void ingresoSinElegirAutorizacion_siElDocumentoTieneUnaVigente_seAsociaSola() {
+        when(residenteRepository.findByNumeroDocumento("5551234")).thenReturn(Optional.of(visitante("res-1", true)));
+        when(visitaAutorizadaService.vigenteParaDocumento("5551234", "apto-1")).thenReturn(Optional.of(autorizacion()));
+
+        visitaService.registrarIngreso(new VisitaService.Ingreso("5551234", null, null, null, "301", false, null, null));
+
+        verify(registroVisitanteRepository).save(argThat(r -> "aut-1".equals(r.getIdVisitaAutorizada())));
     }
 
     @Test

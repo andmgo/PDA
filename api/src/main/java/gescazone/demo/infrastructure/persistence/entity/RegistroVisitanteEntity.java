@@ -50,4 +50,16 @@ public class RegistroVisitanteEntity {
 
     public LocalDateTime getFechaHoraSalida() { return fechaHoraSalida; }
     public void setFechaHoraSalida(LocalDateTime fechaHoraSalida) { this.fechaHoraSalida = fechaHoraSalida; }
+
+    @Column(name = "visita_autorizada_id")
+    private UUID visitaAutorizadaId;
+
+    @Column(name = "registrado_por_usuario_id")
+    private UUID registradoPorUsuarioId;
+
+    public UUID getVisitaAutorizadaId() { return visitaAutorizadaId; }
+    public void setVisitaAutorizadaId(UUID visitaAutorizadaId) { this.visitaAutorizadaId = visitaAutorizadaId; }
+
+    public UUID getRegistradoPorUsuarioId() { return registradoPorUsuarioId; }
+    public void setRegistradoPorUsuarioId(UUID registradoPorUsuarioId) { this.registradoPorUsuarioId = registradoPorUsuarioId; }
 }

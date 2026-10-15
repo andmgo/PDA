@@ -9,12 +9,15 @@ import gescazone.demo.domain.model.RegistroVisitanteModel;
 import gescazone.demo.domain.model.ResidenteModel;
 import gescazone.demo.domain.model.TipoDocumentoModel;
 import gescazone.demo.domain.model.TipoResidenteModel;
+import gescazone.demo.domain.model.UsuarioModel;
+import gescazone.demo.domain.model.VisitaAutorizadaModel;
 import gescazone.demo.domain.model.VehiculoModel;
 import gescazone.demo.domain.repository.ApartamentoRepository;
 import gescazone.demo.domain.repository.ParqueaderoRepository;
 import gescazone.demo.domain.repository.RegistroParqueaderoVisitanteRepository;
 import gescazone.demo.domain.repository.RegistroVisitanteRepository;
 import gescazone.demo.domain.repository.ResidenteRepository;
+import gescazone.demo.domain.repository.UsuarioRepository;
 import gescazone.demo.domain.repository.VehiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,14 +55,25 @@ public class VisitaService {
     /** Una visita (peatonal o en vehículo) tal como la ve portería. */
     public record Visita(String id, Tipo tipo, String numeroDocumento, String nombreCompleto,
                          String numeroApartamento, String placa, String numeroParqueadero,
-                         String entrada, String salida) {}
+                         String entrada, String salida, String autorizadaPor) {}
 
     /** Datos de un visitante que ya vino antes, para autocompletar el formulario. */
     public record Visitante(String numeroDocumento, String nombre, String apellido, Long celular,
                             boolean bloqueado, String ultimaPlaca, int visitasPrevias) {}
 
+    /**
+     * @param idAutorizacion       visita autorizada por el propietario (opcional): completa los datos que falten
+     * @param documentoRegistrador documento del funcionario que registra (sale del JWT, para auditoría)
+     */
     public record Ingreso(String numeroDocumento, String nombre, String apellido, String celular,
-                          String numeroApartamento, boolean conVehiculo, String placa, String numeroParqueadero) {}
+                          String numeroApartamento, boolean conVehiculo, String placa, String numeroParqueadero,
+                          String idAutorizacion, String documentoRegistrador) {
+        public Ingreso(String numeroDocumento, String nombre, String apellido, String celular,
+                       String numeroApartamento, boolean conVehiculo, String placa, String numeroParqueadero) {
+            this(numeroDocumento, nombre, apellido, celular, numeroApartamento, conVehiculo, placa, numeroParqueadero,
+                    null, null);
+        }
+    }
 
     static final DateTimeFormatter FORMATO = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final String TIPO_VISITANTE = "Visitante";
@@ -74,6 +88,8 @@ public class VisitaService {
     @Autowired private RegistroVisitanteRepository registroVisitanteRepository;
     @Autowired private RegistroParqueaderoVisitanteRepository registroParqueaderoRepository;
     @Autowired private VehiculoRepository vehiculoRepository;
+    @Autowired private VisitaAutorizadaService visitaAutorizadaService;
+    @Autowired private UsuarioRepository usuarioRepository;
 
     // ── Consultas ──────────────────────────────────────────────────────────
 
@@ -139,16 +155,34 @@ public class VisitaService {
     @Transactional
     public String registrarIngreso(Ingreso datos) {
         if (datos == null) throw new ValidationException("Faltan los datos del visitante");
-        String documento = documento(datos.numeroDocumento());
 
-        if (datos.numeroApartamento() == null || datos.numeroApartamento().isBlank())
-            throw new ValidationException("Indica a qué apartamento va el visitante");
-        ApartamentoModel apartamento = apartamentoRepository.findByNumero(datos.numeroApartamento().trim().toUpperCase(Locale.ROOT))
-                .orElseThrow(() -> new NotFoundException("El apartamento " + datos.numeroApartamento().trim() + " no existe"));
+        // Con autorización del propietario: lo que portería no escribió sale de ahí.
+        VisitaAutorizadaModel autorizacion = vacio(datos.idAutorizacion()) ? null
+                : visitaAutorizadaService.vigenteParaIngreso(datos.idAutorizacion());
+        if (autorizacion != null && vacio(datos.numeroDocumento()) && vacio(autorizacion.getNumeroDocumento()))
+            throw new ValidationException("El propietario no dejó el documento de " + autorizacion.nombreCompleto()
+                    + ": pídeselo y escríbelo para registrar el ingreso");
+        String documento = documento(vacio(datos.numeroDocumento()) && autorizacion != null
+                ? autorizacion.getNumeroDocumento() : datos.numeroDocumento());
+        String nombreIngresado = autorizacion != null && vacio(datos.nombre()) ? autorizacion.getNombreVisitante() : datos.nombre();
+        String apellidoIngresado = autorizacion != null && vacio(datos.apellido()) ? autorizacion.getApellidoVisitante() : datos.apellido();
+
+        ApartamentoModel apartamento;
+        if (autorizacion != null) {
+            apartamento = apartamentoRepository.findById(autorizacion.getIdApartamento())
+                    .orElseThrow(() -> new NotFoundException("El apartamento de la autorización ya no existe"));
+        } else {
+            if (vacio(datos.numeroApartamento()))
+                throw new ValidationException("Indica a qué apartamento va el visitante");
+            apartamento = apartamentoRepository.findByNumero(datos.numeroApartamento().trim().toUpperCase(Locale.ROOT))
+                    .orElseThrow(() -> new NotFoundException("El apartamento " + datos.numeroApartamento().trim() + " no existe"));
+            // Sin elegirla, si el documento tiene autorización vigente hoy para ese apartamento, se asocia sola.
+            autorizacion = visitaAutorizadaService.vigenteParaDocumento(documento, apartamento.getId()).orElse(null);
+        }
         RequiereActivo.apartamento(apartamento);
 
         ResidenteModel visitante = residenteRepository.findByNumeroDocumento(documento)
-                .orElseGet(() -> crearVisitante(documento, datos));
+                .orElseGet(() -> crearVisitante(documento, nombreIngresado, apellidoIngresado, datos.celular()));
         if (!visitante.isActivo())
             throw new ValidationException(visitante.getNombre() + " " + visitante.getApellido()
                     + " tiene el ingreso bloqueado. Consulta con la administración.");
@@ -159,13 +193,22 @@ public class VisitaService {
 
         String ahora = LocalDateTime.now().format(FORMATO);
         String nombre = visitante.getNombre() + " " + visitante.getApellido();
+        String idAutorizacion = autorizacion == null ? null : autorizacion.getId();
+        String idRegistrador = vacio(datos.documentoRegistrador()) ? null
+                : usuarioRepository.findByNumeroDocumento(datos.documentoRegistrador()).map(UsuarioModel::getId).orElse(null);
+        String conAutorizacion = autorizacion == null ? ""
+                : " · autorizado por " + visitaAutorizadaService.nombreAutor(autorizacion.getId());
 
         if (!datos.conVehiculo()) {
-            registroVisitanteRepository.save(new RegistroVisitanteModel(visitante.getId(), apartamento.getId(), ahora));
-            return "Ingreso registrado: " + nombre + " → apartamento " + apartamento.getNumero();
+            RegistroVisitanteModel registro = new RegistroVisitanteModel(visitante.getId(), apartamento.getId(), ahora);
+            registro.setIdVisitaAutorizada(idAutorizacion);
+            registro.setIdRegistradoPor(idRegistrador);
+            registroVisitanteRepository.save(registro);
+            return "Ingreso registrado: " + nombre + " → apartamento " + apartamento.getNumero() + conAutorizacion;
         }
 
-        String placa = VehiculoModel.normalizarPlaca(datos.placa());
+        String placa = VehiculoModel.normalizarPlaca(vacio(datos.placa()) && autorizacion != null
+                ? autorizacion.getPlaca() : datos.placa());
         if (placa == null || !PLACA_VISITANTE.matcher(placa).matches())
             throw new ValidationException("Escribe una placa válida (ej. ABC123)");
         boolean placaAdentro = registroParqueaderoRepository.findByFechaHoraSalidaIsNull().stream()
@@ -177,9 +220,11 @@ public class VisitaService {
         RegistroParqueaderoVisitanteModel registro =
                 new RegistroParqueaderoVisitanteModel(visitante.getId(), parqueadero.getId(), ahora, placa);
         registro.setIdApartamento(apartamento.getId());
+        registro.setIdVisitaAutorizada(idAutorizacion);
+        registro.setIdRegistradoPor(idRegistrador);
         registroParqueaderoRepository.save(registro);
         return "Ingreso registrado: " + nombre + " (" + placa + ") → apartamento " + apartamento.getNumero()
-                + ", parqueadero " + parqueadero.getNumero();
+                + ", parqueadero " + parqueadero.getNumero() + conAutorizacion;
     }
 
     public String registrarSalida(Tipo tipo, String idRegistro) {
@@ -211,17 +256,21 @@ public class VisitaService {
         return documento;
     }
 
-    private ResidenteModel crearVisitante(String documento, Ingreso datos) {
-        if (datos.nombre() == null || datos.nombre().isBlank() || datos.apellido() == null || datos.apellido().isBlank())
+    private static boolean vacio(String texto) {
+        return texto == null || texto.isBlank();
+    }
+
+    private ResidenteModel crearVisitante(String documento, String nombreNuevo, String apellidoNuevo, String celularTexto) {
+        if (vacio(nombreNuevo) || vacio(apellidoNuevo))
             throw new ValidationException("Es la primera visita de este documento: escribe su nombre y apellido");
         Long celular = null;
-        if (datos.celular() != null && !datos.celular().isBlank()) {
-            String digitos = datos.celular().replaceAll("[^0-9]", "");
+        if (!vacio(celularTexto)) {
+            String digitos = celularTexto.replaceAll("[^0-9]", "");
             if (digitos.length() < 7 || digitos.length() > 15)
                 throw new ValidationException("El celular no es válido");
             celular = Long.valueOf(digitos);
         }
-        ResidenteModel nuevo = new ResidenteModel(documento, datos.nombre().trim(), datos.apellido().trim(), celular,
+        ResidenteModel nuevo = new ResidenteModel(documento, nombreNuevo.trim(), apellidoNuevo.trim(), celular,
                 new TipoDocumentoModel("CC"), new TipoResidenteModel(TIPO_VISITANTE));
         return residenteRepository.save(nuevo);
     }
@@ -245,14 +294,16 @@ public class VisitaService {
     private Visita aVisita(RegistroVisitanteModel r) {
         ResidenteModel v = residenteRepository.findById(r.getIdResidente()).orElse(null);
         return new Visita(r.getId(), Tipo.PEATON, v == null ? null : v.getNumeroDocumento(), nombre(v),
-                numeroApartamento(r.getIdApartamento()), null, null, r.getFechaHoraEntrada(), r.getFechaHoraSalida());
+                numeroApartamento(r.getIdApartamento()), null, null, r.getFechaHoraEntrada(), r.getFechaHoraSalida(),
+                visitaAutorizadaService.nombreAutor(r.getIdVisitaAutorizada()));
     }
 
     private Visita aVisita(RegistroParqueaderoVisitanteModel r) {
         ResidenteModel v = residenteRepository.findById(r.getIdResidente()).orElse(null);
         String parqueadero = parqueaderoRepository.findById(r.getIdParqueadero()).map(ParqueaderoModel::getNumero).orElse(null);
         return new Visita(r.getId(), Tipo.VEHICULO, v == null ? null : v.getNumeroDocumento(), nombre(v),
-                numeroApartamento(r.getIdApartamento()), r.getPlaca(), parqueadero, r.getFechaHoraEntrada(), r.getFechaHoraSalida());
+                numeroApartamento(r.getIdApartamento()), r.getPlaca(), parqueadero, r.getFechaHoraEntrada(), r.getFechaHoraSalida(),
+                visitaAutorizadaService.nombreAutor(r.getIdVisitaAutorizada()));
     }
 
     private String nombre(ResidenteModel v) {

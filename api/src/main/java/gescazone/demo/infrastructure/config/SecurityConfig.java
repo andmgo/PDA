@@ -181,6 +181,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/propiedad/**")
                     .access(permiso("APARTAMENTOS_PARQUEADEROS_RESIDENTES", NivelPermiso.EDITAR))
 
+                // Visitas autorizadas por el propietario (Fase 6). Portería lee los
+                // "esperados" por /api/accesos/visitas/esperadas (CONTROL_ACCESOS).
+                .requestMatchers(HttpMethod.GET, "/api/visitas-autorizadas/**")
+                    .access(permiso("VISITAS", NivelPermiso.VER))
+                .requestMatchers("/api/visitas-autorizadas/**")
+                    .access(permiso("VISITAS", NivelPermiso.EDITAR))
+
                 .requestMatchers("/api/catalogos/**").authenticated()
 
                 .anyRequest().authenticated()

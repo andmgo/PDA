@@ -60,4 +60,15 @@ public class RegistroVisitanteModel {
                 ", salida='" + (fechaHoraSalida != null ? fechaHoraSalida : "AÚN EN EL EDIFICIO") + '\'' +
                 '}';
     }
+
+    /** Autorización del propietario con la que entró (null si llegó sin autorización previa). */
+    private String idVisitaAutorizada;
+    /** Funcionario que registró el ingreso (auditoría). */
+    private String idRegistradoPor;
+
+    public String getIdVisitaAutorizada() { return idVisitaAutorizada; }
+    public void setIdVisitaAutorizada(String idVisitaAutorizada) { this.idVisitaAutorizada = idVisitaAutorizada; }
+
+    public String getIdRegistradoPor() { return idRegistradoPor; }
+    public void setIdRegistradoPor(String idRegistradoPor) { this.idRegistradoPor = idRegistradoPor; }
 }
