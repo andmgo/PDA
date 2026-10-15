@@ -4,9 +4,8 @@
     <script>(function(){try{var t=localStorage.getItem('gescazone_tema');if(t==='oscuro'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');}catch(e){}})();</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="apple-touch-icon" sizes="76x76" th:href="@{/img/apple-icon.png}" />
-    <link rel="icon" type="image/png" th:href="@{/img/aurum-isotipo.png}" />
-    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/img/aurum-apple-touch.png}" />
+    <link rel="icon" type="image/png" sizes="96x96" th:href="@{/img/aurum-favicon.png}" />
     <title>Aurum Condominios - Inicio</title>
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link th:href="@{/css/nucleo-icons.css}" rel="stylesheet" />
@@ -15,6 +14,7 @@
     <link th:href="@{/css/argon-dashboard-tailwind.css}" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link th:href="@{/css/gescazone-theme.css}" rel="stylesheet" />
+    <link th:href="@{/css/aurum-ui.css}" rel="stylesheet" />
     <link th:href="@{/css/inicio.css}" rel="stylesheet" />
 
 </head>
@@ -31,23 +31,20 @@
         <div class="gsz-page">
 
             <!-- Encabezado -->
-            <div class="gsz-header">
-                <div>
-                    <h1 th:text="${@sesionUsuario.nombre != null ? 'Hola, ' + @sesionUsuario.nombre : 'Hola'}">Hola</h1>
-                    <p th:text="'Terrazas de Calicanto · ' + ${@sesionUsuario.nombreRolParaVista}">Terrazas de Calicanto</p>
+            <header class="gsz-page-hero gsz-inicio-hero">
+                <div class="gsz-page-hero-texto">
+                    <p class="gsz-page-hero-kicker" th:text="'Terrazas de Calicanto · ' + ${@sesionUsuario.nombreRolParaVista}">Terrazas de Calicanto</p>
+                    <h1>Hola, <span class="gsz-oro-texto" th:text="${@sesionUsuario.nombre != null ? @sesionUsuario.nombre : ''}">Admin</span></h1>
+                    <p class="gsz-page-hero-desc">Tu conjunto, en un solo lugar.</p>
+                    <p class="gsz-date">
+                        <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/></svg>
+                        <span id="currentDate"></span>
+                    </p>
                 </div>
-                <div class="gsz-date">
-                    <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/></svg>
-                    <span id="currentDate"></span>
-                </div>
-                <a href="javascript:;" class="block p-0 text-sm transition-all ease-nav-brand xl:hidden" sidenav-trigger>
-                    <div class="w-4.5 overflow-hidden">
-                        <i class="ease mb-0.75 relative block h-0.5 rounded-sm transition-all" style="background: var(--gsz-ink);"></i>
-                        <i class="ease mb-0.75 relative block h-0.5 rounded-sm transition-all" style="background: var(--gsz-ink);"></i>
-                        <i class="ease relative block h-0.5 rounded-sm transition-all" style="background: var(--gsz-ink);"></i>
-                    </div>
-                </a>
-            </div>
+                <button type="button" class="gsz-page-hero-menu" sidenav-trigger aria-label="Abrir menú">
+                    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+                </button>
+            </header>
 
             <!-- Accesos rápidos -->
             <div class="gsz-quick-grid">

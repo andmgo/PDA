@@ -103,7 +103,7 @@ function actualizarPropietario() {
     // Facturas
     const listaFacturas = document.getElementById('listaFacturas');
     listaFacturas.innerHTML = datos.facturas.map(function(f) {
-        return '<div style="padding: 1rem 0; border-bottom: 1px solid #f0f2f5;">' +
+        return '<div class="gsz-factura">' +
           '<div class="flex justify-between items-center mb-2">' +
             '<div>' +
               '<p class="font-semibold text-sm text-slate-700">' + f.mes + '</p>' +

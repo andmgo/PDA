@@ -15,43 +15,28 @@
     gap: 22px;
 }
 
-/* ── Encabezado ── */
-.gsz-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
+/* ── Encabezado: usa .gsz-page-hero de aurum-ui.css (dentro de .gsz-page, sin margen propio) ── */
+.gsz-page .gsz-inicio-hero { margin: 0; }
+.gsz-inicio-hero h1 { font-size: clamp(28px, 3.2vw, 38px); }
+.gsz-oro-texto {
+    background: var(--aurum-oro-degradado);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
-.gsz-header h1 {
-    margin: 0 0 4px;
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: var(--gsz-ink);
-    text-wrap: balance;
-}
-.gsz-header p {
-    margin: 0;
-    color: var(--gsz-ink-muted);
-    font-size: 14.5px;
-}
-.gsz-header .gsz-date {
-    color: var(--gsz-ink-muted);
-    font-size: 13px;
+.gsz-inicio-hero .gsz-date {
+    margin: 14px 0 0;
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(248, 247, 244, .62);
 }
-.gsz-header .gsz-date svg {
-    width: 15px;
-    height: 15px;
-    stroke: var(--gsz-ink-faint);
-    fill: none;
-    stroke-width: 2.1;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+.gsz-inicio-hero .gsz-date svg {
+    width: 15px; height: 15px; stroke: var(--aurum-oro-claro); stroke-width: 2.1;
+    stroke-linecap: round; stroke-linejoin: round;
 }
+.gsz-inicio-hero .gsz-date span::first-letter { text-transform: uppercase; }
 
 /* ── Accesos rápidos ── */
 .gsz-quick-grid {

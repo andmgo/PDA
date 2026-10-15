@@ -102,3 +102,30 @@ function updateLastAccess() {
 
 updateLastAccess();
 setInterval(updateLastAccess, 60000);
+// ── Mi hogar: apartamentos y vehículos vinculados a la cuenta (Fase 2) ──
+async function cargarMiHogar() {
+    const caja = document.getElementById('miHogar');
+    if (!caja) return;
+    const esc = t => { const d = document.createElement('div'); d.textContent = t == null ? '' : String(t); return d.innerHTML; };
+    try {
+        const response = await fetch('/api/propiedad/mia');
+        if (!response.ok) throw new Error();
+        const apartamentos = await response.json();
+        if (!apartamentos.length) {
+            caja.innerHTML = '<p class="gsz-hogar-vacio">Aún no tienes apartamentos vinculados. La administración los asigna desde Gestión de Datos.</p>';
+            return;
+        }
+        caja.innerHTML = apartamentos.map(a => {
+            const vehiculos = a.vehiculos.filter(v => v.activo);
+            return `<div class="gsz-hogar-item">
+                <span class="gsz-apto">${esc(a.numeroApartamento)}</span>
+                <div class="gsz-hogar-vehiculos">${vehiculos.length
+                    ? vehiculos.map(v => `<span class="gsz-placa" title="${v.tipo === 'MOTO' ? 'Moto' : 'Carro'}">${esc(v.placa)}</span>`).join('')
+                    : '<small>Sin vehículos registrados</small>'}</div>
+            </div>`;
+        }).join('');
+    } catch (e) {
+        caja.innerHTML = '<p class="gsz-hogar-vacio">No se pudo cargar esta información.</p>';
+    }
+}
+document.addEventListener('DOMContentLoaded', cargarMiHogar);

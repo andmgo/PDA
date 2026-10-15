@@ -5,24 +5,23 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="apple-touch-icon" sizes="76x76" th:href="@{/img/apple-icon.png}" />
-    <link rel="icon" type="image/png" th:href="@{/img/aurum-isotipo.png}" />
-    <link rel="icon" type="image/png" th:href="@{/img/favicon.png}" />
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/img/aurum-apple-touch.png}" />
+    <link rel="icon" type="image/png" sizes="96x96" th:href="@{/img/aurum-favicon.png}" />
     <title>Aurum Condominios - Perfil</title>
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link th:href="@{/css/nucleo-icons.css}" rel="stylesheet" />
     <link th:href="@{/css/nucleo-svg.css}" rel="stylesheet" />
     <link th:href="@{/css/argon-dashboard-tailwind.css}" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link th:href="@{/css/gescazone-theme.css}" rel="stylesheet" />
+    <link th:href="@{/css/aurum-ui.css}" rel="stylesheet" />
 </head>
 
 <body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
     <!-- Sidebar -->
     <div th:replace="~{fragments/sidebar :: sidebar(activo='perfil')}"></div>
     <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
-        <div th:replace="~{fragments/topbar :: topbar(titulo='Perfil')}"></div>
+        <div th:replace="~{fragments/topbar :: topbar(titulo='Mi perfil', seccion='Mi cuenta', descripcion='Tus datos personales y la seguridad de tu cuenta.')}"></div>
 
         <div class="w-full px-6 py-6 mx-auto">
             <!-- Profile Content -->
@@ -43,36 +42,19 @@
                         <h2 class="profile-name" th:text="${usuario.nombre + ' ' + usuario.apellido}">Administrador Master</h2>
                         <p class="profile-role" th:text="${usuario.nombreRol}">Administrador</p>
                         
-                        <div class="profile-stats">
-                            <div class="stat-item">
-                                <div class="stat-value"><i class="fas fa-envelope" style="color: #2F6FED;"></i></div>
-                                <div class="stat-label">Email Verificado</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">2026</div>
-                                <div class="stat-label">Año Actual</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value"><i class="fas fa-map-marker-alt" style="color: #DD5147;"></i></div>
-                                <div class="stat-label">Cartagena, CO</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" style="color: #1F9463;">
-                                    <i class="fas fa-check-circle"></i> Activo
-                                </div>
-                                <div class="stat-label">Estado</div>
-                            </div>
-                        </div>
+                        <dl class="gsz-perfil-datos">
+                            <div><dt>Correo</dt><dd th:text="${usuario.correo}">correo</dd></div>
+                            <div><dt>Documento</dt><dd class="gsz-mono" th:text="${usuario.nombreTipoDocumento + ' ' + usuario.numeroDocumento}">CC 0</dd></div>
+                            <div><dt>Estado</dt><dd><span class="gsz-estado gsz-estado-ok">Cuenta activa</span></dd></div>
+                        </dl>
 
-                        <div class="info-box">
-                            <i class="fas fa-info-circle"></i>
-                            <div>
-                                <div class="info-box-title">Información</div>
-                                <div class="info-box-text" id="lastAccessTime">
-                                    Último acceso: Cargando...
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Mi hogar: apartamentos y vehículos vinculados (GET /api/propiedad/mia) -->
+                        <section class="gsz-perfil-hogar">
+                            <p class="gsz-kicker">Mi hogar</p>
+                            <div id="miHogar" class="gsz-hogar-lista"><p class="gsz-hogar-vacio">Cargando…</p></div>
+                        </section>
+
+                        <p class="gsz-perfil-acceso" id="lastAccessTime">Último acceso: cargando…</p>
                     </div>
                 </div>
 

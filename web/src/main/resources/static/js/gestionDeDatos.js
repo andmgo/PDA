@@ -293,8 +293,8 @@ function mostrarApartamentos(apartamentos) {
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${apt.numero}</p></td>
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs font-semibold">${tipoOcup}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b"><span class="gsz-estado ${statusClass}">${estadoCta}</span></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${apt.medidas} m²</p></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${apt.telefono}</p></td>
+            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${apt.medidas ? apt.medidas + " m²" : "—"}</p></td>
+            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${apt.telefono ?? "—"}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="openPropiedadModal('${apt.id}', '${apt.numero}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-users mr-1"></i>Propietarios y vehículos</button>
                 <button onclick="editApartamento('${apt.numero}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
@@ -496,8 +496,8 @@ function mostrarParqueaderos(parqueaderos) {
         tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${p.numero}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b"><span class="gsz-estado ${statusClass}">${estado}</span></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.medidas} m²</p></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.telefono}</p></td>
+            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.medidas ? p.medidas + " m²" : "—"}</p></td>
+            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.telefono ?? "—"}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="editParqueadero('${p.numero}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
                 ${btnEstado}
@@ -605,8 +605,8 @@ function mostrarSalones(salones) {
         tbody.innerHTML += `<tr class="${activo ? '' : 'opacity-50'}">
             <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${s.numero}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b"><span class="gsz-estado ${statusClass}">${estado}</span></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${s.medidas} m²</p></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${s.telefono}</p></td>
+            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${s.medidas ? s.medidas + " m²" : "—"}</p></td>
+            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${s.telefono ?? "—"}</p></td>
             <td class="p-2 text-center align-middle bg-transparent border-b">
                 <button onclick="editSalon('${s.numero}')" class="text-xs font-semibold text-blue-500 hover:text-blue-700 mr-3"><i class="fas fa-edit mr-1"></i>Editar</button>
                 ${btnEstado}

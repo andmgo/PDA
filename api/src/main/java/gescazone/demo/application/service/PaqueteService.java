@@ -34,6 +34,21 @@ public class PaqueteService {
         return "Paquete registrado exitosamente";
     }
 
+    /** Portería escribe el número del apartamento ("301"), no su ID interno. */
+    public String registrarPorNumeroApartamento(String numeroApartamento, String nombreReceptor, String cedulaReceptor) {
+        if (numeroApartamento == null || numeroApartamento.isBlank())
+            throw new IllegalArgumentException("El apartamento es obligatorio");
+        String idApartamento = apartamentoRepository.findByNumero(numeroApartamento.trim().toUpperCase())
+                .orElseThrow(() -> new NotFoundException("No existe el apartamento " + numeroApartamento.trim()))
+                .getId();
+        return registrar(idApartamento, nombreReceptor, cedulaReceptor);
+    }
+
+    /** Número legible del apartamento de un paquete (para mostrarlo en pantalla). */
+    public String numeroApartamento(String idApartamento) {
+        return apartamentoRepository.findById(idApartamento).map(a -> a.getNumero()).orElse("—");
+    }
+
     public String marcarEntregado(String idPaquete) {
         if (idPaquete == null)
             throw new IllegalArgumentException("El ID del paquete es obligatorio");

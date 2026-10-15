@@ -1,112 +1,120 @@
 // ══════════════════════════════════════════════════════════════════════════════
 //  paquetes.js — registro de paquetes de recepción (Funcionario/Administrador)
+//  Portería escribe el número del apartamento; el API lo resuelve
+//  (POST /api/paquetes con numeroApartamento) y devuelve el número legible en
+//  los listados — antes la tabla mostraba el ID interno del apartamento.
 // ══════════════════════════════════════════════════════════════════════════════
 
+let filtroPaquetes = 'pendientes';
+
+function escaparHtml(texto) {
+    const div = document.createElement('div');
+    div.textContent = texto == null ? '' : String(texto);
+    return div.innerHTML;
+}
+
+function avisoPaquete(texto, esError) {
+    const caja = document.getElementById('paqueteAviso');
+    caja.textContent = texto || '';
+    caja.className = 'gsz-aviso' + (texto ? (esError ? ' error' : ' ok') : '');
+}
+
+function filtrarPaquetes(boton) {
+    document.querySelectorAll('.gsz-segmentado button').forEach(b => b.classList.toggle('activo', b === boton));
+    filtroPaquetes = boton.dataset.filtro;
+    cargarPaquetes();
+}
+
 async function cargarPaquetes() {
-    const soloPendientes = document.getElementById('soloPendientes').checked;
-    const url = soloPendientes ? '/api/paquetes/pendientes' : '/api/paquetes';
+    const url = filtroPaquetes === 'pendientes' ? '/api/paquetes/pendientes' : '/api/paquetes';
     try {
         const response = await fetch(url);
-        if (!response.ok) {
-            console.error('Error al cargar paquetes:', await response.text());
-            return;
-        }
-        const paquetes = await response.json();
-        mostrarPaquetes(paquetes);
+        if (!response.ok) throw new Error(await response.text());
+        mostrarPaquetes(await response.json());
     } catch (error) {
         console.error('Error al cargar paquetes:', error);
     }
 }
 
+function formatoFecha(valor) {
+    return new Date(valor).toLocaleString('es-CO', {
+        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+    });
+}
+
 function mostrarPaquetes(paquetes) {
     const tbody = document.getElementById('paquetesTableBody');
-    tbody.innerHTML = '';
+    const pendientes = paquetes.filter(p => !p.entregado).length;
+    document.getElementById('paquetesContador').textContent =
+        filtroPaquetes === 'pendientes' ? pendientes : paquetes.length;
+
     if (paquetes.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center align-middle bg-transparent border-b">
-            <div class="flex flex-col items-center justify-center text-gray-500">
-                <i class="fas fa-box-open text-4xl mb-3 opacity-50"></i>
-                <p class="text-sm font-semibold mb-1">No hay paquetes registrados</p>
-            </div>
-        </td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5"><div class="gsz-vacio">
+            <svg viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4-8.5 4-8.5-4z"/><path d="M3.5 8v8l8.5 4 8.5-4V8"/><path d="M12 12v8"/></svg>
+            ${filtroPaquetes === 'pendientes' ? 'No hay paquetes pendientes por entregar.' : 'Aún no se han registrado paquetes.'}
+        </div></td></tr>`;
         return;
     }
-    paquetes.forEach(p => {
-        const llegada = new Date(p.fechaHoraLlegada).toLocaleString('es-CO', {
-            year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-        });
-        const estadoBadge = p.entregado
-            ? '<span class="bg-gradient-to-tl from-emerald-500 to-teal-400 px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">Entregado</span>'
-            : '<span class="bg-gradient-to-tl from-yellow-500 to-orange-400 px-2.5 text-xs rounded-1.8 py-1.4 inline-block font-bold uppercase text-white">Pendiente</span>';
-        const accion = p.entregado
-            ? ''
-            : `<button onclick="marcarEntregado('${p.id}')" class="text-xs font-semibold text-emerald-600 hover:text-emerald-800">
-                   <i class="fas fa-check mr-1"></i>Marcar entregado
-               </button>`;
 
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-sm font-semibold">${p.idApartamento}</p></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.nombreReceptor}</p></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${p.cedulaReceptor}</p></td>
-            <td class="p-2 align-middle bg-transparent border-b"><p class="px-6 mb-0 text-xs">${llegada}</p></td>
-            <td class="p-2 text-center align-middle bg-transparent border-b">${estadoBadge}</td>
-            <td class="p-2 text-center align-middle bg-transparent border-b">${accion}</td>`;
-        tbody.appendChild(row);
-    });
+    tbody.innerHTML = paquetes.map(p => `
+        <tr>
+            <td class="px-4 py-3"><span class="gsz-apto">${escaparHtml(p.numeroApartamento)}</span></td>
+            <td class="px-4 py-3">
+                <span class="block text-sm font-semibold">${escaparHtml(p.nombreReceptor)}</span>
+                <span class="block text-xs gsz-mono">${escaparHtml(p.cedulaReceptor)}</span>
+            </td>
+            <td class="px-4 py-3 text-xs">${formatoFecha(p.fechaHoraLlegada)}${p.entregado && p.fechaHoraEntrega
+                ? `<span class="block">Entregado ${formatoFecha(p.fechaHoraEntrega)}</span>` : ''}</td>
+            <td class="px-4 py-3 text-center">${p.entregado
+                ? '<span class="gsz-estado gsz-estado-ok">Entregado</span>'
+                : '<span class="gsz-estado gsz-estado-alerta">Pendiente</span>'}</td>
+            <td class="px-4 py-3 text-center">${p.entregado ? '' :
+                `<button type="button" class="text-xs font-semibold" onclick="marcarEntregado('${p.id}', this)">
+                    <i class="fas fa-check mr-1"></i>Entregar</button>`}</td>
+        </tr>`).join('');
 }
 
 async function submitPaquete(event) {
     event.preventDefault();
-
-    const numeroApartamento = document.getElementById('numeroApartamentoPaquete').value.trim();
-    const nombreReceptor    = document.getElementById('nombreReceptor').value.trim();
-    const cedulaReceptor    = document.getElementById('cedulaReceptor').value.trim();
-    const errorSpan         = document.getElementById('apartamentoPaqueteError');
-    errorSpan.textContent = '';
-
+    const form = document.getElementById('paqueteForm');
+    const boton = form.querySelector('button[type=submit]');
+    boton.disabled = true;
     try {
-        const aptResponse = await fetch(`/api/apartamentos/${numeroApartamento}`);
-        if (!aptResponse.ok) {
-            errorSpan.textContent = 'No existe un apartamento con ese número';
-            return false;
-        }
-        const apartamento = await aptResponse.json();
-
         const response = await fetch('/api/paquetes', {
-            method:  'POST',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({
-                idApartamento:  apartamento.id,
-                nombreReceptor: nombreReceptor,
-                cedulaReceptor: cedulaReceptor
+            body: JSON.stringify({
+                numeroApartamento: document.getElementById('numeroApartamentoPaquete').value.trim(),
+                nombreReceptor: document.getElementById('nombreReceptor').value.trim(),
+                cedulaReceptor: document.getElementById('cedulaReceptor').value.trim()
             })
         });
-
-        const result = await response.text();
-        if (response.ok) {
-            alert('✅ ' + result);
-            document.getElementById('paqueteForm').reset();
-            await cargarPaquetes();
-        } else {
-            alert('Error al registrar el paquete: ' + result);
-        }
+        const texto = await response.text();
+        if (!response.ok) throw new Error(texto);
+        avisoPaquete(texto, false);
+        form.reset();
+        document.getElementById('numeroApartamentoPaquete').focus();
+        await cargarPaquetes();
     } catch (error) {
-        console.error('Error al registrar el paquete:', error);
-        alert('Error al registrar el paquete: ' + error.message);
+        avisoPaquete(error.message || 'No se pudo registrar el paquete', true);
+    } finally {
+        boton.disabled = false;
     }
     return false;
 }
 
-async function marcarEntregado(id) {
+async function marcarEntregado(id, boton) {
     if (!confirm('¿Confirmar la entrega de este paquete?')) return;
+    boton.disabled = true;
     try {
         const response = await fetch(`/api/paquetes/${id}/entregar`, { method: 'POST' });
-        const result = await response.text();
-        alert(result);
-        if (response.ok) await cargarPaquetes();
+        const texto = await response.text();
+        if (!response.ok) throw new Error(texto);
+        avisoPaquete(texto, false);
+        await cargarPaquetes();
     } catch (error) {
-        console.error('Error al marcar el paquete como entregado:', error);
-        alert('Error al marcar el paquete como entregado: ' + error.message);
+        boton.disabled = false;
+        avisoPaquete(error.message, true);
     }
 }
 

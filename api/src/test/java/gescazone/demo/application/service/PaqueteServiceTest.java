@@ -70,6 +70,28 @@ class PaqueteServiceTest {
     }
 
     @Test
+    void registrarPorNumeroApartamento_resuelveElIdYGuarda() {
+        ApartamentoModel apto = new ApartamentoModel();
+        apto.setId("apto-1");
+        when(apartamentoRepository.findByNumero("301")).thenReturn(Optional.of(apto));
+        when(apartamentoRepository.findById("apto-1")).thenReturn(Optional.of(apto));
+
+        paqueteService.registrarPorNumeroApartamento(" 301 ", "Juan Pérez", "123456");
+
+        verify(paqueteRepository).save(argThat(p -> p.getIdApartamento().equals("apto-1")));
+    }
+
+    @Test
+    void registrarPorNumeroApartamento_inexistente_noEncontrado() {
+        when(apartamentoRepository.findByNumero("999")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> paqueteService.registrarPorNumeroApartamento("999", "Juan Pérez", "123456"))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("999");
+        verifyNoInteractions(paqueteRepository);
+    }
+
+    @Test
     void marcarEntregado_noExiste_lanzaExcepcion() {
         when(paqueteRepository.findById("paq-1")).thenReturn(Optional.empty());
         assertThatThrownBy(() -> paqueteService.marcarEntregado("paq-1"))

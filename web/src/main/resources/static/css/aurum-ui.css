@@ -1,0 +1,592 @@
+/* ============================================================
+   Aurum UI — componentes compartidos de las páginas internas.
+   Mismo lenguaje que la landing: azul noche plano con acentos
+   oro, Montserrat, rótulos en mayúsculas espaciadas, tarjetas
+   limpias sobre blanco cálido. Se carga DESPUÉS de
+   gescazone-theme.css (usa sus tokens --aurum-* / --gsz-*) y
+   reestiliza las utilidades de Tailwind/Argon que traen las
+   plantillas, para no tener que reescribir cada una.
+   ============================================================ */
+
+/* ── Encabezado de página (fragments/topbar.html) ── */
+.gsz-page-hero {
+    position: relative;
+    margin: 16px 24px 4px;
+    padding: 30px 34px 32px;
+    border-radius: 22px;
+    /* Azul noche plano, como la barra lateral: un degradado o brillo
+       encima se percibe como "otro azul más claro". */
+    background: var(--aurum-noche);
+    color: var(--aurum-blanco);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    overflow: hidden;
+    box-shadow: 0 26px 50px -34px rgba(30, 42, 74, .75);
+}
+/* Isotipo como marca de agua, muy tenue */
+.gsz-page-hero::after {
+    content: "";
+    position: absolute;
+    right: 28px;
+    bottom: -26px;
+    width: 190px;
+    height: 144px;
+    background: url("/img/aurum-isotipo.png") no-repeat center / contain;
+    opacity: .07;
+    pointer-events: none;
+}
+.dark .gsz-page-hero { border: 1px solid rgba(240, 201, 106, .14); }
+.gsz-page-hero-texto { position: relative; z-index: 1; min-width: 0; }
+.gsz-page-hero-kicker {
+    margin: 0 0 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: var(--aurum-oro-claro);
+}
+.gsz-page-hero h1 {
+    margin: 0;
+    font-size: clamp(24px, 2.6vw, 32px);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.15;
+    color: var(--aurum-blanco);
+}
+.gsz-page-hero-desc {
+    margin: 8px 0 0;
+    max-width: 62ch;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: rgba(248, 247, 244, .74);
+}
+.gsz-page-hero-menu {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, .07);
+    border: 1px solid rgba(255, 255, 255, .14);
+    color: var(--aurum-blanco);
+    cursor: pointer;
+}
+.gsz-page-hero-menu svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+@media (min-width: 1280px) { .gsz-page-hero-menu { display: none; } }
+@media (max-width: 640px) {
+    .gsz-page-hero { margin: 12px 12px 0; padding: 22px 20px 24px; border-radius: 18px; }
+    .gsz-page-hero::after { width: 120px; height: 92px; right: 8px; bottom: -18px; }
+    main .w-full.px-6.py-6.mx-auto { padding-left: 12px; padding-right: 12px; }
+}
+
+/* ── Tarjetas ── */
+main .rounded-2xl.shadow-xl,
+main .shadow-xl.rounded-2xl {
+    border: 1px solid var(--gsz-border) !important;
+    border-radius: 20px !important;
+    background-color: var(--gsz-surface) !important;
+    box-shadow: 0 1px 2px rgba(30, 42, 74, .04), 0 18px 40px -30px rgba(30, 42, 74, .35) !important;
+}
+.dark main .rounded-2xl.shadow-xl { box-shadow: none !important; }
+
+/* Títulos de sección dentro de tarjetas */
+main h5, main h6 { color: var(--gsz-ink); }
+main h6.font-bold, main .p-6 > h6, main .p-6 > div > h6 {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    letter-spacing: -.005em;
+}
+
+/* ── Pestañas: subrayado oro, como la navegación de la landing ── */
+.tab-button {
+    background: transparent !important;
+    color: var(--gsz-ink-faint) !important;
+    border-bottom: 2px solid transparent !important;
+    font-weight: 600 !important;
+    opacity: 1 !important;
+    border-radius: 0 !important;
+}
+.tab-button:hover { color: var(--gsz-ink) !important; }
+.tab-button.active {
+    color: var(--gsz-ink) !important;
+    background: transparent !important;
+    border-bottom-color: var(--gsz-gold) !important;
+}
+.tab-button i, .tab-button svg { color: var(--gsz-ink-faint); }
+.tab-button.active i, .tab-button.active svg { color: var(--gsz-gold); }
+.flex.border-b:has(> .tab-button) { border-color: var(--gsz-border) !important; gap: 4px; }
+
+/* ── Tablas ── */
+main table { border-color: var(--gsz-border) !important; }
+main table thead th {
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gsz-ink-faint) !important;
+    border-bottom: 1px solid var(--gsz-border) !important;
+    background: transparent !important;
+    opacity: 1 !important;
+}
+main table tbody td {
+    border-bottom: 1px solid var(--gsz-border) !important;
+    color: var(--gsz-ink-muted);
+}
+main table tbody td .font-semibold { color: var(--gsz-ink); }
+main table tbody tr { transition: background .12s ease; }
+main table tbody tr:hover { background: var(--gsz-surface-2); }
+
+/* ── Campos de formulario (páginas y modales) ── */
+main input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+main select,
+main textarea,
+.modal input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.modal select,
+.modal textarea {
+    border: 1.5px solid var(--gsz-border) !important;
+    border-radius: 11px !important;
+    background-color: var(--gsz-surface) !important;
+    color: var(--gsz-ink) !important;
+    font-family: 'Montserrat', sans-serif;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+main input:focus, main select:focus, main textarea:focus,
+.modal input:focus, .modal select:focus, .modal textarea:focus {
+    outline: none !important;
+    border-color: var(--gsz-gold) !important;
+    box-shadow: 0 0 0 3px rgba(212, 168, 67, .18) !important;
+}
+main input::placeholder, .modal input::placeholder { color: var(--gsz-ink-faint) !important; opacity: 1; }
+.dark main input:not([type="checkbox"]):not([type="radio"]), .dark main select,
+.dark .modal input:not([type="checkbox"]):not([type="radio"]), .dark .modal select {
+    background-color: var(--gsz-surface-2) !important;
+}
+main label, .modal label { color: var(--gsz-ink) !important; }
+main input[type="checkbox"], .modal input[type="checkbox"] { accent-color: var(--gsz-gold); }
+
+/* ── Botones ── */
+main button, .modal button { font-family: 'Montserrat', sans-serif; }
+/* Mayúsculas de Argon en botones primarios: demasiado "gritón" */
+main .uppercase.bg-gradient-to-tl { text-transform: none !important; letter-spacing: 0 !important; }
+.bg-gray-200 { background-color: var(--gsz-neutral-soft) !important; color: var(--gsz-ink) !important; }
+.bg-gray-200:hover, .hover\:bg-gray-300:hover { background-color: var(--gsz-border) !important; }
+/* Confirmaciones (antes verde azulado) → primario de marca */
+.bg-gradient-to-tl.from-emerald-500 {
+    background-image: linear-gradient(120deg, var(--aurum-lider), var(--aurum-noche)) !important;
+}
+.dark .bg-gradient-to-tl.from-emerald-500 { background-image: var(--aurum-oro-degradado) !important; color: var(--aurum-noche) !important; }
+
+/* Botón secundario de marca, para usar en plantillas nuevas */
+.gsz-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 18px; border-radius: 11px; font-size: 14px; font-weight: 700;
+    border: 1.5px solid transparent; cursor: pointer; text-decoration: none;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+}
+.gsz-btn:hover { transform: translateY(-1px); }
+.gsz-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.gsz-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.gsz-btn-noche { background: linear-gradient(120deg, var(--aurum-lider), var(--aurum-noche)); color: var(--aurum-blanco); box-shadow: 0 10px 20px -12px rgba(30, 42, 74, .7); }
+.gsz-btn-oro { background: var(--aurum-oro-degradado); color: var(--aurum-noche); box-shadow: 0 10px 22px -12px rgba(212, 168, 67, .9); }
+.gsz-btn-borde { background: var(--gsz-surface); color: var(--gsz-ink); border-color: var(--gsz-border); }
+.gsz-btn-borde:hover { border-color: var(--gsz-gold); }
+.dark .gsz-btn-noche { background: var(--aurum-oro-degradado); color: var(--aurum-noche); }
+
+/* ── Modales ── */
+.modal {
+    background: rgba(17, 26, 48, .55) !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.modal-content {
+    border-radius: 22px !important;
+    border: 1px solid var(--gsz-border) !important;
+    border-top: 4px solid var(--gsz-gold) !important;
+    padding: 28px !important;
+    box-shadow: 0 40px 80px -36px rgba(0, 0, 0, .55) !important;
+}
+.modal-content > h5:first-child {
+    font-size: 19px !important;
+    font-weight: 800 !important;
+    letter-spacing: -.01em;
+    color: var(--gsz-ink);
+}
+
+/* ── Rótulo de sección reutilizable (tarjetas nuevas) ── */
+.gsz-kicker {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--gsz-gold-ink);
+}
+.gsz-card-titulo { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -.01em; color: var(--gsz-ink); }
+.gsz-card-sub { margin: 4px 0 0; font-size: 13.5px; color: var(--gsz-ink-muted); }
+
+/* Tarjeta de marca para plantillas nuevas (Fase 3 en adelante) */
+.gsz-panel {
+    background: var(--gsz-surface);
+    border: 1px solid var(--gsz-border);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 1px 2px rgba(30, 42, 74, .04), 0 18px 40px -30px rgba(30, 42, 74, .35);
+}
+.dark .gsz-panel { box-shadow: none; }
+
+/* Mensajes en línea (reemplazo de alert()) */
+.gsz-aviso { display: none; font-size: 13.5px; padding: 11px 14px; border-radius: 11px; margin: 0 0 14px; }
+.gsz-aviso.ok { display: block; background: var(--gsz-blue-soft); color: var(--gsz-ink); border-left: 3px solid var(--gsz-blue); }
+.gsz-aviso.error { display: block; background: var(--gsz-gold-soft); color: var(--gsz-ink); border-left: 3px solid var(--gsz-gold); }
+.dark .gsz-aviso.ok { border-left-color: var(--aurum-oro-claro); }
+
+/* Estado vacío */
+.gsz-vacio {
+    padding: 36px 16px;
+    text-align: center;
+    color: var(--gsz-ink-faint);
+    font-size: 14px;
+}
+.gsz-vacio svg { width: 34px; height: 34px; stroke: var(--gsz-gold); fill: none; stroke-width: 1.6; margin: 0 auto 10px; display: block; }
+
+/* ── Acciones por fila en tablas (Editar / Desactivar / …) como botones
+   pequeños con borde en vez de texto suelto ── */
+main table tbody td button.text-xs {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin: 2px 2px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--gsz-border);
+    background: var(--gsz-surface);
+    color: var(--gsz-ink) !important;
+    white-space: nowrap;
+    transition: border-color .15s ease, background .15s ease;
+}
+main table tbody td button.text-xs:hover { border-color: var(--gsz-gold); background: var(--gsz-gold-soft); }
+main table tbody td button.text-xs i { color: var(--gsz-gold-ink); }
+/* Desactivar: única acción destructiva → rojo apagado de estado (permitido por la marca) */
+main table tbody td button.text-xs.text-red-500 { color: var(--gsz-red) !important; }
+main table tbody td button.text-xs.text-red-500 i { color: var(--gsz-red); }
+main table tbody td button.text-xs.text-red-500:hover { border-color: var(--gsz-red); background: var(--gsz-red-soft); }
+main table tbody td button.text-xs.mr-3 { margin-right: 2px !important; }
+
+/* ── Componentes de formulario y listas para plantillas nuevas ── */
+.gsz-form-stack { display: grid; gap: 14px; margin-top: 18px; }
+.gsz-campo { display: grid; gap: 6px; margin: 0; }
+.gsz-campo > span {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--gsz-ink-muted);
+}
+.gsz-campo input, .gsz-campo select, .gsz-campo textarea {
+    width: 100%;
+    padding: 11px 13px;
+    font-size: 14.5px;
+}
+.gsz-btn-bloque { width: 100%; padding: 12px 18px; margin-top: 4px; }
+
+.gsz-panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.gsz-contador {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 24px;
+    padding: 0 8px;
+    margin-left: 6px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    vertical-align: middle;
+    background: var(--gsz-gold-soft);
+    color: var(--gsz-gold-ink);
+}
+.gsz-contador:empty { display: none; }
+
+/* Selector segmentado (filtros tipo "Pendientes | Todos") */
+.gsz-segmentado {
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 12px;
+    background: var(--gsz-neutral-soft);
+    border: 1px solid var(--gsz-border);
+}
+.gsz-segmentado button {
+    padding: 7px 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gsz-ink-muted);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+.gsz-segmentado button.activo {
+    background: var(--gsz-surface);
+    color: var(--gsz-ink);
+    box-shadow: 0 2px 8px -3px rgba(30, 42, 74, .35);
+}
+.dark .gsz-segmentado button.activo { background: var(--aurum-lider); }
+
+/* Número de apartamento como "placa" pequeña azul noche */
+.gsz-apto {
+    display: inline-block;
+    min-width: 46px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--aurum-noche);
+    color: var(--aurum-oro-claro);
+}
+
+/* Paquetes: formulario a la izquierda, lista a la derecha */
+.gsz-paq-grid { display: grid; grid-template-columns: minmax(280px, 360px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.gsz-paq-grid > * { min-width: 0; }
+.gsz-paq-form { position: sticky; top: 16px; }
+@media (max-width: 1100px) {
+    .gsz-paq-grid { grid-template-columns: 1fr; }
+    .gsz-paq-form { position: static; }
+}
+
+/* ── Perfil (profile.html) ── */
+.profile-card { text-align: center; }
+.avatar {
+    background: var(--aurum-noche) !important;
+    color: var(--aurum-oro-claro) !important;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800 !important;
+    letter-spacing: .02em;
+    box-shadow: 0 0 0 4px var(--gsz-surface), 0 0 0 6px var(--aurum-oro) !important;
+}
+.avatar-upload { background: var(--aurum-oro) !important; color: var(--aurum-noche) !important; }
+.profile-name { color: var(--gsz-ink) !important; font-weight: 800 !important; letter-spacing: -.01em; }
+.profile-role {
+    color: var(--gsz-gold-ink) !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: .22em !important;
+    text-transform: uppercase;
+}
+.gsz-perfil-datos { margin: 22px 0 0; display: grid; gap: 0; text-align: left; border-top: 1px solid var(--gsz-border); }
+.gsz-perfil-datos > div {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 12px 2px; border-bottom: 1px solid var(--gsz-border);
+}
+.gsz-perfil-datos dt { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gsz-ink-faint); }
+.gsz-perfil-datos dd { margin: 0; font-size: 13.5px; color: var(--gsz-ink); text-align: right; word-break: break-all; }
+.gsz-perfil-hogar { margin-top: 22px; text-align: left; }
+.gsz-hogar-lista { display: grid; gap: 8px; margin-top: 8px; }
+.gsz-hogar-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 12px;
+    background: var(--gsz-surface-2); border: 1px solid var(--gsz-border);
+}
+.gsz-hogar-vehiculos { display: flex; flex-wrap: wrap; gap: 6px; }
+.gsz-hogar-vehiculos small { color: var(--gsz-ink-faint); font-size: 12px; }
+.gsz-hogar-vacio { margin: 0; font-size: 13px; color: var(--gsz-ink-faint); line-height: 1.5; }
+.gsz-perfil-acceso { margin: 18px 0 0; font-size: 12px; color: var(--gsz-ink-faint); }
+/* Campos de solo lectura del perfil */
+.form-control[readonly] { background: var(--gsz-surface-2) !important; color: var(--gsz-ink) !important; }
+.form-label { font-size: 11.5px !important; font-weight: 700 !important; letter-spacing: .08em; text-transform: uppercase; color: var(--gsz-ink-muted) !important; }
+.info-box {
+    background: var(--gsz-gold-soft) !important;
+    border-left: 3px solid var(--gsz-gold) !important;
+    color: var(--gsz-ink) !important;
+    border-radius: 12px !important;
+}
+.info-box i { color: var(--gsz-gold-ink) !important; }
+.info-box-title { color: var(--gsz-ink) !important; }
+.info-box-text { color: var(--gsz-ink-muted) !important; }
+.btn-primary {
+    background: linear-gradient(120deg, var(--aurum-lider), var(--aurum-noche)) !important;
+    border: 0 !important;
+    color: var(--aurum-blanco) !important;
+}
+.dark .btn-primary { background: var(--aurum-oro-degradado) !important; color: var(--aurum-noche) !important; }
+
+/* ── Azules de Tailwind sueltos (botón "+" de Roles, etc.) ── */
+.bg-blue-500 { background-color: var(--aurum-lider) !important; color: var(--aurum-blanco) !important; }
+.hover\:bg-blue-600:hover { background-color: var(--aurum-noche) !important; }
+.dark .bg-blue-500 { background: var(--aurum-oro-degradado) !important; color: var(--aurum-noche) !important; }
+
+/* ── Pagos y Cartera (maqueta hasta el Bloque J) ── */
+main .card {
+    background-color: var(--gsz-surface) !important;
+    border: 1px solid var(--gsz-border);
+    border-radius: 20px !important;
+    box-shadow: 0 1px 2px rgba(30, 42, 74, .04), 0 18px 40px -30px rgba(30, 42, 74, .35) !important;
+    color: var(--gsz-ink);
+}
+.dark main .card { box-shadow: none !important; }
+/* Antes salía blanca (otra regla .card posterior le pisaba el fondo) con
+   texto blanco encima: tarjeta "vacía". */
+main .card.card-gradient {
+    background: var(--aurum-noche) !important;
+    color: var(--aurum-blanco) !important;
+    border-color: transparent;
+}
+main .card.card-gradient i { color: var(--aurum-oro-claro); }
+main .card h2, main .card h3 { color: var(--gsz-ink) !important; }
+main .card.card-gradient h3 { color: var(--aurum-oro-claro) !important; letter-spacing: .14em; text-transform: uppercase; font-size: 11.5px !important; }
+.stat-icon, .stat-icon.green {
+    background: var(--gsz-gold-soft) !important;
+    box-shadow: none !important;
+    width: 3.25rem !important;
+    height: 3.25rem !important;
+}
+.stat-icon i { color: var(--gsz-gold-ink) !important; }
+.btn-outline {
+    border: 1.5px solid var(--gsz-border) !important;
+    color: var(--gsz-ink) !important;
+    border-radius: 10px !important;
+    padding: .5rem 1.25rem !important;
+}
+.btn-outline:hover { border-color: var(--gsz-gold) !important; }
+.btn-dark {
+    background: linear-gradient(120deg, var(--aurum-lider), var(--aurum-noche)) !important;
+    border-radius: 11px !important;
+}
+.dark .btn-dark { background: var(--aurum-oro-degradado) !important; color: var(--aurum-noche) !important; }
+.select-box { border: 1.5px solid var(--gsz-border) !important; border-radius: 11px !important; background: var(--gsz-surface) !important; color: var(--gsz-ink) !important; }
+#estadoCartera.text-emerald-500 { color: var(--gsz-blue) !important; }
+.dark #estadoCartera.text-emerald-500 { color: var(--aurum-oro-claro) !important; }
+
+/* ── Calendario de Reservas (reservas.js) ── */
+.calendar-header h3 { color: var(--gsz-ink) !important; font-weight: 800 !important; letter-spacing: -.01em; }
+.calendar-nav button {
+    background: var(--gsz-surface) !important;
+    border: 1.5px solid var(--gsz-border) !important;
+    color: var(--gsz-ink) !important;
+    border-radius: 10px !important;
+}
+.calendar-nav button:hover { border-color: var(--gsz-gold) !important; background: var(--gsz-gold-soft) !important; }
+.calendar-weekday {
+    color: var(--gsz-ink-faint) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+.calendar-day {
+    background: var(--gsz-surface-2) !important;
+    border: 1px solid var(--gsz-border) !important;
+    color: var(--gsz-ink) !important;
+    border-radius: 12px !important;
+    font-weight: 600;
+    max-height: 96px;
+}
+.calendar-day:hover { border-color: var(--gsz-gold) !important; }
+.calendar-day.other-month { color: var(--gsz-ink-faint) !important; background: transparent !important; border-style: dashed !important; }
+.calendar-day.today {
+    background: var(--gsz-gold-soft) !important;
+    border: 2px solid var(--gsz-gold) !important;
+    color: var(--gsz-gold-ink) !important;
+    font-weight: 800;
+}
+/* Día con reserva: azul noche con número oro (antes degradado rojo/naranja) */
+.calendar-day.has-reservation,
+.dark .calendar-day.has-reservation {
+    background: var(--aurum-noche) !important;
+    color: var(--aurum-oro-claro) !important;
+    border-color: var(--aurum-noche) !important;
+}
+.dark .calendar-day.has-reservation { border-color: var(--aurum-oro) !important; }
+
+/* Facturas (maqueta de Pagos): estados con la paleta */
+main .badge { box-shadow: none !important; border-radius: 999px !important; font-weight: 700; padding: 3px 10px !important; }
+main .badge-success { background: var(--gsz-blue-soft) !important; color: var(--gsz-blue) !important; }
+main .badge-warning { background: var(--gsz-gold-soft) !important; color: var(--gsz-gold-ink) !important; }
+.dark main .badge-success { background: var(--aurum-lider) !important; color: var(--aurum-blanco) !important; }
+.gsz-factura { padding: 1rem 0; border-bottom: 1px solid var(--gsz-border); }
+/* Texto slate fijo de Tailwind dentro de tarjetas: sigue el tema */
+main .card .text-slate-700, main .rounded-2xl .text-slate-700 { color: var(--gsz-ink) !important; }
+main .card .text-slate-500, main .rounded-2xl .text-slate-500 { color: var(--gsz-ink-muted) !important; }
+
+/* ============================================================
+   Control de Accesos — portería en un solo paso (Fase 3)
+   ============================================================ */
+.gsz-acc-grid { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.gsz-acc-grid > * { min-width: 0; }
+.gsz-acc-form { position: sticky; top: 16px; }
+@media (max-width: 1100px) {
+    .gsz-acc-grid { grid-template-columns: 1fr; }
+    .gsz-acc-form { position: static; }
+}
+.gsz-campos-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.gsz-campos-2[hidden] { display: none; }
+@media (max-width: 420px) { .gsz-campos-2 { grid-template-columns: 1fr; } }
+.gsz-campo > span em { font-style: normal; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--gsz-ink-faint); }
+.gsz-input-grande { font-size: 19px !important; padding: 13px 14px !important; letter-spacing: .04em; }
+.gsz-input-placa { font-size: 17px !important; letter-spacing: .12em; text-transform: uppercase; }
+
+.gsz-visitante-estado { margin: -6px 0 0; font-size: 13px; line-height: 1.5; color: var(--gsz-ink-muted); min-height: 0; }
+.gsz-visitante-estado:empty { display: none; }
+.gsz-visitante-estado.conocido { padding: 9px 12px; border-radius: 10px; background: var(--gsz-blue-soft); color: var(--gsz-ink); border-left: 3px solid var(--gsz-blue); }
+.gsz-visitante-estado.nuevo { padding: 9px 12px; border-radius: 10px; background: var(--gsz-gold-soft); color: var(--gsz-ink); border-left: 3px solid var(--gsz-gold); }
+.gsz-visitante-estado.bloqueado { padding: 9px 12px; border-radius: 10px; background: var(--gsz-red-soft); color: var(--gsz-ink); border-left: 3px solid var(--gsz-red); }
+.dark .gsz-visitante-estado.conocido { border-left-color: var(--aurum-oro-claro); }
+
+.gsz-segmentado-bloque { display: grid; grid-template-columns: 1fr 1fr; }
+.gsz-segmentado-bloque button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 12px; font-size: 14px; }
+.gsz-segmentado svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.gsz-segmentado button.activo svg { color: var(--gsz-gold); }
+
+/* Lista de visitas */
+.gsz-visitas { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.gsz-visita {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--gsz-border);
+    background: var(--gsz-surface-2);
+    transition: border-color .15s ease;
+}
+.gsz-visita:hover { border-color: var(--gsz-gold); }
+.gsz-visita.salio { opacity: .62; }
+.gsz-visita-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--aurum-noche); color: var(--aurum-oro-claro);
+    font-weight: 800; font-size: 14px; letter-spacing: .02em;
+}
+.gsz-visita-info b { display: block; font-size: 14.5px; color: var(--gsz-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gsz-visita-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 5px; }
+.gsz-visita-meta .gsz-apto { min-width: 0; padding: 2px 8px; font-size: 12px; }
+.gsz-visita-meta .gsz-placa { font-size: 12px; padding: 0 6px; }
+.gsz-visita-dato { font-size: 12px; color: var(--gsz-ink-muted); }
+.gsz-visita-hora { text-align: right; }
+.gsz-visita-hora b { display: block; font-size: 14px; color: var(--gsz-ink); }
+.gsz-visita-hora small { font-size: 11.5px; color: var(--gsz-ink-faint); }
+.gsz-btn-salida { padding: 8px 14px; font-size: 13px; }
+li.gsz-vacio { list-style: none; border: 1px dashed var(--gsz-border); border-radius: 14px; }
+@media (max-width: 640px) {
+    .gsz-visita { grid-template-columns: auto minmax(0, 1fr) auto; }
+    .gsz-btn-salida { grid-column: 1 / -1; width: 100%; }
+}
+
+/* Piscina */
+.gsz-piscina-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 16px; }
+@media (max-width: 720px) { .gsz-piscina-form { grid-template-columns: 1fr; } }
