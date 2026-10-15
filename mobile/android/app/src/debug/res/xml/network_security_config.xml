@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Solo compilaciones de DESARROLLO (debug): permite HTTP sin cifrar para
+     hablar con el API en el PC desde un celular real en la misma red Wi-Fi
+     (http://192.168.x.x:8080). Reemplaza al de src/main. Las compilaciones de
+     producción (release) usan el de src/main, que exige HTTPS. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

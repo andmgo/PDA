@@ -24,14 +24,16 @@ Con el API corriendo en el PC (`../api`, puerto 8080):
 flutter pub get
 flutter run                     # emulador Android: usa http://10.0.2.2:8080
 flutter run -d chrome           # vista previa web
-flutter run --dart-define=API_URL=http://192.168.1.50:8080   # celular real en la misma red
+flutter run --dart-define=API_URL=http://<IP-del-PC>:8080    # celular real en la misma red Wi-Fi
 ```
 
 Para la vista previa web el API debe permitir ese origen:
 `APP_CORS_ALLOWED_ORIGINS=http://localhost:8081,http://localhost:<puerto>`.
 La app nativa no necesita CORS.
 
-HTTP sin cifrar solo se permite hacia el servidor de desarrollo
+HTTP sin cifrar: en compilaciones de desarrollo (debug) se permite hacia cualquier
+dirección, para probar con un celular real contra el PC (`src/debug/res/xml`); en
+producción (release) solo hacia el servidor de desarrollo
 (`10.0.2.2`/`localhost`, ver `android/app/src/main/res/xml/network_security_config.xml`);
 en producción el API va por HTTPS.
 
@@ -43,6 +45,9 @@ en producción el API va por HTTPS.
    Android SDK → pestaña *SDK Tools* → marcar *Android SDK Command-line Tools (latest)* → Apply.
 2. Aceptar licencias: `flutter doctor --android-licenses` (responder `y`).
 3. Crear un emulador (Device Manager) o conectar un celular con *Depuración USB*.
+
+En este PC las licencias ya estaban aceptadas: `flutter build apk --debug` compila
+aunque falten las cmdline-tools (solo las necesita el comando de licencias).
 
 Después: `flutter build apk --debug` genera `build/app/outputs/flutter-apk/app-debug.apk`.
 
