@@ -71,6 +71,11 @@ public class VehiculoRepositoryImpl implements VehiculoRepository {
     }
 
     @Override
+    public List<String> findIdsParqueaderoAsignados() {
+        return jpaRepository.findIdsParqueaderoAsignados().stream().map(UUID::toString).toList();
+    }
+
+    @Override
     public List<VehiculoModel> findByApartamentoId(String idApartamento) {
         return jpaRepository.findByApartamento_IdOrderByActivoDescFechaRegistroDesc(UUID.fromString(idApartamento))
                 .stream().map(this::toModel).toList();

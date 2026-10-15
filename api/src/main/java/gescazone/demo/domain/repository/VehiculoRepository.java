@@ -11,4 +11,6 @@ public interface VehiculoRepository {
     /** Solo vehículos activos — una placa puede existir desactivada varias veces. */
     Optional<VehiculoModel> findActivoByPlaca(String placaNormalizada);
     List<VehiculoModel> findByApartamentoId(String idApartamento);
+    /** Parqueaderos asignados a algún vehículo activo de residente (no se prestan a visitantes). */
+    List<String> findIdsParqueaderoAsignados();
 }
