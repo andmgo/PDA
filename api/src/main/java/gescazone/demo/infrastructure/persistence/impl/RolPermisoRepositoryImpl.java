@@ -75,10 +75,16 @@ public class RolPermisoRepositoryImpl implements RolPermisoRepository {
 
     @Override
     public void crearRol(String nombreRol) {
-        if (rolJpaRepository.findByNombreRol(nombreRol).isPresent()) {
+        // Mismo criterio que CatalogoResolver: "Administrador" y "ADMINISTRADOR"
+        // son el mismo rol (antes se aceptaban los dos, ver migración V10).
+        String clave = CatalogoResolver.normalizar(nombreRol);
+        boolean existe = rolJpaRepository.findAll().stream()
+                .anyMatch(r -> CatalogoResolver.normalizar(r.getNombreRol()).equals(clave));
+        if (existe) {
             throw new IllegalArgumentException("Ya existe un rol con ese nombre: " + nombreRol);
         }
-        rolJpaRepository.save(new RolEntity(nombreRol));
+        // Convención de los roles del sistema: en mayúsculas (RolNombre, authorities ROLE_X).
+        rolJpaRepository.save(new RolEntity(nombreRol.trim().toUpperCase(java.util.Locale.ROOT)));
     }
 
     @Override

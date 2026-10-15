@@ -21,6 +21,9 @@ import java.util.UUID;
 public class ApartamentoRepositoryImpl implements ApartamentoRepository {
 
     @Autowired
+    private CatalogoResolver catalogoResolver;
+
+    @Autowired
     private ApartamentoJpaRepository jpaRepository;
 
     @Autowired
@@ -62,15 +65,13 @@ public class ApartamentoRepositoryImpl implements ApartamentoRepository {
 
         if (model.getTipoOcupacion() != null) {
             String nombre = model.getTipoOcupacion().getNombreTipoOcupacion();
-            TipoOcupacionEntity to = tipoOcupacionJpaRepository.findByNombreTipoOcupacion(nombre)
-                    .orElseGet(() -> tipoOcupacionJpaRepository.save(new TipoOcupacionEntity(nombre)));
+            TipoOcupacionEntity to = catalogoResolver.tipoOcupacion(nombre);
             entity.setTipoOcupacion(to);
         }
 
         if (model.getEstadoCuenta() != null) {
             String nombre = model.getEstadoCuenta().getNombreEstadoCuenta();
-            EstadoCuentaEntity ec = estadoCuentaJpaRepository.findByNombreEstadoCuenta(nombre)
-                    .orElseGet(() -> estadoCuentaJpaRepository.save(new EstadoCuentaEntity(nombre)));
+            EstadoCuentaEntity ec = catalogoResolver.estadoCuenta(nombre);
             entity.setEstadoCuenta(ec);
         }
 

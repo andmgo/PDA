@@ -18,6 +18,9 @@ import java.util.UUID;
 public class ParqueaderoRepositoryImpl implements ParqueaderoRepository {
 
     @Autowired
+    private CatalogoResolver catalogoResolver;
+
+    @Autowired
     private ParqueaderoJpaRepository jpaRepository;
 
     @Autowired
@@ -50,8 +53,7 @@ public class ParqueaderoRepositoryImpl implements ParqueaderoRepository {
 
         if (model.getEstado() != null) {
             String nombre = model.getEstado().getNombreEstado();
-            EstadoEntity estado = estadoJpaRepository.findByNombreEstado(nombre)
-                    .orElseGet(() -> estadoJpaRepository.save(new EstadoEntity(nombre)));
+            EstadoEntity estado = catalogoResolver.estado(nombre);
             entity.setEstado(estado);
         }
 

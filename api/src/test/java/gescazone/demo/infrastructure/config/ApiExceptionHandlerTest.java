@@ -9,6 +9,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ApiExceptionHandlerTest {
 
+    @org.junit.jupiter.api.Test
+    void validacionEnvueltaPorElRepositorio_respondeBadRequestConSuMensaje() {
+        var envuelta = new org.springframework.dao.InvalidDataAccessApiUsageException(
+                "x", new IllegalArgumentException("\"Inventado\" no es un tipo de ocupación válido"));
+        var respuesta = new ApiExceptionHandler().handleValidationEnRepositorio(envuelta);
+        org.assertj.core.api.Assertions.assertThat(respuesta.getStatusCode().value()).isEqualTo(400);
+        org.assertj.core.api.Assertions.assertThat(respuesta.getBody()).contains("Inventado");
+    }
+
     private final ApiExceptionHandler handler = new ApiExceptionHandler();
 
     @Test

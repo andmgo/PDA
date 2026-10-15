@@ -21,6 +21,9 @@ import java.util.UUID;
 public class ResidenteRepositoryImpl implements ResidenteRepository {
 
     @Autowired
+    private CatalogoResolver catalogoResolver;
+
+    @Autowired
     private ResidenteJpaRepository jpaRepository;
 
     @Autowired
@@ -64,15 +67,13 @@ public class ResidenteRepositoryImpl implements ResidenteRepository {
 
         if (model.getTipoDocumento() != null) {
             String nombre = model.getTipoDocumento().getNombreTipoDocumento();
-            TipoDocumentoEntity td = tipoDocumentoJpaRepository.findByNombreTipoDocumento(nombre)
-                    .orElseGet(() -> tipoDocumentoJpaRepository.save(new TipoDocumentoEntity(nombre)));
+            TipoDocumentoEntity td = catalogoResolver.tipoDocumento(nombre);
             entity.setTipoDocumento(td);
         }
 
         if (model.getTipoResidente() != null) {
             String nombre = model.getTipoResidente().getNombreTipoResidente();
-            TipoResidenteEntity tr = tipoResidenteJpaRepository.findByNombreTipoResidente(nombre)
-                    .orElseGet(() -> tipoResidenteJpaRepository.save(new TipoResidenteEntity(nombre)));
+            TipoResidenteEntity tr = catalogoResolver.tipoResidente(nombre);
             entity.setTipoResidente(tr);
         }
 

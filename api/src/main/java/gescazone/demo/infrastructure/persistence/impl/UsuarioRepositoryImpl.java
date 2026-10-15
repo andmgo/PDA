@@ -21,6 +21,9 @@ import java.util.UUID;
 public class UsuarioRepositoryImpl implements UsuarioRepository {
 
     @Autowired
+    private CatalogoResolver catalogoResolver;
+
+    @Autowired
     private UsuarioJpaRepository jpaRepository;
 
     @Autowired
@@ -66,15 +69,13 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
 
         if (model.getRol() != null) {
             String nombre = model.getRol().getNombreRol();
-            RolEntity rol = rolJpaRepository.findByNombreRol(nombre)
-                    .orElseGet(() -> rolJpaRepository.save(new RolEntity(nombre)));
+            RolEntity rol = catalogoResolver.rol(nombre);
             entity.setRol(rol);
         }
 
         if (model.getTipoDocumento() != null) {
             String nombre = model.getTipoDocumento().getNombreTipoDocumento();
-            TipoDocumentoEntity td = tipoDocumentoJpaRepository.findByNombreTipoDocumento(nombre)
-                    .orElseGet(() -> tipoDocumentoJpaRepository.save(new TipoDocumentoEntity(nombre)));
+            TipoDocumentoEntity td = catalogoResolver.tipoDocumento(nombre);
             entity.setTipoDocumento(td);
         }
 

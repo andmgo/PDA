@@ -30,12 +30,14 @@ public class RegistroController {
     @Autowired
     private AuthApiClient authApiClient;
 
-    private static final String[] TIPOS_DOCUMENTO = {
-        "Cédula de Ciudadanía",
-        "Cédula de Extranjería",
-        "Pasaporte",
-        "Tarjeta de Identidad"
-    };
+    /** Valor = código del catálogo tipos_documento en la base; texto = cómo se muestra. */
+    private static final java.util.Map<String, String> TIPOS_DOCUMENTO = new java.util.LinkedHashMap<>();
+    static {
+        TIPOS_DOCUMENTO.put("CC", "Cédula de Ciudadanía");
+        TIPOS_DOCUMENTO.put("CE", "Cédula de Extranjería");
+        TIPOS_DOCUMENTO.put("Pasaporte", "Pasaporte");
+        TIPOS_DOCUMENTO.put("TI", "Tarjeta de Identidad");
+    }
 
     @GetMapping("/registro")
     public String mostrarFormulario(@RequestParam(required = false) String error, Model model) {

@@ -3,6 +3,7 @@ package gescazone.demo.infrastructure.config;
 import gescazone.demo.application.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,6 +29,20 @@ public class ApiExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleValidation(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    /**
+     * Una validación lanzada DENTRO de un @Repository (p. ej. CatalogoResolver
+     * rechazando un rol que no existe) llega envuelta: Spring traduce las
+     * excepciones de los repositorios a InvalidDataAccessApiUsageException.
+     * Si por dentro es una validación, se responde 400 con su mensaje.
+     */
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<String> handleValidationEnRepositorio(InvalidDataAccessApiUsageException e) {
+        if (e.getCause() instanceof IllegalArgumentException causa) {
+            return handleValidation(causa);
+        }
+        return handleGeneral(e);
     }
 
     @ExceptionHandler(IllegalStateException.class)
