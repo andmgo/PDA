@@ -28,3 +28,20 @@ String horaDe(Object? fechaHora) {
   final t = '${fechaHora ?? ''}';
   return t.length >= 16 ? t.substring(11, 16) : '';
 }
+
+/// "2026-10-15T16:20:44.123" (LocalDateTime del API) → DateTime local.
+DateTime? leerFechaHora(Object? texto) => texto == null ? null : DateTime.tryParse('$texto');
+
+/// "jue 15 oct · 16:20"
+String fechaHoraCorta(DateTime d) =>
+    '${fechaCorta(d)} · ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+
+/// "hace 5 min", "hace 3 h", "hace 2 días" (cuánto lleva esperando).
+String haceCuanto(DateTime d, [DateTime? ahora]) {
+  final min = (ahora ?? DateTime.now()).difference(d).inMinutes.clamp(0, 1 << 30);
+  if (min < 60) return 'hace $min min';
+  final h = (min / 60).round();
+  if (h < 24) return 'hace $h h';
+  final dias = (h / 24).round();
+  return 'hace $dias día${dias == 1 ? '' : 's'}';
+}

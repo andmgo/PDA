@@ -6,6 +6,7 @@ import '../datos/sesion.dart';
 import '../tema/aurum_tema.dart';
 import '../widgets/marca.dart';
 import 'mis_visitas.dart';
+import 'paquetes.dart';
 import 'porteria.dart';
 
 /// Inicio según los PERMISOS del rol (los mismos de "Roles y permisos" en la
@@ -26,6 +27,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
   List<dynamic>? _hogar; // GET /api/propiedad/mia
   List<dynamic>? _dentro; // GET /api/accesos/visitas/dentro
   int? _paquetesPendientes; // GET /api/paquetes/pendientes
+  int? _misPaquetes; // GET /api/paquetes/mios (por recoger)
   String? _error;
   bool _cargando = true;
 
@@ -33,6 +35,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
   bool get _porteria => _s.puedeVer('CONTROL_ACCESOS');
   bool get _paquetes => _s.puedeVer('PAQUETES');
   bool get _visitas => _s.puedeVer('VISITAS');
+  bool get _misPaquetesPermiso => _s.puedeVer('MIS_PAQUETES');
 
   /// Abre una pantalla y al volver refresca el inicio (pudo cambiar quién está dentro).
   Future<void> _abrir(Widget pantalla) async {
@@ -56,11 +59,15 @@ class _PantallaInicioState extends State<PantallaInicio> {
         widget.api.get('/api/propiedad/mia'),
         if (_porteria) widget.api.get('/api/accesos/visitas/dentro'),
         if (_paquetes) widget.api.get('/api/paquetes/pendientes'),
+        if (_misPaquetesPermiso) widget.api.get('/api/paquetes/mios'),
       ]);
       var i = 0;
       _hogar = resultados[i++] as List<dynamic>;
       if (_porteria) _dentro = resultados[i++] as List<dynamic>;
       if (_paquetes) _paquetesPendientes = (resultados[i++] as List<dynamic>).length;
+      if (_misPaquetesPermiso) {
+        _misPaquetes = (resultados[i++] as List<dynamic>).where((p) => p['entregado'] != true).length;
+      }
     } on ApiError catch (e) {
       _error = e.mensaje;
     } on SesionTerminada {
@@ -127,6 +134,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
                 if (_porteria) ...[_seccionPorteria(), const SizedBox(height: 14)],
                 if (_paquetes) ...[_resumenPaquetes(), const SizedBox(height: 14)],
                 if (_hogar!.isNotEmpty || !_porteria) ...[_seccionHogar(), const SizedBox(height: 14)],
+                if ((_misPaquetes ?? 0) > 0) ...[_avisoMisPaquetes(), const SizedBox(height: 14)],
               ],
               const SizedBox(height: 4),
               const Rotulo('Accesos'),
@@ -202,6 +210,28 @@ class _PantallaInicioState extends State<PantallaInicio> {
     );
   }
 
+  /// Propietario: "Tienes N paquetes en portería" (toca para ver el detalle).
+  Widget _avisoMisPaquetes() {
+    final n = _misPaquetes!;
+    return InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: () => _abrir(PantallaMisPaquetes(api: widget.api)),
+      child: AvisoAurum('',
+          contenido: Row(children: [
+            const Icon(Icons.inventory_2_outlined, color: Aurum.oro, size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(n == 1 ? 'Tienes 1 paquete por recoger en portería.' : 'Tienes $n paquetes por recoger en portería.',
+                  style: GoogleFonts.montserrat(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).brightness == Brightness.dark ? Aurum.blanco : Aurum.noche)),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: Aurum.oro),
+          ])),
+    );
+  }
+
   Widget _seccionHogar() {
     final aptos = _hogar ?? const [];
     return SeccionAurum(
@@ -248,17 +278,23 @@ class _PantallaInicioState extends State<PantallaInicio> {
             proximamente: 'Fase 8'),
       ],
       if (_paquetes)
-        const TarjetaAccion(
-            icono: Icons.inventory_2_outlined, titulo: 'Paquetes', subtitulo: 'Recepción', proximamente: 'Fase 7'),
+        TarjetaAccion(
+            icono: Icons.inventory_2_outlined,
+            titulo: 'Paquetes',
+            subtitulo: 'Recepción',
+            alTocar: () => _abrir(PantallaPaquetes(api: widget.api))),
       if (_visitas)
         TarjetaAccion(
             icono: Icons.event_available_outlined,
             titulo: 'Mis visitas',
             subtitulo: 'Autorizar visitantes',
             alTocar: () => _abrir(PantallaMisVisitas(api: widget.api))),
-      if (!_porteria)
-        const TarjetaAccion(
-            icono: Icons.inventory_2_outlined, titulo: 'Mis paquetes', subtitulo: 'Historial', proximamente: 'Fase 7'),
+      if (_misPaquetesPermiso)
+        TarjetaAccion(
+            icono: Icons.markunread_mailbox_outlined,
+            titulo: 'Mis paquetes',
+            subtitulo: 'Por recoger',
+            alTocar: () => _abrir(PantallaMisPaquetes(api: widget.api))),
       if (_s.puedeVer('RESERVAS'))
         const TarjetaAccion(
             icono: Icons.calendar_month_outlined,
