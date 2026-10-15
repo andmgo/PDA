@@ -12,6 +12,14 @@ public class PaqueteModel {
     private LocalDateTime fechaHoraLlegada;
     private boolean entregado;
     private LocalDateTime fechaHoraEntrega;
+    /** "Caja de Amazon", "Sobre"… (opcional). */
+    private String descripcion;
+    /** Funcionario que lo recibió en portería (auditoría). */
+    private String idRegistradoPor;
+    /** Funcionario que lo entregó. */
+    private String idEntregadoPor;
+    /** Quién lo retiró de portería (puede ser distinto del destinatario). */
+    private String entregadoA;
 
     public PaqueteModel() {}
 
@@ -44,10 +52,32 @@ public class PaqueteModel {
     public LocalDateTime getFechaHoraEntrega() { return fechaHoraEntrega; }
     public void setFechaHoraEntrega(LocalDateTime fechaHoraEntrega) { this.fechaHoraEntrega = fechaHoraEntrega; }
 
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public String getIdRegistradoPor() { return idRegistradoPor; }
+    public void setIdRegistradoPor(String idRegistradoPor) { this.idRegistradoPor = idRegistradoPor; }
+
+    public String getIdEntregadoPor() { return idEntregadoPor; }
+    public void setIdEntregadoPor(String idEntregadoPor) { this.idEntregadoPor = idEntregadoPor; }
+
+    public String getEntregadoA() { return entregadoA; }
+    public void setEntregadoA(String entregadoA) { this.entregadoA = entregadoA; }
+
     public void marcarEntregado() {
+        marcarEntregado(null, null);
+    }
+
+    /**
+     * @param entregadoA      quién lo retiró; si viene vacío se asume el destinatario
+     * @param idEntregadoPor  funcionario que lo entrega (auditoría, puede ser null)
+     */
+    public void marcarEntregado(String entregadoA, String idEntregadoPor) {
         if (this.entregado)
             throw new IllegalStateException("Este paquete ya fue marcado como entregado");
         this.entregado = true;
         this.fechaHoraEntrega = LocalDateTime.now();
+        this.entregadoA = entregadoA == null || entregadoA.isBlank() ? nombreReceptor : entregadoA.trim();
+        this.idEntregadoPor = idEntregadoPor;
     }
 }

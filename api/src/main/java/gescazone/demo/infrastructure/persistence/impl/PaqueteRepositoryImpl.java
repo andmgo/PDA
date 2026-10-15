@@ -30,6 +30,10 @@ public class PaqueteRepositoryImpl implements PaqueteRepository {
         model.setFechaHoraLlegada(entity.getFechaHoraLlegada());
         model.setEntregado(entity.isEntregado());
         model.setFechaHoraEntrega(entity.getFechaHoraEntrega());
+        model.setDescripcion(entity.getDescripcion());
+        model.setIdRegistradoPor(texto(entity.getRegistradoPorUsuarioId()));
+        model.setIdEntregadoPor(texto(entity.getEntregadoPorUsuarioId()));
+        model.setEntregadoA(entity.getEntregadoA());
         return model;
     }
 
@@ -42,7 +46,22 @@ public class PaqueteRepositoryImpl implements PaqueteRepository {
         entity.setFechaHoraLlegada(model.getFechaHoraLlegada());
         entity.setEntregado(model.isEntregado());
         entity.setFechaHoraEntrega(model.getFechaHoraEntrega());
+        entity.setDescripcion(model.getDescripcion());
+        entity.setRegistradoPorUsuarioId(uuid(model.getIdRegistradoPor()));
+        entity.setEntregadoPorUsuarioId(uuid(model.getIdEntregadoPor()));
+        entity.setEntregadoA(model.getEntregadoA());
         return entity;
+    }
+
+    private static String texto(UUID id) { return id == null ? null : id.toString(); }
+
+    private static UUID uuid(String id) { return id == null ? null : UUID.fromString(id); }
+
+    @Override
+    public List<PaqueteModel> findByApartamentoIds(List<String> idsApartamento) {
+        if (idsApartamento.isEmpty()) return List.of();
+        return jpaRepository.findByApartamento_IdIn(idsApartamento.stream().map(UUID::fromString).toList())
+                .stream().map(this::toModel).toList();
     }
 
     @Override

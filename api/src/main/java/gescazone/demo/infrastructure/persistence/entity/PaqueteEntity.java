@@ -41,6 +41,29 @@ public class PaqueteEntity {
     @Column(name = "fecha_hora_entrega")
     private LocalDateTime fechaHoraEntrega;
 
+    private String descripcion;
+
+    @Column(name = "registrado_por_usuario_id")
+    private UUID registradoPorUsuarioId;
+
+    @Column(name = "entregado_por_usuario_id")
+    private UUID entregadoPorUsuarioId;
+
+    @Column(name = "entregado_a")
+    private String entregadoA;
+
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public UUID getRegistradoPorUsuarioId() { return registradoPorUsuarioId; }
+    public void setRegistradoPorUsuarioId(UUID registradoPorUsuarioId) { this.registradoPorUsuarioId = registradoPorUsuarioId; }
+
+    public UUID getEntregadoPorUsuarioId() { return entregadoPorUsuarioId; }
+    public void setEntregadoPorUsuarioId(UUID entregadoPorUsuarioId) { this.entregadoPorUsuarioId = entregadoPorUsuarioId; }
+
+    public String getEntregadoA() { return entregadoA; }
+    public void setEntregadoA(String entregadoA) { this.entregadoA = entregadoA; }
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 

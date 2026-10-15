@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface PaqueteJpaRepository extends JpaRepository<PaqueteEntity, UUID> {
     List<PaqueteEntity> findByEntregadoFalse();
     List<PaqueteEntity> findByApartamento_Id(UUID idApartamento);
+    List<PaqueteEntity> findByApartamento_IdIn(List<UUID> idsApartamento);
 }

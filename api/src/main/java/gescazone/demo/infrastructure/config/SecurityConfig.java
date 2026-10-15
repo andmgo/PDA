@@ -167,8 +167,14 @@ public class SecurityConfig {
                 .requestMatchers("/api/solicitudes-registro/**")
                     .access(permiso("USUARIOS", NivelPermiso.EDITAR))
 
-                .requestMatchers("/api/paquetes/**")
+                // Paquetes. Orden: específico → general. /mios es el propietario
+                // (Fase 7); registrar y entregar exigen EDITAR (antes bastaba VER).
+                .requestMatchers(HttpMethod.GET, "/api/paquetes/mios")
+                    .access(permiso("MIS_PAQUETES", NivelPermiso.VER))
+                .requestMatchers(HttpMethod.GET, "/api/paquetes/**")
                     .access(permiso("PAQUETES", NivelPermiso.VER))
+                .requestMatchers("/api/paquetes/**")
+                    .access(permiso("PAQUETES", NivelPermiso.EDITAR))
 
                 // Propietarios y vehículos (Fase 2). Orden: específico → general.
                 // /mia siempre opera sobre la cuenta del JWT; la búsqueda por

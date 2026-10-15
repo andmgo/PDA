@@ -11,4 +11,6 @@ public interface PaqueteRepository {
     List<PaqueteModel> findAll();
     List<PaqueteModel> findByEntregadoFalse();
     List<PaqueteModel> findByApartamentoId(String idApartamento);
+    /** Paquetes de varios apartamentos (los de un propietario). */
+    List<PaqueteModel> findByApartamentoIds(List<String> idsApartamento);
 }
