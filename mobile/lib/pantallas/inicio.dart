@@ -5,6 +5,8 @@ import '../datos/api.dart';
 import '../datos/sesion.dart';
 import '../tema/aurum_tema.dart';
 import '../widgets/marca.dart';
+import 'mis_visitas.dart';
+import 'porteria.dart';
 
 /// Inicio según los PERMISOS del rol (los mismos de "Roles y permisos" en la
 /// web), no según el nombre del rol: un rol nuevo como VIGILANTE con permiso
@@ -30,6 +32,13 @@ class _PantallaInicioState extends State<PantallaInicio> {
   Sesion get _s => widget.sesion;
   bool get _porteria => _s.puedeVer('CONTROL_ACCESOS');
   bool get _paquetes => _s.puedeVer('PAQUETES');
+  bool get _visitas => _s.puedeVer('VISITAS');
+
+  /// Abre una pantalla y al volver refresca el inicio (pudo cambiar quién está dentro).
+  Future<void> _abrir(Widget pantalla) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => pantalla));
+    if (mounted) _cargar();
+  }
 
   @override
   void initState() {
@@ -155,18 +164,12 @@ class _PantallaInicioState extends State<PantallaInicio> {
   Widget _filaVisita(dynamic v) {
     final tema = Theme.of(context);
     final nombre = '${v['nombreCompleto'] ?? '—'}';
-    final iniciales = nombre.split(' ').where((p) => p.isNotEmpty).take(2).map((p) => p[0]).join().toUpperCase();
     final entrada = '${v['entrada'] ?? ''}';
     final hora = entrada.length >= 16 ? entrada.substring(11, 16) : '';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundColor: Aurum.noche,
-          child: Text(iniciales,
-              style: GoogleFonts.montserrat(fontWeight: FontWeight.w800, fontSize: 13, color: Aurum.oroClaro)),
-        ),
+        AvatarIniciales(nombre),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -232,10 +235,13 @@ class _PantallaInicioState extends State<PantallaInicio> {
 
   Widget _accesos() {
     final tarjetas = <Widget>[
-      if (_porteria) ...const [
+      if (_porteria) ...[
         TarjetaAccion(
-            icono: Icons.how_to_reg_outlined, titulo: 'Registrar ingreso', subtitulo: 'Visitantes', proximamente: 'Fase 6'),
-        TarjetaAccion(
+            icono: Icons.how_to_reg_outlined,
+            titulo: 'Registrar ingreso',
+            subtitulo: 'Visitantes y esperados',
+            alTocar: () => _abrir(PantallaPorteria(api: widget.api))),
+        const TarjetaAccion(
             icono: Icons.document_scanner_outlined,
             titulo: 'Lector de placas',
             subtitulo: 'Con la cámara',
@@ -244,15 +250,15 @@ class _PantallaInicioState extends State<PantallaInicio> {
       if (_paquetes)
         const TarjetaAccion(
             icono: Icons.inventory_2_outlined, titulo: 'Paquetes', subtitulo: 'Recepción', proximamente: 'Fase 7'),
-      if (!_porteria) ...const [
+      if (_visitas)
         TarjetaAccion(
             icono: Icons.event_available_outlined,
             titulo: 'Mis visitas',
             subtitulo: 'Autorizar visitantes',
-            proximamente: 'Fase 6'),
-        TarjetaAccion(
+            alTocar: () => _abrir(PantallaMisVisitas(api: widget.api))),
+      if (!_porteria)
+        const TarjetaAccion(
             icono: Icons.inventory_2_outlined, titulo: 'Mis paquetes', subtitulo: 'Historial', proximamente: 'Fase 7'),
-      ],
       if (_s.puedeVer('RESERVAS'))
         const TarjetaAccion(
             icono: Icons.calendar_month_outlined,

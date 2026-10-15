@@ -131,6 +131,7 @@ class TextoOro extends StatelessWidget {
 }
 
 /// Número de apartamento: etiqueta azul noche con texto oro (como la web).
+/// En modo oscuro la tarjeta ya es azul noche: ahí la etiqueta va en azul líder.
 class ChipApto extends StatelessWidget {
   final String numero;
   const ChipApto(this.numero, {super.key});
@@ -138,7 +139,9 @@ class ChipApto extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(color: Aurum.noche, borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(
+            color: Theme.of(context).brightness == Brightness.dark ? Aurum.lider : Aurum.noche,
+            borderRadius: BorderRadius.circular(8)),
         child: Text(numero,
             style: GoogleFonts.ibmPlexMono(fontSize: 13, fontWeight: FontWeight.w600, color: Aurum.oroClaro)),
       );
@@ -299,6 +302,82 @@ class Contador extends StatelessWidget {
       child: Text('$valor',
           style: GoogleFonts.montserrat(
               fontSize: 12.5, fontWeight: FontWeight.w700, color: oscuro ? Aurum.oroClaro : Aurum.oroTexto)),
+    );
+  }
+}
+
+/// Aviso dentro de un formulario: fondo oro suave con borde izquierdo (oro
+/// para errores y avisos, azul líder para confirmaciones). Sin rojo ni verde.
+class AvisoAurum extends StatelessWidget {
+  final String texto;
+  final bool error;
+  final Widget? contenido;
+  const AvisoAurum(this.texto, {super.key, this.error = true, this.contenido});
+
+  @override
+  Widget build(BuildContext context) {
+    final oscuro = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      decoration: BoxDecoration(
+        color: oscuro ? Aurum.superficieOscura2 : (error ? Aurum.oroSuave : const Color(0xFFEEF0F6)),
+        borderRadius: BorderRadius.circular(10),
+        border: Border(left: BorderSide(color: error ? Aurum.oro : (oscuro ? Aurum.oroClaro : Aurum.lider), width: 3)),
+      ),
+      child: contenido ??
+          Text(texto,
+              style: GoogleFonts.montserrat(fontSize: 13, height: 1.4, color: oscuro ? Aurum.blanco : Aurum.noche)),
+    );
+  }
+}
+
+/// Etiqueta de estado ("Hoy", "Programada", "Ya ingresó"…).
+class EtiquetaEstado extends StatelessWidget {
+  final String texto;
+  final bool destacada;
+  final bool apagada;
+  const EtiquetaEstado(this.texto, {super.key, this.destacada = false, this.apagada = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final oscuro = Theme.of(context).brightness == Brightness.dark;
+    final fondo = destacada
+        ? Aurum.noche
+        : apagada
+            ? Theme.of(context).colorScheme.surfaceContainerHighest
+            : (oscuro ? Aurum.lider : Aurum.oroSuave);
+    final color = destacada ? Aurum.oroClaro : apagada ? Aurum.grisTenue : (oscuro ? Aurum.oroClaro : Aurum.oroTexto);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+      decoration: BoxDecoration(
+        color: fondo,
+        borderRadius: BorderRadius.circular(99),
+        border: destacada && oscuro ? Border.all(color: Aurum.oroClaro.withValues(alpha: .4)) : null,
+      ),
+      child: Text(texto.toUpperCase(),
+          style: GoogleFonts.montserrat(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: .6, color: color)),
+    );
+  }
+}
+
+/// Círculo azul noche con las iniciales en oro (como en la web).
+class AvatarIniciales extends StatelessWidget {
+  final String nombre;
+  final bool apagado;
+  const AvatarIniciales(this.nombre, {super.key, this.apagado = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final iniciales = nombre.split(' ').where((p) => p.isNotEmpty).take(2).map((p) => p[0]).join().toUpperCase();
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: apagado
+          ? Aurum.grisTenue
+          : (Theme.of(context).brightness == Brightness.dark ? Aurum.lider : Aurum.noche),
+      child: Text(iniciales,
+          style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.w800, fontSize: 13, color: apagado ? Aurum.blanco : Aurum.oroClaro)),
     );
   }
 }

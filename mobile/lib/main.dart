@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'datos/api.dart';
 import 'datos/sesion.dart';
@@ -86,6 +87,10 @@ class _AurumAppState extends State<AurumApp> {
       debugShowCheckedModeBanner: false,
       theme: temaAurum(Brightness.light),
       darkTheme: temaAurum(Brightness.dark),
+      // Calendarios y textos del sistema en español, sin importar el idioma del teléfono.
+      locale: const Locale('es', 'CO'),
+      supportedLocales: const [Locale('es', 'CO'), Locale('es')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       home: AnimatedSwitcher(duration: const Duration(milliseconds: 250), child: pantalla),
     );
   }
