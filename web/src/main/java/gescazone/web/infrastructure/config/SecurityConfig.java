@@ -87,6 +87,9 @@ public class SecurityConfig {
                 .requestMatchers("/rolesYPermisos")
                     .access(permiso("GESTION_DATOS", true))
 
+                .requestMatchers("/misVisitas")
+                    .access(permiso("VISITAS", false))
+
                 .requestMatchers("/paquetes")
                     .access(permiso("PAQUETES", false))
 

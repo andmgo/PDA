@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script>(function(){try{var t=localStorage.getItem('gescazone_tema');if(t==='oscuro'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');}catch(e){}})();</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/img/aurum-apple-touch.png}" />
+    <link rel="icon" type="image/png" sizes="96x96" th:href="@{/img/aurum-favicon.png}" />
+    <title>Aurum Condominios - Mis visitas</title>
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/argon-dashboard-tailwind.css}" rel="stylesheet" />
+    <link th:href="@{/css/gescazone-theme.css}" rel="stylesheet" />
+    <link th:href="@{/css/aurum-ui.css}" rel="stylesheet" />
+</head>
+
+<body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
+
+    <div th:replace="~{fragments/sidebar :: sidebar(activo='visitas')}"></div>
+
+    <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
+        <div th:replace="~{fragments/topbar :: topbar(titulo='Mis visitas', seccion='Mi hogar', descripcion='Autoriza a quien te visita y portería lo deja entrar sin llamarte.')}"></div>
+
+        <div class="w-full px-6 py-6 mx-auto">
+            <div class="gsz-paq-grid">
+
+                <!-- Autorizar -->
+                <section class="gsz-panel gsz-paq-form">
+                    <p class="gsz-kicker">Nueva autorización</p>
+                    <h2 class="gsz-card-titulo">¿Quién te visita?</h2>
+                    <p class="gsz-card-sub">Con el documento, portería lo registra en un toque.</p>
+
+                    <form id="visitaForm" class="gsz-form-stack" onsubmit="return autorizarVisita(event)" autocomplete="off">
+                        <div id="visitaAviso" class="gsz-aviso" role="status"></div>
+
+                        <label class="gsz-campo">
+                            <span>Apartamento</span>
+                            <select id="visitaApto" required></select>
+                        </label>
+                        <div class="gsz-campos-2">
+                            <label class="gsz-campo"><span>Nombre</span><input type="text" id="visitaNombre" required maxlength="100" placeholder="Nombre" /></label>
+                            <label class="gsz-campo"><span>Apellido</span><input type="text" id="visitaApellido" required maxlength="100" placeholder="Apellido" /></label>
+                        </div>
+                        <div class="gsz-campos-2">
+                            <label class="gsz-campo"><span>Documento</span><input type="text" id="visitaDocumento" maxlength="20" class="gsz-mono" placeholder="Recomendado" /></label>
+                            <label class="gsz-campo"><span>Placa <em>(opcional)</em></span><input type="text" id="visitaPlaca" maxlength="8" class="gsz-mono gsz-input-placa" placeholder="ABC123" /></label>
+                        </div>
+                        <div class="gsz-campos-2">
+                            <label class="gsz-campo"><span>Desde</span><input type="date" id="visitaDesde" required /></label>
+                            <label class="gsz-campo"><span>Hasta</span><input type="date" id="visitaHasta" required /></label>
+                        </div>
+                        <label class="gsz-campo">
+                            <span>Nota para portería <em>(opcional)</em></span>
+                            <input type="text" id="visitaNota" maxlength="300" placeholder="Ej: viene con dos niños" />
+                        </label>
+                        <button type="submit" class="gsz-btn gsz-btn-noche gsz-btn-bloque" id="btnAutorizar">
+                            <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Autorizar visita
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Lista -->
+                <section class="gsz-panel">
+                    <div class="gsz-panel-head">
+                        <div>
+                            <p class="gsz-kicker">Tus autorizaciones</p>
+                            <h2 class="gsz-card-titulo">Visitas <span id="visitasContador" class="gsz-contador"></span></h2>
+                        </div>
+                        <div class="gsz-segmentado" role="tablist">
+                            <button type="button" class="activo" data-filtro="proximas" onclick="filtrarVisitas(this)">Próximas</button>
+                            <button type="button" data-filtro="historial" onclick="filtrarVisitas(this)">Historial</button>
+                        </div>
+                    </div>
+                    <ul id="listaAutorizaciones" class="gsz-visitas"></ul>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script th:src="@{/js/misVisitas.js}"></script>
+</body>
+</html>

@@ -64,6 +64,11 @@ public class HomeController {
         return "controlDeAccesos";
     }
 
+    @GetMapping("/misVisitas")
+    public String misVisitas() {
+        return "misVisitas";
+    }
+
     @GetMapping("/paquetes")
     public String paquetes() {
         return "paquetes";

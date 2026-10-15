@@ -91,6 +91,17 @@
         </a>
       </li>
 
+      <!-- MIS VISITAS - quien tenga el permiso VISITAS (propietarios por defecto) -->
+      <li class="mt-0.5 w-full" th:if="${@sesionUsuario.tienePermiso('VISITAS', false)}">
+        <a th:href="@{/misVisitas}"
+           th:class="${activo == 'visitas'}
+               ? 'py-2.7 bg-blue-500/13 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 transition-colors'
+               : 'py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors dark:text-white dark:opacity-80'">
+          <span class="gsz-icon-badge gsz-badge-green"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.2 2.8-5 5.5-5 1.3 0 2.5.4 3.4 1.1"/><path d="M15 17.5l2 2 4-4.5"/></svg></span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Mis visitas</span>
+        </a>
+      </li>
+
       <!-- CONTROL DE ACCESOS - ADMINISTRADOR Y FUNCIONARIO -->
       <li class="mt-0.5 w-full" th:if="${session.rolUsuario == 'Administrador' || session.rolUsuario == 'Funcionario'}">
         <a th:href="@{/controlDeAccesos}"

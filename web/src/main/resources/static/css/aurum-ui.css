@@ -532,7 +532,9 @@ main .card .text-slate-500, main .rounded-2xl .text-slate-500 { color: var(--gsz
     .gsz-acc-grid { grid-template-columns: 1fr; }
     .gsz-acc-form { position: static; }
 }
-.gsz-campos-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.gsz-campos-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: end; }
+.gsz-campos-2 > .gsz-campo { min-width: 0; }
+.gsz-campos-2 .gsz-campo input, .gsz-campos-2 .gsz-campo select { width: 100%; min-width: 0; }
 .gsz-campos-2[hidden] { display: none; }
 @media (max-width: 420px) { .gsz-campos-2 { grid-template-columns: 1fr; } }
 .gsz-campo > span em { font-style: normal; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--gsz-ink-faint); }
@@ -590,3 +592,12 @@ li.gsz-vacio { list-style: none; border: 1px dashed var(--gsz-border); border-ra
 /* Piscina */
 .gsz-piscina-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; margin-bottom: 16px; }
 @media (max-width: 720px) { .gsz-piscina-form { grid-template-columns: 1fr; } }
+
+/* Mis visitas (Fase 6): nota que el propietario deja para portería */
+.gsz-visita-nota { display: block; margin-top: 4px; font-size: .78rem; font-style: italic; color: var(--gsz-ink-muted); overflow-wrap: anywhere; }
+/* En Mis visitas la columna derecha lleva un rango de fechas: en pantallas angostas baja a su propia fila. */
+@media (max-width: 640px) {
+    .gsz-visita.gsz-visita-aut { grid-template-columns: auto minmax(0, 1fr); }
+    .gsz-visita-aut .gsz-visita-hora { grid-column: 2; text-align: left; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+    .gsz-visita-aut .gsz-btn-salida { grid-column: 1 / -1; width: 100%; }
+}
