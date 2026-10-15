@@ -601,3 +601,15 @@ li.gsz-vacio { list-style: none; border: 1px dashed var(--gsz-border); border-ra
     .gsz-visita-aut .gsz-visita-hora { grid-column: 2; text-align: left; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
     .gsz-visita-aut .gsz-btn-salida { grid-column: 1 / -1; width: 100%; }
 }
+
+/* Control de Accesos (Fase 6): visita autorizada por el propietario */
+.gsz-visitante-estado.autorizado { padding: 9px 12px; border-radius: 10px; background: var(--gsz-gold-soft); color: var(--gsz-ink); border-left: 3px solid var(--gsz-gold); }
+.gsz-visita-autor { display: block; margin-top: 4px; font-size: .76rem; font-weight: 600; color: var(--gsz-gold-ink); }
+.gsz-contador-mini { margin-left: 4px; min-width: 18px; height: 18px; padding: 0 5px; font-size: 10.5px; }
+.gsz-contador-mini:empty { display: none; }
+/* En pantallas angostas el selector de la cabecera ocupa todo el ancho y reparte el espacio. */
+@media (max-width: 520px) {
+    .gsz-panel-head .gsz-segmentado { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; }
+    .gsz-panel-head .gsz-segmentado button { padding: 7px 4px; font-size: 12px; line-height: 1.25; }
+    .gsz-panel-head .gsz-contador-mini { margin-left: 2px; }
+}

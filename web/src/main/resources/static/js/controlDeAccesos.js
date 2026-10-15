@@ -10,6 +10,8 @@
 let modoIngreso = 'pie';
 let vistaActual = 'dentro';
 let busquedaVisitante = null;   // temporizador de la búsqueda por documento
+let autorizacionElegida = null; // visita autorizada por el propietario con la que se registra el ingreso (Fase 6)
+let esperados = [];
 
 // ── Utilidades ──────────────────────────────────────────────────────────────
 
@@ -92,8 +94,14 @@ function estadoVisitante(html, clase) {
 function alEscribirDocumento() {
     clearTimeout(busquedaVisitante);
     const doc = document.getElementById('docVisitante').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (autorizacionElegida && autorizacionElegida.numeroDocumento !== doc) autorizacionElegida = null;
     if (doc.length < 5) { estadoVisitante(''); return; }
     busquedaVisitante = setTimeout(async () => {
+        const autorizada = await pedir(`/api/accesos/visitas/autorizada/${doc}`).catch(() => null);
+        if (autorizada && autorizada.id) {
+            usarAutorizacion(autorizada, false);
+            return;
+        }
         try {
             const v = await pedir(`/api/accesos/visitas/visitante/${doc}`);
             document.getElementById('nombreVisitante').value = v.nombre || '';
@@ -128,13 +136,16 @@ async function registrarIngreso(event) {
             numeroApartamento: valor('aptoVisitante'),
             conVehiculo: modoIngreso === 'vehiculo',
             placa: valor('placaVisitante'),
-            numeroParqueadero: valor('parqueaderoVisitante')
+            numeroParqueadero: valor('parqueaderoVisitante'),
+            idAutorizacion: autorizacionElegida ? autorizacionElegida.id : null
         });
+        autorizacionElegida = null;
         aviso('ingresoAviso', mensaje, false);
         document.getElementById('ingresoForm').reset();
         estadoVisitante('');
         elegirModo(document.querySelector('[data-modo="pie"]'));
         document.getElementById('docVisitante').focus();
+        cargarEsperados();
         if (vistaActual !== 'piscina') await cargarVisitas();
     } catch (error) {
         aviso('ingresoAviso', error.message, true);
@@ -154,12 +165,15 @@ function cambiarVista(boton) {
     document.getElementById('vistaPiscina').hidden = !piscina;
     const titulos = {
         dentro: ['En este momento', 'Dentro del conjunto'],
+        esperados: ['Autorizadas por propietarios', 'Esperados hoy'],
         hoy: ['Registro del día', 'Visitas de hoy'],
         piscina: ['Áreas comunes', 'Acceso a la piscina']
     };
     document.getElementById('vistaKicker').textContent = titulos[vistaActual][0];
     document.getElementById('vistaTitulo').firstChild.textContent = titulos[vistaActual][1] + ' ';
-    if (piscina) cargarPiscina(); else cargarVisitas();
+    if (piscina) cargarPiscina();
+    else if (vistaActual === 'esperados') cargarEsperados();
+    else cargarVisitas();
 }
 
 async function cargarVisitas() {
@@ -187,6 +201,7 @@ async function cargarVisitas() {
                         <span class="gsz-apto">${esc(v.numeroApartamento)}</span>${vehiculo}
                         <span class="gsz-visita-dato gsz-mono">${esc(v.numeroDocumento)}</span>
                     </div>
+                    ${v.autorizadaPor ? `<small class="gsz-visita-autor">Autorizó ${esc(v.autorizadaPor)}</small>` : ''}
                 </div>
                 <div class="gsz-visita-hora">
                     <b>${entrada.hora}</b>
@@ -198,6 +213,89 @@ async function cargarVisitas() {
         }).join('');
     } catch (error) {
         lista.innerHTML = `<li class="gsz-vacio">No se pudo cargar la lista: ${esc(error.message)}</li>`;
+    }
+}
+
+// ── Esperados hoy: visitas autorizadas por los propietarios (Fase 6) ───────
+
+async function cargarEsperados() {
+    try {
+        esperados = await pedir('/api/accesos/visitas/esperadas');
+    } catch (e) {
+        esperados = [];
+        if (vistaActual === 'esperados')
+            document.getElementById('listaVisitas').innerHTML = `<li class="gsz-vacio">No se pudo cargar: ${esc(e.message)}</li>`;
+        return;
+    }
+    const pendientes = esperados.filter(a => !a.ingresos).length;
+    document.getElementById('contadorEsperados').textContent = pendientes || '';
+    if (vistaActual === 'esperados') pintarEsperados();
+}
+
+function pintarEsperados() {
+    const lista = document.getElementById('listaVisitas');
+    document.getElementById('contadorVista').textContent = esperados.length;
+    if (!esperados.length) {
+        lista.innerHTML = `<li class="gsz-vacio">
+            <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.2 2.8-5 5.5-5"/><path d="M15 17.5l2 2 4-4.5"/></svg>
+            Ningún propietario ha autorizado visitas para hoy.</li>`;
+        return;
+    }
+    // Primero los que aún no han llegado
+    const orden = [...esperados].sort((a, b) => (a.ingresos > 0) - (b.ingresos > 0));
+    lista.innerHTML = orden.map(a => {
+        const nombre = `${a.nombreVisitante} ${a.apellidoVisitante}`;
+        const llego = a.ingresos > 0;
+        return `<li class="gsz-visita gsz-visita-aut${llego ? ' salio' : ''}">
+            <span class="gsz-visita-avatar">${esc(iniciales(nombre))}</span>
+            <div class="gsz-visita-info">
+                <b>${esc(nombre)}</b>
+                <div class="gsz-visita-meta">
+                    <span class="gsz-apto">${esc(a.numeroApartamento)}</span>
+                    ${a.placa ? `<span class="gsz-placa">${esc(a.placa)}</span>` : ''}
+                    <span class="gsz-visita-dato gsz-mono">${esc(a.numeroDocumento || 'Sin documento')}</span>
+                </div>
+                <small class="gsz-visita-autor">Autorizó ${esc(a.autorizadaPor)}</small>
+                ${a.nota ? `<small class="gsz-visita-nota">“${esc(a.nota)}”</small>` : ''}
+            </div>
+            <div class="gsz-visita-hora">
+                <span class="gsz-estado ${llego ? '' : 'gsz-estado-ok'}">${llego ? (a.ingresos === 1 ? 'Ya ingresó' : a.ingresos + ' ingresos') : 'Por llegar'}</span>
+            </div>
+            <button type="button" class="gsz-btn ${llego ? 'gsz-btn-borde' : 'gsz-btn-noche'} gsz-btn-salida"
+                onclick="usarAutorizacionPorId('${a.id}')">Registrar ingreso</button>
+        </li>`;
+    }).join('');
+}
+
+function usarAutorizacionPorId(id) {
+    const a = esperados.find(x => x.id === id);
+    if (a) usarAutorizacion(a, true);
+}
+
+/** Llena el formulario con la autorización del propietario. */
+function usarAutorizacion(a, desdeLista) {
+    autorizacionElegida = a;
+    const campo = (id, valor) => { if (valor) document.getElementById(id).value = valor; };
+    if (desdeLista) {
+        document.getElementById('ingresoForm').reset();
+        document.getElementById('docVisitante').value = a.numeroDocumento || '';
+    }
+    campo('nombreVisitante', a.nombreVisitante);
+    campo('apellidoVisitante', a.apellidoVisitante);
+    campo('aptoVisitante', a.numeroApartamento);
+    if (a.placa) {
+        elegirModo(document.querySelector('[data-modo="vehiculo"]'));
+        document.getElementById('placaVisitante').value = a.placa;
+    } else if (desdeLista) {
+        elegirModo(document.querySelector('[data-modo="pie"]'));
+    }
+    estadoVisitante(`Visita autorizada · <b>${esc(a.nombreVisitante)} ${esc(a.apellidoVisitante)}</b> → apto ${esc(a.numeroApartamento)}`
+        + ` · autorizó ${esc(a.autorizadaPor)}${a.nota ? ` · “${esc(a.nota)}”` : ''}`
+        + (a.numeroDocumento ? '' : '<br>El propietario no dejó el documento: pídeselo y escríbelo.'), 'autorizado');
+    const doc = document.getElementById('docVisitante');
+    if (desdeLista) {
+        doc.focus();
+        if (a.numeroDocumento) document.getElementById('btnIngreso').scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
 }
 
@@ -311,6 +409,8 @@ function confirmarCerrarSesion(event) {
 
 window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('docVisitante').addEventListener('input', alEscribirDocumento);
+    cargarEsperados();
+    setInterval(cargarEsperados, 60000);
     document.getElementById('placaVisitante').addEventListener('input', e => {
         e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     });
