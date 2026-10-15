@@ -1,0 +1,14 @@
+# Ícono de la app: isotipo oficial de Aurum sobre azul noche (#1E2A4A).
+# Regenerar con: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: "assets/marca/icono-app.png"
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  adaptive_icon_background: "#1E2A4A"
+  adaptive_icon_foreground: "assets/marca/icono-app-frente.png"
+  web:
+    generate: true
+    image_path: "assets/marca/icono-app.png"
+    background_color: "#1E2A4A"
+    theme_color: "#1E2A4A"
