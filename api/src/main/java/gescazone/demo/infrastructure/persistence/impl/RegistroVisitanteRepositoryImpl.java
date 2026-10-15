@@ -30,8 +30,8 @@ public class RegistroVisitanteRepositoryImpl implements RegistroVisitanteReposit
         model.setId(entity.getId().toString());
         model.setIdResidente(entity.getResidente().getId().toString());
         model.setIdApartamento(entity.getApartamento().getId().toString());
-        model.setFechaHoraEntrada(entity.getFechaHoraEntrada());
-        model.setFechaHoraSalida(entity.getFechaHoraSalida());
+        model.setFechaHoraEntrada(FechaTexto.aTexto(entity.getFechaHoraEntrada()));
+        model.setFechaHoraSalida(FechaTexto.aTexto(entity.getFechaHoraSalida()));
         return model;
     }
 
@@ -40,8 +40,8 @@ public class RegistroVisitanteRepositoryImpl implements RegistroVisitanteReposit
         if (model.getId() != null) entity.setId(UUID.fromString(model.getId()));
         entity.setResidente(residenteJpaRepository.getReferenceById(UUID.fromString(model.getIdResidente())));
         entity.setApartamento(apartamentoJpaRepository.getReferenceById(UUID.fromString(model.getIdApartamento())));
-        entity.setFechaHoraEntrada(model.getFechaHoraEntrada());
-        entity.setFechaHoraSalida(model.getFechaHoraSalida());
+        entity.setFechaHoraEntrada(FechaTexto.aFecha(model.getFechaHoraEntrada()));
+        entity.setFechaHoraSalida(FechaTexto.aFecha(model.getFechaHoraSalida()));
         return entity;
     }
 

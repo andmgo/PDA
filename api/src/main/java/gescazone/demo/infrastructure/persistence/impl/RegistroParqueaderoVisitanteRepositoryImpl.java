@@ -35,8 +35,8 @@ public class RegistroParqueaderoVisitanteRepositoryImpl implements RegistroParqu
         model.setIdResidente(entity.getResidente().getId().toString());
         model.setIdParqueadero(entity.getParqueadero().getId().toString());
         model.setIdApartamento(entity.getApartamento() != null ? entity.getApartamento().getId().toString() : null);
-        model.setFechaHoraEntrada(entity.getFechaHoraEntrada());
-        model.setFechaHoraSalida(entity.getFechaHoraSalida());
+        model.setFechaHoraEntrada(FechaTexto.aTexto(entity.getFechaHoraEntrada()));
+        model.setFechaHoraSalida(FechaTexto.aTexto(entity.getFechaHoraSalida()));
         model.setPlaca(entity.getPlaca());
         return model;
     }
@@ -49,8 +49,8 @@ public class RegistroParqueaderoVisitanteRepositoryImpl implements RegistroParqu
         if (model.getIdApartamento() != null) {
             entity.setApartamento(apartamentoJpaRepository.getReferenceById(UUID.fromString(model.getIdApartamento())));
         }
-        entity.setFechaHoraEntrada(model.getFechaHoraEntrada());
-        entity.setFechaHoraSalida(model.getFechaHoraSalida());
+        entity.setFechaHoraEntrada(FechaTexto.aFecha(model.getFechaHoraEntrada()));
+        entity.setFechaHoraSalida(FechaTexto.aFecha(model.getFechaHoraSalida()));
         entity.setPlaca(model.getPlaca());
         return entity;
     }

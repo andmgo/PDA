@@ -1,5 +1,6 @@
 package gescazone.demo.infrastructure.persistence.entity;
 
+import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -36,10 +37,10 @@ public class RegistroParqueaderoVisitanteEntity {
     private String placa;
 
     @Column(name = "fecha_hora_entrada")
-    private String fechaHoraEntrada;
+    private LocalDateTime fechaHoraEntrada;
 
     @Column(name = "fecha_hora_salida")
-    private String fechaHoraSalida;
+    private LocalDateTime fechaHoraSalida;
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -56,9 +57,9 @@ public class RegistroParqueaderoVisitanteEntity {
     public String getPlaca() { return placa; }
     public void setPlaca(String placa) { this.placa = placa; }
 
-    public String getFechaHoraEntrada() { return fechaHoraEntrada; }
-    public void setFechaHoraEntrada(String fechaHoraEntrada) { this.fechaHoraEntrada = fechaHoraEntrada; }
+    public LocalDateTime getFechaHoraEntrada() { return fechaHoraEntrada; }
+    public void setFechaHoraEntrada(LocalDateTime fechaHoraEntrada) { this.fechaHoraEntrada = fechaHoraEntrada; }
 
-    public String getFechaHoraSalida() { return fechaHoraSalida; }
-    public void setFechaHoraSalida(String fechaHoraSalida) { this.fechaHoraSalida = fechaHoraSalida; }
+    public LocalDateTime getFechaHoraSalida() { return fechaHoraSalida; }
+    public void setFechaHoraSalida(LocalDateTime fechaHoraSalida) { this.fechaHoraSalida = fechaHoraSalida; }
 }
