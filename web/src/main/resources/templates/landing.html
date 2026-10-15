@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurum Condominios - Tu conjunto, en un solo lugar</title>
+    <meta name="description" content="Plataforma digital para la gestión administrativa y contable en propiedad horizontal: reservas, pagos, paquetes y control de accesos.">
+    <link rel="icon" type="image/png" th:href="@{/img/aurum-isotipo.png}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link th:href="@{/css/landing.css}" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ── Encabezado ── -->
+<header class="lp-header">
+    <div class="lp-wrap lp-header-row">
+        <a th:href="@{/}" class="lp-lockup" aria-label="Aurum Condominios, inicio">
+            <img th:src="@{/img/aurum-isotipo.png}" alt="" />
+            <span class="lp-wordmark"><img th:src="@{/img/aurum-palabra.png}" alt="Aurum" class="aurum-palabra" /><small>Condominios</small></span>
+        </a>
+
+        <nav class="lp-nav" aria-label="Secciones">
+            <a href="#que-es">Qué es</a>
+            <a href="#funcionalidades">Funcionalidades</a>
+            <a href="#para-quien">Para quién</a>
+        </nav>
+
+        <div class="lp-actions">
+            <th:block th:unless="${autenticado}">
+                <a th:href="@{/login}" class="lp-btn lp-btn-ghost">Iniciar sesión</a>
+                <a th:href="@{/registro}" class="lp-btn lp-btn-gold">Registrarse</a>
+            </th:block>
+            <a th:if="${autenticado}" th:href="@{/inicio}" class="lp-btn lp-btn-gold">Ir a mi panel</a>
+        </div>
+    </div>
+</header>
+
+<div th:if="${param.logout != null}" class="lp-aviso" role="status">Cerraste sesión correctamente. ¡Hasta pronto!</div>
+
+<!-- ── Hero ── -->
+<section class="lp-hero">
+    <div class="lp-wrap lp-hero-grid">
+        <div class="lp-hero-copy">
+            <p class="lp-eyebrow">Plataforma digital para propiedad horizontal</p>
+            <h1>Tu conjunto, <span>en un solo lugar.</span></h1>
+            <p class="lp-lead">
+                Aurum Condominios reúne la administración, la contabilidad y la portería de tu
+                conjunto residencial: reservas, pagos, paquetes y visitantes, sin papeles ni llamadas.
+            </p>
+            <div class="lp-hero-ctas">
+                <th:block th:unless="${autenticado}">
+                    <a th:href="@{/registro}" class="lp-btn lp-btn-gold lp-btn-lg">Crear cuenta</a>
+                    <a th:href="@{/login}" class="lp-btn lp-btn-ghost lp-btn-lg">Ya tengo cuenta</a>
+                </th:block>
+                <a th:if="${autenticado}" th:href="@{/inicio}" class="lp-btn lp-btn-gold lp-btn-lg">Ir a mi panel</a>
+            </div>
+        </div>
+
+        <div class="lp-hero-art" aria-hidden="true">
+            <div class="lp-glow"></div>
+            <img th:src="@{/img/aurum-isotipo.png}" alt="" class="lp-hero-logo" />
+            <div class="lp-chip lp-chip-1">
+                <span class="lp-chip-ico"><svg viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4-8.5 4-8.5-4z"/><path d="M3.5 8v8l8.5 4 8.5-4V8"/></svg></span>
+                <span><b>Paquete recibido</b><small>Portería · hace 2 min</small></span>
+            </div>
+            <div class="lp-chip lp-chip-2">
+                <span class="lp-chip-ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8.5 14l2 2 4-4"/></svg></span>
+                <span><b>Reserva confirmada</b><small>Salón social · sábado</small></span>
+            </div>
+            <div class="lp-chip lp-chip-3">
+                <span class="lp-chip-ico"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></span>
+                <span><b>Visitante autorizado</b><small>Ingreso registrado</small></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pilares del imagotipo -->
+    <div class="lp-wrap">
+        <ul class="lp-pillars">
+            <li>
+                <svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>
+                Seguridad
+            </li>
+            <li>
+                <svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="2.8"/><circle cx="16.5" cy="9.5" r="2.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><path d="M14.8 14.3c2.1.2 3.7 1.8 4.2 4.7"/></svg>
+                Comunidad
+            </li>
+            <li>
+                <svg viewBox="0 0 24 24"><path d="M4 20V9l5-3v14"/><path d="M9 20V4l7 3.5V20"/><path d="M16 20v-8l4 2v6"/><path d="M3 20h18"/></svg>
+                Zonas comunes
+            </li>
+            <li>
+                <svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/></svg>
+                Gestión en línea
+            </li>
+        </ul>
+    </div>
+</section>
+
+<!-- ── Qué es ── -->
+<section class="lp-section" id="que-es">
+    <div class="lp-wrap">
+        <p class="lp-kicker">Qué es</p>
+        <h2 class="lp-title">Del cuaderno de portería a una plataforma clara</h2>
+        <p class="lp-sub">Aurum lleva la administración del conjunto del papel y las llamadas a un solo lugar, con información al día para todos.</p>
+
+        <div class="lp-compare">
+            <article class="lp-compare-card lp-before">
+                <p class="lp-tag">Gestión tradicional</p>
+                <h3>Procesos manuales y opacos</h3>
+                <ul>
+                    <li><b>Registros en papel:</b> demoras en consultas e informes de cartera.</li>
+                    <li><b>Autorizaciones físicas:</b> tiempos de espera para usar la piscina o el salón.</li>
+                    <li><b>Control por radio y teléfono:</b> desorden en parqueaderos y visitantes.</li>
+                </ul>
+            </article>
+            <article class="lp-compare-card lp-after">
+                <p class="lp-tag">Plataforma Aurum</p>
+                <h3>Automatización y control directo</h3>
+                <ul>
+                    <li><b>Transparencia contable:</b> estado de cuenta y pagos al instante.</li>
+                    <li><b>Reservas digitales:</b> disponibilidad y separación de áreas comunes en línea.</li>
+                    <li><b>Acceso inteligente:</b> control digital en portería, sin consumo de papel.</li>
+                </ul>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ── Funcionalidades ── -->
+<section class="lp-section lp-section-alt" id="funcionalidades">
+    <div class="lp-wrap">
+        <p class="lp-kicker">Funcionalidades</p>
+        <h2 class="lp-title">Todo lo que tu conjunto necesita</h2>
+
+        <div class="lp-features">
+            <article class="lp-feature">
+                <span class="lp-feature-ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/><path d="M8.5 14l2 2 4-4"/></svg></span>
+                <h3>Reservas de áreas comunes</h3>
+                <p>Consulta la disponibilidad del salón social y reserva en línea, con fechas especiales bloqueadas automáticamente.</p>
+            </article>
+            <article class="lp-feature">
+                <span class="lp-feature-ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><path d="M7 15h4"/></svg></span>
+                <h3>Pagos y cartera</h3>
+                <p>Estado de cuenta de cada apartamento, cuotas de administración y pagos en un solo lugar.</p>
+            </article>
+            <article class="lp-feature">
+                <span class="lp-feature-ico"><svg viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4-8.5 4-8.5-4z"/><path d="M3.5 8v8l8.5 4 8.5-4V8"/><path d="M12 12v8"/></svg></span>
+                <h3>Paquetes de recepción</h3>
+                <p>Portería registra cada paquete que llega y deja constancia de quién lo recibe y cuándo se entrega.</p>
+            </article>
+            <article class="lp-feature">
+                <span class="lp-feature-ico"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></span>
+                <h3>Control de accesos</h3>
+                <p>Ingreso y salida de visitantes, con o sin vehículo, y control de acceso a la piscina.</p>
+            </article>
+            <article class="lp-feature">
+                <span class="lp-feature-ico"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><path d="M3 19c.7-3 2.6-4.6 5-4.6"/><path d="M14 13h7M14 17h7M14 9h7"/></svg></span>
+                <h3>Roles y permisos</h3>
+                <p>Cada persona ve solo lo que le corresponde: administración, propietarios y portería, configurable sin tocar código.</p>
+            </article>
+            <article class="lp-feature">
+                <span class="lp-feature-ico"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="13" height="10" rx="2"/><path d="M6 18h6"/><rect x="16.5" y="8" width="5" height="12" rx="1.5"/></svg></span>
+                <h3>Desde cualquier dispositivo</h3>
+                <p>Funciona en computador, tableta y celular, con modo claro y oscuro.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ── Para quién ── -->
+<section class="lp-section" id="para-quien">
+    <div class="lp-wrap">
+        <p class="lp-kicker">Para quién</p>
+        <h2 class="lp-title">Una plataforma, tres formas de usarla</h2>
+
+        <div class="lp-roles">
+            <article class="lp-role">
+                <h3>Administración</h3>
+                <ul>
+                    <li>Gestiona apartamentos, parqueaderos, residentes y salones.</li>
+                    <li>Aprueba registros y solicitudes especiales.</li>
+                    <li>Define qué puede ver y hacer cada rol.</li>
+                </ul>
+            </article>
+            <article class="lp-role lp-role-featured">
+                <h3>Propietarios</h3>
+                <ul>
+                    <li>Reserva el salón social sin trámites.</li>
+                    <li>Consulta tu estado de cuenta y pagos.</li>
+                    <li>Mantén tus datos y tu contraseña al día.</li>
+                </ul>
+            </article>
+            <article class="lp-role">
+                <h3>Portería</h3>
+                <ul>
+                    <li>Registra visitantes y vehículos en segundos.</li>
+                    <li>Recibe y entrega paquetes con trazabilidad.</li>
+                    <li>Controla el acceso a la piscina.</li>
+                </ul>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ── Por qué Aurum ── -->
+<section class="lp-section lp-meaning">
+    <div class="lp-wrap lp-meaning-grid">
+        <img th:src="@{/img/aurum-isotipo.png}" alt="" class="lp-meaning-logo" />
+        <div>
+            <p class="lp-kicker">Por qué "Aurum"</p>
+            <h2 class="lp-title">El estándar de oro para tu conjunto</h2>
+            <p class="lp-sub">
+                <i>Aurum</i> es la palabra latina para «oro»: símbolo de valor, solidez y excelencia.
+                Representa la evolución hacia una administración sin papel, con transparencia,
+                rapidez y precisión contable para toda la comunidad.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- ── Llamado final ── -->
+<section class="lp-cta">
+    <div class="lp-wrap lp-cta-row">
+        <div>
+            <h2>¿Listo para empezar?</h2>
+            <p>Crea tu cuenta; la administración la aprueba y te asigna tu rol.</p>
+        </div>
+        <div class="lp-hero-ctas">
+            <th:block th:unless="${autenticado}">
+                <a th:href="@{/registro}" class="lp-btn lp-btn-gold lp-btn-lg">Registrarse</a>
+                <a th:href="@{/login}" class="lp-btn lp-btn-ghost lp-btn-lg">Iniciar sesión</a>
+            </th:block>
+            <a th:if="${autenticado}" th:href="@{/inicio}" class="lp-btn lp-btn-gold lp-btn-lg">Ir a mi panel</a>
+        </div>
+    </div>
+</section>
+
+<footer class="lp-footer">
+    <div class="lp-wrap lp-footer-row">
+        <a th:href="@{/}" class="lp-lockup lp-lockup-sm">
+            <img th:src="@{/img/aurum-isotipo.png}" alt="" />
+            <span class="lp-wordmark"><img th:src="@{/img/aurum-palabra.png}" alt="Aurum" class="aurum-palabra" /><small>Condominios</small></span>
+        </a>
+        <p>Terrazas de Calicanto &middot; Cartagena</p>
+        <p>&copy; <span th:text="${#dates.year(#dates.createNow())}">2026</span> Aurum Condominios</p>
+    </div>
+</footer>
+
+</body>
+</html>

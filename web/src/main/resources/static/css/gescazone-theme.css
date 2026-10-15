@@ -1,57 +1,87 @@
 /* ============================================================
-   GESCAZONE — sistema visual (azules amigables + Plus Jakarta Sans)
-   Aprobado por el usuario como Artifact antes de aplicarse aquí.
+   Aurum Condominios — sistema visual según el Manual de Marca
+   (carpeta Imagotipo/): azul noche #1E2A4A (60%, fondos y
+   estructura), azul líder #2E3F6F (30%, tarjetas y UI), oro
+   propósito #D4A843 y oro claro #F0C96A (10%, acentos), blanco
+   cálido #F8F7F4, gris texto #4A4A4A. Tipografía Montserrat.
    Se carga DESPUÉS de argon-dashboard-tailwind.css a propósito,
    para poder sobreescribir puntualmente sus utilidades.
+   Los nombres --gsz-* se conservan (los usan inicio.css y varias
+   plantillas) — solo cambian sus valores.
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
 :root {
-    --gsz-bg: #EFF4FC;
-    --gsz-surface: #FFFFFF;
-    --gsz-surface-2: #F7F9FE;
-    --gsz-ink: #1B2A4A;
-    --gsz-ink-muted: #5C6C8C;
-    --gsz-ink-faint: #8C99B8;
-    --gsz-border: #DFE7FA;
-    /* --gsz-blue/--gsz-blue-deep son de MARCA (topbar, botón primario) y no
-       cambian con el tema — solo lo que sigue abajo se redefine en oscuro. */
-    --gsz-blue: #2F6FED;
-    --gsz-blue-deep: #17356E;
-    --gsz-blue-soft: #E7F0FE;
-    --gsz-active-ink: var(--gsz-blue-deep);
-    --gsz-sky: #38BDF8;
+    /* Paleta de marca, fija en ambos temas */
+    --aurum-noche: #1E2A4A;
+    --aurum-lider: #2E3F6F;
+    --aurum-oro: #D4A843;
+    --aurum-oro-claro: #F0C96A;
+    --aurum-blanco: #F8F7F4;
+    --aurum-gris: #4A4A4A;
+    --aurum-oro-degradado: linear-gradient(120deg, #F0C96A 0%, #D4A843 55%, #B88A2C 100%);
 
-    --gsz-violet: #7C5CFC; --gsz-violet-soft: #EFE9FE;
-    --gsz-green:  #1F9463; --gsz-green-soft:  #DFF5EA;
-    --gsz-amber:  #B4791C; --gsz-amber-soft:  #FBF0DC;
-    --gsz-red:    #DD5147; --gsz-red-soft:    #FCE7E5;
-    --gsz-cyan:   #0C8FBF; --gsz-cyan-soft:   #E3F6FE;
-    --gsz-neutral: #647096; --gsz-neutral-soft: #EEF1F8;
+    --gsz-bg: #F8F7F4;
+    --gsz-surface: #FFFFFF;
+    --gsz-surface-2: #FBFAF7;
+    --gsz-ink: #1E2A4A;
+    --gsz-ink-muted: #4A4A4A;
+    --gsz-ink-faint: #8B8F9C;
+    --gsz-border: #E8E4DA;
+    /* --gsz-blue/--gsz-blue-deep son de MARCA (botón primario, enlaces) y no
+       cambian con el tema — solo lo que sigue abajo se redefine en oscuro. */
+    --gsz-blue: #2E3F6F;
+    --gsz-blue-deep: #1E2A4A;
+    --gsz-blue-soft: #ECEEF4;
+    --gsz-active-ink: var(--gsz-blue-deep);
+    --gsz-sky: #F0C96A;
+    --gsz-gold: #D4A843;
+    --gsz-gold-ink: #9A7420;   /* oro legible sobre fondo claro (texto) */
+    --gsz-gold-soft: #FBF3DF;
+
+    /* Acentos de estado — se mantienen distintos entre sí (éxito, alerta,
+       error) pero apagados para no competir con el oro de marca. */
+    --gsz-violet: #2E3F6F; --gsz-violet-soft: #ECEEF4;
+    --gsz-green:  #2F7D5B; --gsz-green-soft:  #E1F1E8;
+    --gsz-amber:  #9A7420; --gsz-amber-soft:  #FBF3DF;
+    --gsz-red:    #B23A3A; --gsz-red-soft:    #F8E3E1;
+    --gsz-cyan:   #2E3F6F; --gsz-cyan-soft:   #ECEEF4;
+    --gsz-neutral: #5E6475; --gsz-neutral-soft: #F0EEE8;
+
+    /* Barra lateral: azul noche en ambos temas (estructura de marca) */
+    --gsz-side-bg: #1E2A4A;
+    --gsz-side-ink: rgba(248, 247, 244, .80);
+    --gsz-side-ink-faint: rgba(248, 247, 244, .45);
+    --gsz-side-hover: rgba(255, 255, 255, .06);
+    --gsz-side-active: rgba(212, 168, 67, .16);
 }
 
 /* Modo oscuro — se activa agregando la clase .dark a <html> (ver
    theme.js / script inline en cada <head>). Solo se redefinen los tokens
    de superficie/texto/acento "de contenido"; los de marca (--gsz-blue,
-   --gsz-blue-deep) se quedan fijos a propósito. */
+   --gsz-blue-deep, --aurum-*) se quedan fijos a propósito. */
 :root.dark {
-    --gsz-bg: #0F1729;
-    --gsz-surface: #17203A;
-    --gsz-surface-2: #1C2745;
-    --gsz-ink: #EAF0FF;
-    --gsz-ink-muted: #A9B6D6;
-    --gsz-ink-faint: #7684AC;
-    --gsz-border: #2A3660;
-    --gsz-blue-soft: #21335F;
-    --gsz-active-ink: #9DBCFB;
+    --gsz-bg: #111A30;
+    --gsz-surface: #1E2A4A;
+    --gsz-surface-2: #24325A;
+    --gsz-ink: #F8F7F4;
+    --gsz-ink-muted: #C3C7D3;
+    --gsz-ink-faint: #8E96AE;
+    --gsz-border: #2E3F6F;
+    --gsz-blue-soft: #2E3F6F;
+    --gsz-active-ink: #F0C96A;
+    --gsz-gold-ink: #F0C96A;
+    --gsz-gold-soft: #3A3420;
 
-    --gsz-violet: #A28CFF; --gsz-violet-soft: #2A2560;
-    --gsz-green:  #4CC796; --gsz-green-soft:  #163A30;
-    --gsz-amber:  #E0A64B; --gsz-amber-soft:  #3C2E12;
-    --gsz-red:    #F08A80; --gsz-red-soft:    #3E2020;
-    --gsz-cyan:   #5FC4EE; --gsz-cyan-soft:   #123244;
-    --gsz-neutral: #A9B6D6; --gsz-neutral-soft: #232E52;
+    --gsz-violet: #AEB9DA; --gsz-violet-soft: #2E3F6F;
+    --gsz-green:  #6CC79C; --gsz-green-soft:  #1D3B33;
+    --gsz-amber:  #F0C96A; --gsz-amber-soft:  #3A3420;
+    --gsz-red:    #EE8A80; --gsz-red-soft:    #43252A;
+    --gsz-cyan:   #AEB9DA; --gsz-cyan-soft:   #2E3F6F;
+    --gsz-neutral: #C3C7D3; --gsz-neutral-soft: #2A365A;
+
+    --gsz-side-bg: #1E2A4A;
 
     /* Le dice al navegador que dibuje sus propios widgets nativos (el
        calendario emergente de <input type="datetime-local">, scrollbars,
@@ -63,7 +93,8 @@
 }
 
 body {
-    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif !important;
+    font-family: 'Montserrat', ui-sans-serif, system-ui, sans-serif !important;
+    background-color: var(--gsz-bg) !important;
 }
 
 /* Red de seguridad: el resto de plantillas (fuera de sidebar + Inicio,
@@ -189,12 +220,6 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
-/* Enlace activo del sidebar (antes bg-blue-500/13) */
-.bg-blue-500\/13 {
-    background: var(--gsz-blue-soft) !important;
-    color: var(--gsz-active-ink) !important;
-}
-
 /* ── Sidebar: todas las opciones deben caber sin scroll interno ──
    h-sidenav traía un calc(100vh - 360px) heredado de la plantilla Argon
    original (pensado para un sidebar con menos ítems + una tarjeta extra
@@ -254,11 +279,6 @@ body {
     stroke-width: 2.2;
     stroke-linecap: round;
     stroke-linejoin: round;
-}
-
-li.mt-0\.5.w-full > a.bg-blue-500\/13 .gsz-icon-badge {
-    background: var(--gsz-surface);
-    box-shadow: 0 2px 6px rgba(23, 53, 110, .12);
 }
 
 /* Variantes de color de los badges del sidebar — reemplazan los
@@ -337,13 +357,246 @@ li.mt-0\.5.w-full > a.bg-blue-500\/13 .gsz-icon-badge {
     height: auto !important;
 }
 
-/* ── Botón primario con degradado (reemplaza from-blue-500 to-violet-500) ── */
+/* ── Botón primario (reemplaza from-blue-500 to-violet-500): azul líder →
+   azul noche, como pide el manual para la UI. El oro se reserva para
+   acentos y llamados a la acción de la landing. ── */
 .gsz-btn-primary {
-    background: linear-gradient(120deg, #3E7EFA, var(--gsz-blue-deep)) !important;
-    box-shadow: 0 10px 20px -10px rgba(47, 111, 237, .55);
+    background: linear-gradient(120deg, var(--aurum-lider), var(--aurum-noche)) !important;
+    box-shadow: 0 10px 20px -10px rgba(30, 42, 74, .55);
 }
 
-.bg-gradient-to-tl.from-blue-500.to-violet-500 {
-    background-image: linear-gradient(120deg, #3E7EFA, var(--gsz-blue-deep)) !important;
-    box-shadow: 0 10px 20px -10px rgba(47, 111, 237, .55);
+.bg-gradient-to-tl.from-blue-500.to-violet-500,
+.btn-registrar[style*="#3b82f6"] {
+    background-image: linear-gradient(120deg, var(--aurum-lider), var(--aurum-noche)) !important;
+    background-color: var(--aurum-noche) !important;
+    box-shadow: 0 10px 20px -10px rgba(30, 42, 74, .55);
+}
+/* En oscuro el azul noche se pierde contra la superficie (también azul
+   noche) — ahí el botón primario pasa a oro con texto azul noche. */
+.dark .gsz-btn-primary,
+.dark .bg-gradient-to-tl.from-blue-500.to-violet-500,
+.dark .btn-registrar[style*="#3b82f6"] {
+    background-image: var(--aurum-oro-degradado) !important;
+    background-color: var(--aurum-oro) !important;
+    color: var(--aurum-noche) !important;
+}
+
+/* ── Azules de Tailwind/Argon (#5e72e4) que quedan sueltos en las
+   plantillas: foco de inputs, pestañas, enlaces/íconos. Se remapean a la
+   marca aquí en vez de tocar cientos de clases en las plantillas. ── */
+.focus\:border-blue-500:focus {
+    border-color: var(--gsz-gold) !important;
+    box-shadow: 0 0 0 3px rgba(212, 168, 67, .18);
+}
+.text-blue-500, .text-blue-600 { color: var(--gsz-blue) !important; }
+.dark .text-blue-500, .dark .text-blue-600 { color: var(--aurum-oro-claro) !important; }
+.border-blue-200 { border-color: var(--gsz-border) !important; }
+.tab-button:hover { color: var(--gsz-ink) !important; }
+.tab-button.active {
+    color: var(--gsz-ink) !important;
+    background-color: var(--gsz-gold-soft) !important;
+    border-bottom-color: var(--gsz-gold) !important;
+}
+.modal-content {
+    background-color: var(--gsz-surface) !important;
+    color: var(--gsz-ink);
+}
+.dark .modal-content label,
+.dark .modal-content h5 { color: var(--gsz-ink) !important; }
+
+/* ============================================================
+   Barra lateral azul noche (fragments/sidebar.html)
+   El manual asigna el azul noche a "fondos y estructura" — la
+   barra lateral es la estructura principal de la app, y el
+   isotipo dorado luce sobre ese fondo como en el manual.
+   ============================================================ */
+aside[aria-expanded] {
+    background: var(--gsz-side-bg) !important;
+    color: var(--gsz-side-ink);
+    transition: transform .2s ease, max-width .2s ease;
+}
+aside[aria-expanded] a,
+aside[aria-expanded] h6,
+aside[aria-expanded] .gsz-brand-text {
+    color: var(--gsz-side-ink) !important;
+    opacity: 1 !important;
+}
+aside[aria-expanded] h6 { color: var(--gsz-side-ink-faint) !important; letter-spacing: .08em; }
+aside[aria-expanded] a:hover { background: var(--gsz-side-hover) !important; border-radius: .5rem; }
+aside[aria-expanded] hr {
+    background-image: linear-gradient(to right, transparent, rgba(240, 201, 106, .35), transparent) !important;
+}
+/* Logo oficial (Imagotipo/aurum_logo_degradado_transparente.png, recortado
+   en aurum-isotipo.png + aurum-palabra.png). "AURUM" siempre va como
+   imagen — nunca como texto — para conservar la tipografía del logo. */
+.gsz-isotipo { width: 36px; height: auto; }
+aside[aria-expanded] .gsz-brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: var(--aurum-blanco) !important;
+}
+.aurum-palabra { display: block; height: 12px; width: auto; }
+aside[aria-expanded] .gsz-brand-text small {
+    display: block;
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: .2em;
+    color: var(--aurum-blanco);
+    text-transform: uppercase;
+}
+
+/* Enlace activo: fondo dorado translúcido + texto oro claro */
+.bg-blue-500\/13 {
+    background: var(--gsz-side-active) !important;
+    color: var(--aurum-oro-claro) !important;
+}
+
+/* Badges de íconos: un solo lenguaje (oro sobre azul noche) en vez de un
+   color distinto por módulo — el manual limita la paleta a azules + oro. */
+aside[aria-expanded] .gsz-icon-badge {
+    --ic-bg: rgba(255, 255, 255, .06);
+    --ic-fg: var(--aurum-oro-claro);
+}
+aside[aria-expanded] a.bg-blue-500\/13 .gsz-icon-badge {
+    --ic-bg: var(--aurum-oro);
+    --ic-fg: var(--aurum-noche);
+    box-shadow: 0 4px 12px -4px rgba(212, 168, 67, .6);
+}
+
+aside[aria-expanded] .gsz-theme-toggle,
+aside[aria-expanded] .gsz-collapse-btn {
+    background: rgba(255, 255, 255, .06);
+    border-color: rgba(255, 255, 255, .12);
+    color: var(--aurum-blanco);
+}
+aside[aria-expanded] .gsz-theme-toggle:hover,
+aside[aria-expanded] .gsz-collapse-btn:hover {
+    background: var(--gsz-side-active);
+    color: var(--aurum-oro-claro);
+}
+
+/* ── Botón para colapsar/expandir la barra (solo escritorio ≥1280px; en
+   pantallas angostas la barra ya es un cajón que se abre con ☰). ── */
+.gsz-collapse-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    border: 1px solid var(--gsz-border);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .15s ease, color .15s ease;
+}
+.gsz-collapse-btn svg {
+    width: 16px; height: 16px;
+    stroke: currentColor; fill: none; stroke-width: 2.1;
+    stroke-linecap: round; stroke-linejoin: round;
+    transition: transform .2s ease;
+}
+.gsz-sidebar-actions { display: flex; gap: 6px; align-items: center; }
+
+@media (min-width: 1280px) {
+    .gsz-collapse-btn { display: flex; }
+
+    main.xl\:ml-68 { transition: margin-left .2s ease; }
+
+    /* Estado colapsado — clase en <html>, la pone el script del sidebar
+       (antes de pintar el contenido) leyendo localStorage. */
+    html.gsz-colapsado aside[aria-expanded] { max-width: 5.25rem !important; }
+    html.gsz-colapsado main.xl\:ml-68 { margin-left: 7.25rem !important; }
+
+    html.gsz-colapsado .gsz-nav-label,
+    html.gsz-colapsado .gsz-brand-text,
+    html.gsz-colapsado .gsz-nav-section { display: none !important; }
+
+    html.gsz-colapsado .gsz-sidebar-header > div {
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px 0 !important;
+    }
+    html.gsz-colapsado .gsz-sidebar-actions { flex-direction: column; }
+    html.gsz-colapsado .gsz-collapse-btn svg { transform: rotate(180deg); }
+
+    html.gsz-colapsado aside[aria-expanded] li > a {
+        justify-content: center;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    html.gsz-colapsado aside[aria-expanded] .gsz-icon-badge { margin-right: 0; width: 34px; height: 34px; }
+    html.gsz-colapsado aside[aria-expanded] .gsz-icon-badge svg { width: 17px; height: 17px; }
+}
+
+/* ── Etiquetas de estado de tablas (Gestión de Datos) ──
+   Antes: degradados verde/rojo de Tailwind (fuera de la paleta). "Al día" /
+   "Disponible" = azul líder; mora / ocupado / mantenimiento = oro (aviso). */
+.gsz-estado {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.gsz-estado-ok { background: var(--gsz-blue-soft); color: var(--gsz-blue); }
+.gsz-estado-alerta { background: var(--gsz-gold-soft); color: var(--gsz-gold-ink); }
+.dark .gsz-estado-ok { background: var(--aurum-lider); color: var(--aurum-blanco); }
+
+/* ── Modal "Propietarios y vehículos" (propiedad.js) ── */
+.modal-content.gsz-propiedad { max-width: 640px; width: 92%; max-height: 88vh; overflow-y: auto; }
+.gsz-propiedad-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.gsz-propiedad-kicker { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--gsz-gold-ink); margin: 0; }
+.gsz-propiedad-cerrar { font-size: 26px; line-height: 1; color: var(--gsz-ink-faint); background: none; border: 0; cursor: pointer; }
+.gsz-propiedad-cerrar:hover { color: var(--gsz-ink); }
+.gsz-propiedad-msg { display: none; font-size: 13px; padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; }
+.gsz-propiedad-msg.ok { display: block; background: var(--gsz-blue-soft); color: var(--gsz-ink); border-left: 3px solid var(--gsz-blue); }
+.gsz-propiedad-msg.error { display: block; background: var(--gsz-gold-soft); color: var(--gsz-ink); border-left: 3px solid var(--gsz-gold); }
+.dark .gsz-propiedad-msg.ok { border-left-color: var(--aurum-oro-claro); }
+.gsz-propiedad-seccion { border-top: 1px solid var(--gsz-border); padding-top: 14px; margin-top: 14px; }
+.gsz-propiedad-seccion h6 { font-size: 13px; font-weight: 700; color: var(--gsz-ink); margin-bottom: 10px; }
+.gsz-propiedad-lista { list-style: none; padding: 0; margin: 0 0 12px; display: grid; gap: 8px; }
+.gsz-propiedad-lista li {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 10px 12px; border: 1px solid var(--gsz-border); border-radius: 10px;
+    background: var(--gsz-surface-2);
+}
+.gsz-propiedad-lista li.vacio { justify-content: flex-start; color: var(--gsz-ink-faint); font-size: 13px; border-style: dashed; background: none; }
+.gsz-propiedad-lista li.inactivo { opacity: .55; }
+.gsz-propiedad-lista b { display: block; font-size: 13.5px; color: var(--gsz-ink); }
+.gsz-propiedad-lista small { display: block; font-size: 12px; color: var(--gsz-ink-muted); }
+.gsz-placa {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+    letter-spacing: .08em;
+    display: inline-block !important;
+    padding: 1px 8px;
+    border-radius: 6px;
+    background: var(--aurum-oro-claro);
+    color: var(--aurum-noche) !important;
+    border: 1.5px solid var(--aurum-noche);
+}
+.gsz-propiedad-quitar {
+    font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 8px; flex-shrink: 0;
+    color: var(--gsz-ink-muted); border: 1px solid var(--gsz-border); background: var(--gsz-surface);
+}
+.gsz-propiedad-quitar:hover { color: var(--gsz-ink); border-color: var(--gsz-gold); }
+.gsz-propiedad-form { display: flex; gap: 8px; }
+.gsz-propiedad-form-vehiculo { display: grid; grid-template-columns: 1fr 1fr; }
+.gsz-propiedad-form-vehiculo button { grid-column: 1 / -1; }
+.gsz-propiedad-ayuda { font-size: 12px; color: var(--gsz-ink-faint); margin: 6px 0 0; }
+@media (max-width: 520px) {
+    .gsz-propiedad-form { flex-direction: column; }
+    .gsz-propiedad-form-vehiculo { grid-template-columns: 1fr; }
+}
+
+/* Pestañas (Gestión de Datos, Control de Accesos, Perfil): en pantallas
+   angostas se desplazan horizontalmente dentro de su fila en vez de
+   ensanchar toda la página. */
+.flex.border-b:has(> .tab-button) { overflow-x: auto; scrollbar-width: thin; }
+.tab-button { white-space: nowrap; flex-shrink: 0; }
+@media (max-width: 640px) {
+    /* Fila "Agregar varios / Nuevo …" de Gestión de Datos: que baje de línea */
+    .flex-shrink-0.mt-6.flex.gap-2 { flex-wrap: wrap; max-width: 100%; }
 }

@@ -1,0 +1,451 @@
+/* ============================================================
+   Landing pública de Aurum Condominios (templates/landing.html)
+   Paleta y tipografía del Manual de Marca: azul noche dominante,
+   azul líder secundario, oro como acento, blanco cálido, Montserrat.
+   ============================================================ */
+:root {
+    --noche: #1E2A4A;
+    --lider: #2E3F6F;
+    --oro: #D4A843;
+    --oro-claro: #F0C96A;
+    --oro-texto: #9A7420;
+    --blanco: #F8F7F4;
+    --gris: #4A4A4A;
+    --borde: #E8E4DA;
+    --oro-degradado: linear-gradient(120deg, #F0C96A 0%, #D4A843 55%, #B88A2C 100%);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--blanco);
+    color: var(--gris);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+
+.lp-wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+/* ── Botones ── */
+.lp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.lp-btn:hover { transform: translateY(-1px); }
+.lp-btn-gold {
+    background: var(--oro-degradado);
+    color: var(--noche);
+    box-shadow: 0 10px 24px -12px rgba(212, 168, 67, .9);
+}
+.lp-btn-ghost {
+    color: var(--blanco);
+    border: 1.5px solid rgba(248, 247, 244, .35);
+}
+.lp-btn-ghost:hover { border-color: var(--oro-claro); color: var(--oro-claro); }
+.lp-btn-lg { padding: 14px 26px; font-size: 15px; border-radius: 12px; }
+
+/* ── Logotipo horizontal ── */
+.lp-lockup { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.lp-lockup > img { width: 44px; height: auto; }
+/* "AURUM" es imagen (aurum-palabra.png) para conservar la letra del logo */
+.lp-wordmark { display: flex; flex-direction: column; gap: 5px; }
+.lp-wordmark .aurum-palabra { height: 16px; width: auto; }
+.lp-wordmark small {
+    font-size: 9px;
+    letter-spacing: .3em;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--blanco);
+}
+
+/* ── Encabezado ── */
+.lp-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--noche);
+    backdrop-filter: saturate(1.4) blur(10px);
+    -webkit-backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid rgba(240, 201, 106, .14);
+}
+.lp-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 70px;
+}
+.lp-nav { display: flex; gap: 28px; }
+.lp-nav a {
+    color: rgba(248, 247, 244, .78);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+.lp-nav a:hover { color: var(--oro-claro); }
+.lp-actions { display: flex; gap: 10px; }
+
+/* Aviso tras cerrar sesión (redirige a /?logout) — se desvanece solo */
+.lp-aviso {
+    position: fixed;
+    top: 84px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: var(--blanco);
+    color: var(--noche);
+    border-left: 4px solid var(--oro);
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .6);
+    animation: lpAviso 5s ease forwards;
+    max-width: calc(100% - 32px);
+}
+@keyframes lpAviso {
+    0%   { opacity: 0; transform: translate(-50%, -8px); }
+    8%   { opacity: 1; transform: translate(-50%, 0); }
+    85%  { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+}
+
+/* ── Hero ── */
+.lp-hero {
+    /* Azul noche plano — el mismo de la barra lateral y el login; solo
+       un brillo dorado detrás del isotipo. */
+    background:
+        radial-gradient(circle at 78% 40%, rgba(212, 168, 67, .14), transparent 40%),
+        var(--noche);
+    color: var(--blanco);
+    padding: 72px 0 0;
+    overflow: hidden;
+}
+.lp-hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap: 40px;
+    align-items: center;
+}
+.lp-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--oro-claro);
+    margin-bottom: 18px;
+}
+.lp-hero h1 {
+    font-size: clamp(36px, 5.4vw, 60px);
+    line-height: 1.06;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--blanco);
+    text-wrap: balance;
+}
+.lp-hero h1 span {
+    background: var(--oro-degradado);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.lp-lead {
+    margin-top: 20px;
+    font-size: 17px;
+    line-height: 1.65;
+    color: rgba(248, 247, 244, .8);
+    max-width: 52ch;
+}
+.lp-hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+
+.lp-hero-art {
+    position: relative;
+    min-height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.lp-glow {
+    position: absolute;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(240, 201, 106, .28), transparent 65%);
+}
+.lp-hero-logo {
+    position: relative;
+    width: min(300px, 70%);
+    filter: drop-shadow(0 24px 40px rgba(0, 0, 0, .35));
+}
+.lp-chip {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 10px 10px;
+    border-radius: 14px;
+    background: rgba(248, 247, 244, .96);
+    color: var(--noche);
+    box-shadow: 0 18px 36px -16px rgba(0, 0, 0, .55);
+    font-size: 13px;
+    animation: lpFlotar 6s ease-in-out infinite;
+}
+.lp-chip b { display: block; font-weight: 700; }
+.lp-chip small { display: block; font-size: 11.5px; color: #6B7080; }
+.lp-chip-ico {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--noche); color: var(--oro-claro); flex-shrink: 0;
+}
+.lp-chip-ico svg { width: 18px; height: 18px; }
+.lp-chip-1 { top: 8%; left: -4%; }
+.lp-chip-2 { bottom: 14%; right: -6%; animation-delay: -2s; }
+.lp-chip-3 { bottom: 2%; left: 4%; animation-delay: -4s; }
+@keyframes lpFlotar {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .lp-chip { animation: none; }
+    html { scroll-behavior: auto; }
+}
+
+/* Íconos de línea compartidos */
+.lp-hero svg, .lp-section svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ── Pilares ── */
+.lp-pillars {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-top: 56px;
+    border-top: 1px solid rgba(240, 201, 106, .18);
+}
+.lp-pillars li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 26px 8px 30px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(248, 247, 244, .85);
+}
+.lp-pillars li + li { border-left: 1px solid rgba(240, 201, 106, .18); }
+.lp-pillars svg { width: 30px; height: 30px; color: var(--oro); }
+
+/* ── Secciones ── */
+.lp-section { padding: 88px 0; }
+.lp-section-alt { background: #fff; border-top: 1px solid var(--borde); border-bottom: 1px solid var(--borde); }
+.lp-kicker {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--oro-texto);
+    margin-bottom: 10px;
+}
+.lp-title {
+    font-size: clamp(26px, 3.4vw, 38px);
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -.015em;
+    color: var(--noche);
+    max-width: 22ch;
+    text-wrap: balance;
+}
+.lp-sub {
+    margin-top: 14px;
+    font-size: 16px;
+    max-width: 62ch;
+    color: var(--gris);
+}
+
+/* Comparativo (diapositiva "Marca diferencial") */
+.lp-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 44px;
+}
+.lp-compare-card {
+    border-radius: 18px;
+    padding: 30px 30px 32px;
+    position: relative;
+}
+.lp-compare-card h3 { font-size: 20px; font-weight: 700; margin: 6px 0 16px; }
+.lp-compare-card ul { list-style: none; display: grid; gap: 12px; font-size: 14.5px; }
+.lp-compare-card li { position: relative; padding-left: 26px; }
+.lp-compare-card li::before {
+    position: absolute;
+    left: 0; top: 0;
+    font-weight: 800;
+}
+.lp-tag { font-size: 11.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+
+/* "Antes": neutro (gris texto + blanco), sin rojo — la paleta de marca no
+   incluye rojo. El contraste lo da la tarjeta "después" en azul noche y oro. */
+.lp-before {
+    background: #fff;
+    border: 2px solid var(--borde);
+    box-shadow: 8px 8px 0 var(--borde);
+    color: var(--gris);
+}
+.lp-before .lp-tag { color: #8B8F9C; }
+.lp-before h3 { color: var(--gris); }
+.lp-before li::before { content: "\2014"; color: #8B8F9C; }
+
+.lp-after {
+    background: var(--noche);
+    border: 2px solid var(--oro-claro);
+    box-shadow: 8px 8px 0 var(--oro-claro);
+    color: rgba(248, 247, 244, .85);
+}
+.lp-after .lp-tag { color: var(--oro); }
+.lp-after h3 { color: var(--oro-claro); }
+.lp-after b { color: var(--blanco); }
+.lp-after li::before { content: "\2713"; color: var(--oro-claro); }
+
+/* Funcionalidades */
+.lp-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 44px;
+}
+.lp-feature {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    padding: 26px;
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.lp-feature:hover {
+    transform: translateY(-3px);
+    border-color: var(--oro);
+    box-shadow: 0 18px 36px -24px rgba(30, 42, 74, .5);
+}
+.lp-feature-ico {
+    width: 46px; height: 46px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--noche); color: var(--oro-claro);
+    margin-bottom: 16px;
+}
+.lp-feature-ico svg { width: 23px; height: 23px; }
+.lp-feature h3 { font-size: 16.5px; font-weight: 700; color: var(--noche); margin-bottom: 8px; }
+.lp-feature p { font-size: 14px; }
+
+/* Para quién */
+.lp-roles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 44px;
+}
+.lp-role {
+    border-radius: 16px;
+    padding: 28px;
+    background: #fff;
+    border: 1px solid var(--borde);
+    border-top: 4px solid var(--lider);
+}
+.lp-role-featured { border-top-color: var(--oro); }
+.lp-role h3 { font-size: 18px; font-weight: 700; color: var(--noche); margin-bottom: 14px; }
+.lp-role ul { list-style: none; display: grid; gap: 10px; font-size: 14.5px; }
+.lp-role li { position: relative; padding-left: 18px; }
+.lp-role li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: .6em;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--oro);
+}
+
+/* Por qué Aurum */
+.lp-meaning { background: #fff; border-top: 1px solid var(--borde); }
+.lp-meaning-grid {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 56px;
+    align-items: center;
+}
+.lp-meaning-logo {
+    width: 220px;
+    padding: 46px 30px;
+    border-radius: 28px;
+    background: var(--noche);
+    box-shadow: 0 24px 50px -28px rgba(30, 42, 74, .8);
+}
+
+/* Llamado final */
+.lp-cta {
+    background:
+        radial-gradient(circle at 85% 50%, rgba(212, 168, 67, .2), transparent 45%),
+        var(--noche);
+    color: var(--blanco);
+    padding: 64px 0;
+}
+.lp-cta-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.lp-cta h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 800; color: var(--blanco); }
+.lp-cta p { margin-top: 6px; color: rgba(248, 247, 244, .78); }
+.lp-cta .lp-hero-ctas { margin-top: 0; }
+
+/* Pie */
+.lp-footer { background: var(--noche); border-top: 1px solid rgba(240, 201, 106, .14); color: rgba(248, 247, 244, .6); padding: 28px 0; font-size: 13px; }
+.lp-footer-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.lp-lockup-sm > img { width: 34px; }
+.lp-lockup-sm .lp-wordmark .aurum-palabra { height: 13px; }
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+    .lp-nav { display: none; }
+    .lp-hero-grid { grid-template-columns: 1fr; }
+    .lp-hero-art { min-height: 320px; }
+    .lp-features { grid-template-columns: repeat(2, 1fr); }
+    .lp-roles { grid-template-columns: 1fr; }
+    .lp-compare { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .lp-wrap { padding: 0 16px; }
+    .lp-header-row { height: 62px; }
+    .lp-lockup > img { width: 36px; }
+    .lp-wordmark .aurum-palabra { height: 13px; }
+    .lp-wordmark small { font-size: 7.5px; }
+    .lp-actions .lp-btn { padding: 8px 12px; font-size: 13px; }
+    .lp-actions .lp-btn-ghost { display: none; }
+    .lp-hero { padding-top: 48px; }
+    .lp-lead { font-size: 15.5px; }
+    .lp-hero-art { min-height: 280px; }
+    .lp-chip { font-size: 12px; }
+    .lp-chip-1 { left: 0; }
+    .lp-chip-2 { right: 0; }
+    .lp-pillars { grid-template-columns: repeat(2, 1fr); }
+    .lp-pillars li:nth-child(3) { border-left: none; }
+    .lp-pillars li:nth-child(n+3) { border-top: 1px solid rgba(240, 201, 106, .18); }
+    .lp-section { padding: 64px 0; }
+    .lp-features { grid-template-columns: 1fr; }
+    .lp-before { box-shadow: 5px 5px 0 var(--borde); }
+    .lp-after { box-shadow: 5px 5px 0 var(--oro-claro); }
+    .lp-meaning-grid { grid-template-columns: 1fr; gap: 28px; }
+    .lp-meaning-logo { width: 150px; padding: 24px; }
+    .lp-footer-row { flex-direction: column; align-items: flex-start; }
+}

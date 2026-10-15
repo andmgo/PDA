@@ -1,3 +1,4 @@
+/* Página de error — paleta del Manual de Marca de Aurum Condominios. */
 * {
     margin: 0;
     padding: 0;
@@ -5,19 +6,19 @@
 }
 
 body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background: #EFF4FC;
+    font-family: 'Montserrat', sans-serif;
+    background: #F8F7F4;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 20px 16px;
 }
 
 .error-container {
     background: white;
     border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(23, 53, 110, .25);
+    box-shadow: 0 24px 60px -20px rgba(30, 42, 74, .35);
     overflow: hidden;
     max-width: 450px;
     width: 100%;
@@ -30,10 +31,11 @@ body {
 }
 
 .error-header {
-    background: linear-gradient(155deg, #2F6FED 0%, #17356E 100%);
-    padding: 40px 30px;
+    background: #1E2A4A;
+    padding: 36px 30px;
     text-align: center;
-    color: white;
+    color: #F8F7F4;
+    border-bottom: 3px solid #D4A843;
 }
 
 .logo-container {
@@ -43,44 +45,39 @@ body {
     gap: 12px;
 }
 
-.logo-container img {
-    width: 80px;
-    height: 80px;
-    border-radius: 16px;
-    background: white;
-    padding: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.logo-container > img {
+    width: 76px;
+    height: auto;
 }
 
 .error-code {
-    font-size: 72px;
+    font-size: 64px;
     font-weight: 800;
     line-height: 1;
-    opacity: 0.25;
+    color: #F0C96A;
+    opacity: .35;
     letter-spacing: -2px;
 }
 
-.logo-container h1 {
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin: 0;
-}
+/* "AURUM" es imagen (aurum-palabra.png) para conservar la letra del logo */
+.logo-container h1 { display: flex; flex-direction: column; align-items: center; gap: 7px; margin: 0; }
+.logo-container h1 .aurum-palabra { height: 20px; width: auto; }
+.logo-container h1 small { font-size: 10.5px; font-weight: 600; letter-spacing: .32em; text-transform: uppercase; color: #F8F7F4; }
 
 .error-body {
-    padding: 40px 30px;
+    padding: 36px 30px;
     text-align: center;
 }
 
 .error-title {
     font-size: 22px;
     font-weight: 800;
-    color: #1B2A4A;
+    color: #1E2A4A;
     margin-bottom: 10px;
 }
 
 .error-message {
-    color: #5C6C8C;
+    color: #4A4A4A;
     font-size: 14px;
     margin-bottom: 12px;
 }
@@ -88,18 +85,18 @@ body {
 .error-ruta {
     font-family: monospace;
     font-size: 12px;
-    background: #f8f9fa;
+    background: #F3F1EC;
     padding: 5px 14px;
     border-radius: 8px;
-    color: #adb5bd;
+    color: #8B8F9C;
     display: inline-block;
     margin-bottom: 28px;
 }
 
 .btn-home {
     display: inline-block;
-    background: linear-gradient(120deg, #3E7EFA, #2457C7);
-    color: white;
+    background: linear-gradient(120deg, #2E3F6F, #1E2A4A);
+    color: #F8F7F4;
     padding: 13px 32px;
     border-radius: 10px;
     text-decoration: none;
@@ -108,9 +105,11 @@ body {
     transition: all 0.3s ease;
 }
 
+.btn-home i { color: #F0C96A; }
+
 .btn-home:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(33, 82, 255, 0.4);
+    box-shadow: 0 8px 20px rgba(30, 42, 74, 0.35);
 }
 
 .btn-home:active {
@@ -119,7 +118,7 @@ body {
 
 @media (max-width: 480px) {
     .error-container { border-radius: 16px; }
-    .error-header { padding: 30px 20px; }
-    .error-body { padding: 30px 20px; }
-    .error-code { font-size: 56px; }
+    .error-header { padding: 28px 20px; }
+    .error-body { padding: 28px 20px; }
+    .error-code { font-size: 52px; }
 }

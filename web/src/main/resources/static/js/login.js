@@ -49,10 +49,6 @@ function mostrarError(mensaje) {
     setTimeout(() => errorDiv.classList.remove('show'), 5000);
 }
 
-function cerrarLogin() {
-    window.close();
-}
-
 window.addEventListener('DOMContentLoaded', function () {
     try {
         const documentoRecordado = localStorage.getItem(CLAVE_DOCUMENTO_RECORDADO);

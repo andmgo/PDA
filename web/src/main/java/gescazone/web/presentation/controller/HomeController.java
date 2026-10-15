@@ -17,9 +17,15 @@ public class HomeController {
     @Autowired
     private UsuarioApiClient usuarioApiClient;
 
+    /**
+     * Landing pública: lo primero que se ve al entrar (antes era directo el
+     * login). Si ya hay sesión, el encabezado ofrece "Ir a mi panel" en vez
+     * de iniciar sesión / registrarse.
+     */
     @GetMapping("/")
-    public String index() {
-        return "login";
+    public String index(Model model) {
+        model.addAttribute("autenticado", sesionUsuario.estaAutenticado());
+        return "landing";
     }
 
     @GetMapping("/inicio")

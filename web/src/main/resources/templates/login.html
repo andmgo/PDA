@@ -6,37 +6,25 @@
     <title>Aurum Condominios - Iniciar Sesión</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" th:href="@{/img/aurum-isotipo.png}" />
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link th:href="@{/css/login.css}" rel="stylesheet" />
 </head>
 <body>
+    <a th:href="@{/}" class="back-link">&larr; Volver a Aurum Condominios</a>
+
     <div class="login-container">
         <div class="brand-panel">
-            <div>
-                <div class="brand">Aurum Condominios</div>
-                <div class="tag">Terrazas de Calicanto &middot; Cartagena</div>
+            <a th:href="@{/}" class="brand-lockup">
+                <img th:src="@{/img/aurum-isotipo.png}" alt="" />
+                <span class="wordmark"><img th:src="@{/img/aurum-palabra.png}" alt="Aurum" class="aurum-palabra" /><small>Condominios</small></span>
+            </a>
+            <div class="brand-copy">
+                <p class="tagline">Tu conjunto, en un solo lugar.</p>
+                <p class="desc">Reservas, pagos, paquetes y control de accesos del conjunto, sin papeles ni llamadas.</p>
             </div>
-            <svg class="skyline" viewBox="0 0 260 110" width="100%" height="110" preserveAspectRatio="xMidYMax meet">
-                <circle class="sun" cx="205" cy="30" r="20"/>
-                <rect class="bldg" x="18" y="52" width="26" height="50" rx="3"/>
-                <rect class="bldg hi" x="48" y="30" width="30" height="72" rx="3"/>
-                <rect class="bldg" x="82" y="60" width="22" height="42" rx="3"/>
-                <rect class="bldg hi" x="108" y="42" width="28" height="60" rx="3"/>
-                <rect class="bldg" x="140" y="66" width="24" height="36" rx="3"/>
-                <rect class="win" x="56" y="40" width="5" height="5" rx="1"/>
-                <rect class="win" x="66" y="40" width="5" height="5" rx="1"/>
-                <rect class="win" x="56" y="52" width="5" height="5" rx="1"/>
-                <rect class="win" x="66" y="52" width="5" height="5" rx="1"/>
-                <rect class="win" x="115" y="52" width="5" height="5" rx="1"/>
-                <rect class="win" x="125" y="52" width="5" height="5" rx="1"/>
-                <path class="wave" d="M0 102 Q20 96 40 102 T80 102 T120 102 T160 102 T200 102 T240 102 T260 102" />
-                <path class="wave" d="M0 108 Q20 103 40 108 T80 108 T120 108 T160 108 T200 108 T240 108 T260 108" opacity=".6"/>
-            </svg>
-            <div class="quote">
-                &ldquo;Un solo lugar para reservar el salón social, ver la cartera del apartamento y avisar
-                que llegó un paquete.&rdquo;
-            </div>
+            <div class="tag">Terrazas de Calicanto &middot; Cartagena</div>
         </div>
 
         <div class="login-body">
@@ -102,7 +90,6 @@
                 </div>
 
                 <div class="button-group">
-                    <button type="button" class="btn btn-cerrar" onclick="cerrarLogin()">Cerrar</button>
                     <button type="submit" class="btn btn-aceptar">
                         <i class="fas fa-sign-in-alt"></i> Iniciar sesión
                     </button>

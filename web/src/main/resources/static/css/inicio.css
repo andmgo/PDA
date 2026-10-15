@@ -108,6 +108,32 @@
 
 .gsz-stack { display: flex; flex-direction: column; gap: 18px; }
 
+/* Paleta de marca: los íconos decorativos van todos en oro (como los
+   pilares del imagotipo), no un color distinto por tarjeta — se pisan
+   aquí los style="" inline de inicio.html (rojo, verde, violeta...). */
+.gsz-quick-tile .qi,
+.gsz-about-row .badge,
+.gsz-amenity-row .badge {
+    background: var(--gsz-gold-soft) !important;
+    color: var(--gsz-gold-ink) !important;
+}
+.gsz-contact-row .badge {
+    background: var(--aurum-noche) !important;
+    color: var(--aurum-oro-claro) !important;
+}
+.dark .gsz-contact-row .badge { background: var(--aurum-lider) !important; }
+
+/* argon-dashboard-tailwind.css también define una clase .badge (con
+   padding y font-size en em) — encogía los SVG de estas filas a unos
+   pocos píxeles. Se neutraliza aquí. */
+.gsz-about-row .badge,
+.gsz-amenity-row .badge,
+.gsz-contact-row .badge {
+    padding: 0;
+    font-size: inherit;
+    line-height: 1;
+}
+
 /* Sobre el conjunto — filas compactas, no párrafos largos */
 .gsz-about-row {
     display: flex;

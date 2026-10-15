@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.client.web.HttpSessionOAuth2Authoriza
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -67,7 +68,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                 .requestMatchers(
-                    "/login", "/registro", "/registro/completar-google", "/logout",
+                    "/", "/login", "/registro", "/registro/completar-google", "/logout",
                     "/css/**", "/js/**", "/img/**", "/fonts/**",
                     "/favicon.ico", "/error"
                 ).permitAll()
@@ -117,7 +118,7 @@ public class SecurityConfig {
 
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout=true")
+                .logoutSuccessUrl("/?logout")
                 .invalidateHttpSession(true)
                 .deleteCookies("GESCAZONE-SESSION")
                 .clearAuthentication(true)
@@ -135,6 +136,9 @@ public class SecurityConfig {
             )
 
             .exceptionHandling(ex -> ex
+                // Sin sesión, cualquier página protegida lleva a la landing
+                // (lo primero que se debe ver), no directo al login.
+                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/"))
                 .accessDeniedHandler((request, response, e) -> {
                     request.setAttribute("codigo",  403);
                     request.setAttribute("mensaje", "No tienes permisos para acceder a esta sección.");

@@ -6,7 +6,7 @@
     <title>Error - Aurum Condominios</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
     <link th:href="@{/css/error.css}" rel="stylesheet" />
 </head>
@@ -15,8 +15,8 @@
         <div class="error-header">
             <div class="logo-container">
                 <div class="error-code" th:text="${codigo} ?: '500'">500</div>
-                <img th:src="@{/img/logo-aurum.svg}" alt="Aurum Condominios Logo" onerror="this.style.display='none'">
-                <h1>Aurum Condominios</h1>
+                <img th:src="@{/img/aurum-isotipo.png}" alt="Aurum Condominios Logo">
+                <h1><img th:src="@{/img/aurum-palabra.png}" alt="Aurum" class="aurum-palabra" /><small>Condominios</small></h1>
             </div>
         </div>
 
