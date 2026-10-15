@@ -1,4 +1,4 @@
-package gescazone.demo.infrastructure.util;
+package gescazone.demo.domain.util;
 
 import org.junit.jupiter.api.Test;
 

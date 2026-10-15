@@ -1,9 +1,9 @@
 package gescazone.demo.presentation.controller.api;
 
+import gescazone.demo.application.service.PermisoService;
 import gescazone.demo.application.service.UsuarioService;
 import gescazone.demo.domain.model.RolPermisoModel;
 import gescazone.demo.domain.model.UsuarioModel;
-import gescazone.demo.domain.repository.RolPermisoRepository;
 import gescazone.demo.infrastructure.security.CustomUserDetailsService;
 import gescazone.demo.infrastructure.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class AuthController {
     private UsuarioService usuarioService;
 
     @Autowired
-    private RolPermisoRepository rolPermisoRepository;
+    private PermisoService permisoService;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -135,8 +135,7 @@ public class AuthController {
         UsuarioModel usuario = usuarioService.consultar(numeroDocumento);
         String nombreRol = usuario.getRol().getNombreRol();
 
-        List<Map<String, Object>> permisos = rolPermisoRepository.matrizCompleta().stream()
-                .filter(c -> c.getNombreRol().equalsIgnoreCase(nombreRol))
+        List<Map<String, Object>> permisos = permisoService.permisosDeRol(nombreRol).stream()
                 .map(this::celdaAMapa)
                 .toList();
 

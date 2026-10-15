@@ -4,7 +4,7 @@ import gescazone.demo.application.exception.NotFoundException;
 import gescazone.demo.application.service.ParqueaderoService;
 import gescazone.demo.domain.model.EstadoModel;
 import gescazone.demo.domain.model.ParqueaderoModel;
-import gescazone.demo.infrastructure.util.GeneradorNumeros;
+import gescazone.demo.domain.util.GeneradorNumeros;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,7 @@
 package gescazone.demo.infrastructure.mail;
 
 import gescazone.demo.application.exception.MailEnvioException;
+import gescazone.demo.application.port.NotificadorCorreo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
  * resetea la de otro usuario.
  */
 @Service
-public class MailService {
+public class MailService implements NotificadorCorreo {
 
     private static final Logger log = LoggerFactory.getLogger(MailService.class);
 
@@ -27,6 +28,7 @@ public class MailService {
      *         configurar, credenciales inválidas, etc.) — el llamador decide
      *         cómo mostrarlo (ver UsuarioService.resetearContrasena).
      */
+    @Override
     public void enviarContrasenaReseteada(String correoDestino, String nombre, String contrasenaNueva) {
         SimpleMailMessage mensaje = new SimpleMailMessage();
         mensaje.setTo(correoDestino);

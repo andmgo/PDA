@@ -1,4 +1,4 @@
-package gescazone.demo.infrastructure.util;
+package gescazone.demo.domain.util;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -13,7 +13,7 @@ import gescazone.demo.domain.model.RolModel;
 import gescazone.demo.domain.model.TipoDocumentoModel;
 import gescazone.demo.domain.model.UsuarioModel;
 import gescazone.demo.domain.repository.UsuarioRepository;
-import gescazone.demo.infrastructure.mail.MailService;
+import gescazone.demo.application.port.NotificadorCorreo;
 
 @Service
 public class UsuarioService {
@@ -29,7 +29,7 @@ public class UsuarioService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private MailService mailService;
+    private NotificadorCorreo notificadorCorreo;
 
     public List<UsuarioModel> consultarTodos() {
         return usuarioRepository.findAll();
@@ -194,7 +194,7 @@ public class UsuarioService {
             .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         String contrasenaNueva = generarContrasenaAleatoria();
-        mailService.enviarContrasenaReseteada(usuario.getCorreo(), usuario.getNombre(), contrasenaNueva);
+        notificadorCorreo.enviarContrasenaReseteada(usuario.getCorreo(), usuario.getNombre(), contrasenaNueva);
 
         usuario.setContrasena(passwordEncoder.encode(contrasenaNueva));
         usuarioRepository.save(usuario);

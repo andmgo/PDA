@@ -1,11 +1,7 @@
 package gescazone.demo.presentation.controller.api;
 
-import gescazone.demo.application.exception.NotFoundException;
 import gescazone.demo.application.service.ReservaSalonSocialService;
 import gescazone.demo.domain.model.ReservaSalonSocialModel;
-import gescazone.demo.domain.model.UsuarioModel;
-import gescazone.demo.domain.repository.SalonSocialRepository;
-import gescazone.demo.domain.repository.UsuarioRepository;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +18,9 @@ import java.util.Map;
 public class ReservaSalonSocialRestController {
 
     private final ReservaSalonSocialService reservaService;
-    private final UsuarioRepository usuarioRepository;
-    private final SalonSocialRepository salonRepository;
 
-    public ReservaSalonSocialRestController(ReservaSalonSocialService reservaService,
-                                            UsuarioRepository usuarioRepository,
-                                            SalonSocialRepository salonRepository) {
+    public ReservaSalonSocialRestController(ReservaSalonSocialService reservaService) {
         this.reservaService = reservaService;
-        this.usuarioRepository = usuarioRepository;
-        this.salonRepository = salonRepository;
     }
 
     @GetMapping("/todas")
@@ -98,14 +88,8 @@ public class ReservaSalonSocialRestController {
         if (fechaHoraStr == null || fechaHoraStr.isBlank())
             return ResponseEntity.badRequest().body("La fecha y hora de la reserva son obligatorias");
 
-        UsuarioModel usuarioActual = usuarioRepository.findByNumeroDocumento(authentication.getName())
-                .orElseThrow(() -> new NotFoundException("Usuario autenticado no encontrado"));
-
-        ReservaSalonSocialModel reserva = new ReservaSalonSocialModel(
-                usuarioActual.getId(), idSalon, LocalDateTime.parse(fechaHoraStr));
-
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(reservaService.guardarReserva(reserva));
+                .body(reservaService.crearPropia(authentication.getName(), idSalon, LocalDateTime.parse(fechaHoraStr)));
     }
 
     @PutMapping("/actualizar/{id}")
@@ -144,14 +128,10 @@ public class ReservaSalonSocialRestController {
      */
     private Map<String, Object> convertirAMap(ReservaSalonSocialModel res) {
         Map<String, Object> usuario = new HashMap<>();
-        usuario.put("numeroDocumento", usuarioRepository.findById(res.getIdUsuario())
-                .map(u -> (Object) u.getNumeroDocumento())
-                .orElse(res.getIdUsuario()));
+        usuario.put("numeroDocumento", reservaService.numeroDocumentoUsuario(res.getIdUsuario()));
 
         Map<String, Object> salon = new HashMap<>();
-        salon.put("numero", salonRepository.findById(res.getIdSalon())
-                .map(s -> (Object) s.getNumero())
-                .orElse(res.getIdSalon()));
+        salon.put("numero", reservaService.numeroSalon(res.getIdSalon()));
 
         Map<String, Object> map = new HashMap<>();
         map.put("idReserva",         res.getId());

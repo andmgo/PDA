@@ -35,6 +35,35 @@ class PermisoServiceTest {
     }
 
     @Test
+    void guardarPermiso_invalidaLaCacheSinQueNadieTengaQueAcordarse() {
+        // 1ª lectura: sin permiso (queda en caché)
+        when(rolPermisoRepository.matrizCompleta())
+                .thenReturn(List.of(celda("FUNCIONARIO", "PAQUETES", false, false)))
+                .thenReturn(List.of(celda("FUNCIONARIO", "PAQUETES", true, false)));
+        assertThat(permisoService.tienePermiso("FUNCIONARIO", "PAQUETES", NivelPermiso.VER)).isFalse();
+
+        permisoService.guardarPermiso("FUNCIONARIO", "PAQUETES", true, false);
+
+        // 2ª lectura: el servicio invalidó su caché y relee la matriz
+        assertThat(permisoService.tienePermiso("FUNCIONARIO", "PAQUETES", NivelPermiso.VER)).isTrue();
+        verify(rolPermisoRepository).guardarPermiso("FUNCIONARIO", "PAQUETES", true, false);
+        verify(rolPermisoRepository, times(2)).matrizCompleta();
+    }
+
+    @Test
+    void crearRol_nombreVacio_rechazaSinTocarElRepositorio() {
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> permisoService.crearRol("  "))
+                .isInstanceOf(IllegalArgumentException.class);
+        org.mockito.Mockito.verifyNoInteractions(rolPermisoRepository);
+    }
+
+    @Test
+    void crearRol_guardaEnMayusculas() {
+        permisoService.crearRol(" vigilante ");
+        verify(rolPermisoRepository).crearRol("VIGILANTE");
+    }
+
+    @Test
     void tienePermiso_rolConAccesoVer_retornaTrue() {
         when(rolPermisoRepository.matrizCompleta())
                 .thenReturn(List.of(celda("PROPIETARIO", "PAGOS_Y_CARTERA", true, true)));

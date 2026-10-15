@@ -2,6 +2,7 @@ package gescazone.demo.application.service;
 
 import gescazone.demo.application.exception.NotFoundException;
 import gescazone.demo.domain.model.ReservaSalonSocialModel;
+import gescazone.demo.domain.model.UsuarioModel;
 import gescazone.demo.domain.repository.ReservaSalonSocialRepository;
 import gescazone.demo.domain.repository.SalonSocialRepository;
 import gescazone.demo.domain.repository.UsuarioRepository;
@@ -30,6 +31,26 @@ public class ReservaSalonSocialService {
         if (id == null)
             throw new IllegalArgumentException("El ID no puede ser nulo");
         return reservaRepository.findById(id).orElse(null);
+    }
+
+    /**
+     * Reserva a nombre de quien inició sesión: el usuario sale del documento
+     * del JWT (nunca de un ID enviado por el cliente).
+     */
+    public String crearPropia(String numeroDocumentoAutenticado, String idSalon, LocalDateTime fechaYHora) {
+        UsuarioModel usuario = usuarioRepository.findByNumeroDocumento(numeroDocumentoAutenticado)
+                .orElseThrow(() -> new NotFoundException("Usuario autenticado no encontrado"));
+        return guardarReserva(new ReservaSalonSocialModel(usuario.getId(), idSalon, fechaYHora));
+    }
+
+    /** Documento legible del usuario de una reserva (para listados); el ID si ya no existe. */
+    public String numeroDocumentoUsuario(String idUsuario) {
+        return usuarioRepository.findById(idUsuario).map(UsuarioModel::getNumeroDocumento).orElse(idUsuario);
+    }
+
+    /** Número legible del salón de una reserva (para listados); el ID si ya no existe. */
+    public String numeroSalon(String idSalon) {
+        return salonRepository.findById(idSalon).map(s -> s.getNumero()).orElse(idSalon);
     }
 
     public String guardarReserva(ReservaSalonSocialModel reserva) {

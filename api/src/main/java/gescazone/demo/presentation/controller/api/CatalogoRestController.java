@@ -1,6 +1,6 @@
 package gescazone.demo.presentation.controller.api;
 
-import gescazone.demo.domain.repository.CatalogoRepository;
+import gescazone.demo.application.service.CatalogoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,12 +24,12 @@ import java.util.stream.IntStream;
 public class CatalogoRestController {
 
     @Autowired
-    private CatalogoRepository catalogoRepository;
+    private CatalogoService catalogoService;
 
     @GetMapping("/todos")
     public Map<String, Object> todos() {
         Map<String, Object> data = new LinkedHashMap<>();
-        catalogoRepository.todos().forEach((clave, nombres) -> data.put(clave, opciones(nombres)));
+        catalogoService.todos().forEach((clave, nombres) -> data.put(clave, opciones(nombres)));
         return data;
     }
 

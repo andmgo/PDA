@@ -6,7 +6,7 @@ import gescazone.demo.domain.model.RolModel;
 import gescazone.demo.domain.model.TipoDocumentoModel;
 import gescazone.demo.domain.model.UsuarioModel;
 import gescazone.demo.domain.repository.UsuarioRepository;
-import gescazone.demo.infrastructure.mail.MailService;
+import gescazone.demo.application.port.NotificadorCorreo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,7 +33,7 @@ class UsuarioServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private MailService mailService;
+    private NotificadorCorreo notificadorCorreo;
 
     @InjectMocks
     private UsuarioService usuarioService;
@@ -222,7 +222,7 @@ class UsuarioServiceTest {
         assertThatThrownBy(() -> usuarioService.resetearContrasena("999"))
                 .isInstanceOf(NotFoundException.class);
 
-        verifyNoInteractions(mailService);
+        verifyNoInteractions(notificadorCorreo);
         verify(usuarioRepository, never()).save(any());
     }
 
@@ -231,7 +231,7 @@ class UsuarioServiceTest {
         UsuarioModel u = usuarioGuardado();
         when(usuarioRepository.findByNumeroDocumento("123")).thenReturn(Optional.of(u));
         doThrow(new MailEnvioException("SMTP no configurado"))
-                .when(mailService).enviarContrasenaReseteada(anyString(), anyString(), anyString());
+                .when(notificadorCorreo).enviarContrasenaReseteada(anyString(), anyString(), anyString());
 
         assertThatThrownBy(() -> usuarioService.resetearContrasena("123"))
                 .isInstanceOf(MailEnvioException.class);
@@ -250,7 +250,7 @@ class UsuarioServiceTest {
 
         assertThat(resultado).contains("ana@gescazone.com");
         assertThat(u.getContrasena()).isEqualTo("HASH_NUEVO");
-        verify(mailService).enviarContrasenaReseteada(eq("ana@gescazone.com"), eq("Ana"), anyString());
+        verify(notificadorCorreo).enviarContrasenaReseteada(eq("ana@gescazone.com"), eq("Ana"), anyString());
         verify(usuarioRepository).save(u);
     }
 }

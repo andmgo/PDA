@@ -5,7 +5,7 @@ import gescazone.demo.application.service.ApartamentoService;
 import gescazone.demo.domain.model.ApartamentoModel;
 import gescazone.demo.domain.model.TipoOcupacionModel;
 import gescazone.demo.domain.model.EstadoCuentaModel;
-import gescazone.demo.infrastructure.util.GeneradorNumeros;
+import gescazone.demo.domain.util.GeneradorNumeros;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
