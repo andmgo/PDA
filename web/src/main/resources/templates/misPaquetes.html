@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script>(function(){try{var t=localStorage.getItem('gescazone_tema');if(t==='oscuro'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark');}catch(e){}})();</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/img/aurum-apple-touch.png}" />
+    <link rel="icon" type="image/png" sizes="96x96" th:href="@{/img/aurum-favicon.png}" />
+    <title>Aurum Condominios - Mis paquetes</title>
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link th:href="@{/css/argon-dashboard-tailwind.css}" rel="stylesheet" />
+    <link th:href="@{/css/gescazone-theme.css}" rel="stylesheet" />
+    <link th:href="@{/css/aurum-ui.css}" rel="stylesheet" />
+</head>
+
+<body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
+
+    <div th:replace="~{fragments/sidebar :: sidebar(activo='misPaquetes')}"></div>
+
+    <main class="relative h-full max-h-screen transition-all duration-200 ease-in-out xl:ml-68 rounded-xl">
+        <div th:replace="~{fragments/topbar :: topbar(titulo='Mis paquetes', seccion='Mi hogar', descripcion='Lo que llega a portería para tus apartamentos.')}"></div>
+
+        <div class="w-full px-6 py-6 mx-auto">
+            <div class="gsz-paq-grid">
+
+                <!-- Resumen -->
+                <section class="gsz-panel gsz-paq-form">
+                    <p class="gsz-kicker">En portería</p>
+                    <h2 class="gsz-card-titulo">Por recoger</h2>
+                    <p class="gsz-paq-numero" id="paqPorRecoger">—</p>
+                    <p class="gsz-card-sub" id="paqResumenTexto">Cargando…</p>
+                    <div class="gsz-aviso" id="paqAviso" role="status"></div>
+                </section>
+
+                <!-- Lista -->
+                <section class="gsz-panel">
+                    <div class="gsz-panel-head">
+                        <div>
+                            <p class="gsz-kicker">Tus apartamentos</p>
+                            <h2 class="gsz-card-titulo">Paquetes <span id="paqContador" class="gsz-contador"></span></h2>
+                        </div>
+                        <div class="gsz-segmentado" role="tablist">
+                            <button type="button" class="activo" data-filtro="pendientes" onclick="filtrarMisPaquetes(this)">Por recoger</button>
+                            <button type="button" data-filtro="entregados" onclick="filtrarMisPaquetes(this)">Entregados</button>
+                        </div>
+                    </div>
+                    <ul id="listaMisPaquetes" class="gsz-visitas"></ul>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script th:src="@{/js/misPaquetes.js}"></script>
+</body>
+</html>

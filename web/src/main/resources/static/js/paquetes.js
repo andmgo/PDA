@@ -62,9 +62,13 @@ function mostrarPaquetes(paquetes) {
             <td class="px-4 py-3">
                 <span class="block text-sm font-semibold">${escaparHtml(p.nombreReceptor)}</span>
                 <span class="block text-xs gsz-mono">${escaparHtml(p.cedulaReceptor)}</span>
+                ${p.descripcion ? `<span class="block text-xs gsz-paq-desc">${escaparHtml(p.descripcion)}</span>` : ''}
             </td>
-            <td class="px-4 py-3 text-xs">${formatoFecha(p.fechaHoraLlegada)}${p.entregado && p.fechaHoraEntrega
-                ? `<span class="block">Entregado ${formatoFecha(p.fechaHoraEntrega)}</span>` : ''}</td>
+            <td class="px-4 py-3 text-xs">${formatoFecha(p.fechaHoraLlegada)}
+                ${p.recibidoPor ? `<span class="block gsz-paq-quien">Recibió ${escaparHtml(p.recibidoPor)}</span>` : ''}
+                ${p.entregado && p.fechaHoraEntrega
+                ? `<span class="block">Entregado ${formatoFecha(p.fechaHoraEntrega)}</span>
+                   ${p.entregadoA ? `<span class="block gsz-paq-quien">a ${escaparHtml(p.entregadoA)}</span>` : ''}` : ''}</td>
             <td class="px-4 py-3 text-center">${p.entregado
                 ? '<span class="gsz-estado gsz-estado-ok">Entregado</span>'
                 : '<span class="gsz-estado gsz-estado-alerta">Pendiente</span>'}</td>
@@ -86,7 +90,8 @@ async function submitPaquete(event) {
             body: JSON.stringify({
                 numeroApartamento: document.getElementById('numeroApartamentoPaquete').value.trim(),
                 nombreReceptor: document.getElementById('nombreReceptor').value.trim(),
-                cedulaReceptor: document.getElementById('cedulaReceptor').value.trim()
+                cedulaReceptor: document.getElementById('cedulaReceptor').value.trim(),
+                descripcion: document.getElementById('descripcionPaquete').value.trim()
             })
         });
         const texto = await response.text();
@@ -104,10 +109,16 @@ async function submitPaquete(event) {
 }
 
 async function marcarEntregado(id, boton) {
-    if (!confirm('¿Confirmar la entrega de este paquete?')) return;
+    // null = canceló; vacío = lo retira el destinatario
+    const entregadoA = prompt('¿Quién retira el paquete?\nDéjalo vacío si es el mismo destinatario.', '');
+    if (entregadoA === null) return;
     boton.disabled = true;
     try {
-        const response = await fetch(`/api/paquetes/${id}/entregar`, { method: 'POST' });
+        const response = await fetch(`/api/paquetes/${id}/entregar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ entregadoA: entregadoA.trim() })
+        });
         const texto = await response.text();
         if (!response.ok) throw new Error(texto);
         avisoPaquete(texto, false);

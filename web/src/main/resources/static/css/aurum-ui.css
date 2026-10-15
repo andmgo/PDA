@@ -613,3 +613,11 @@ li.gsz-vacio { list-style: none; border: 1px dashed var(--gsz-border); border-ra
     .gsz-panel-head .gsz-segmentado button { padding: 7px 4px; font-size: 12px; line-height: 1.25; }
     .gsz-panel-head .gsz-contador-mini { margin-left: 2px; }
 }
+
+/* Paquetes (Fase 7) */
+.gsz-paq-numero { margin: 6px 0 2px; font-size: 52px; line-height: 1; font-weight: 800; color: var(--gsz-gold-ink); }
+.gsz-paq-icono svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.gsz-paq-desc { margin-top: 2px; color: var(--gsz-ink); font-weight: 600; }
+.gsz-paq-quien { color: var(--gsz-ink-muted); }
+/* En modo oscuro las tarjetas ya son azul noche: avatar y número de apartamento pasan a azul líder. */
+.dark .gsz-visita-avatar, .dark .gsz-apto { background: var(--aurum-lider); }

@@ -69,6 +69,11 @@ public class HomeController {
         return "misVisitas";
     }
 
+    @GetMapping("/misPaquetes")
+    public String misPaquetes() {
+        return "misPaquetes";
+    }
+
     @GetMapping("/paquetes")
     public String paquetes() {
         return "paquetes";

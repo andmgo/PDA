@@ -90,6 +90,9 @@ public class SecurityConfig {
                 .requestMatchers("/misVisitas")
                     .access(permiso("VISITAS", false))
 
+                .requestMatchers("/misPaquetes")
+                    .access(permiso("MIS_PAQUETES", false))
+
                 .requestMatchers("/paquetes")
                     .access(permiso("PAQUETES", false))
 
