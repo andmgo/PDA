@@ -56,7 +56,6 @@ class RegistroParqueaderoVisitanteServiceTest {
     void crear_sinApartamento_noValidaApartamento() {
         when(residenteRepository.findById("res-1")).thenReturn(Optional.of(new ResidenteModel()));
         when(parqueaderoRepository.findById("parq-1")).thenReturn(Optional.of(new ParqueaderoModel()));
-        when(registroRepository.existsByIdResidenteAndIdParqueadero("res-1", "parq-1")).thenReturn(false);
 
         RegistroParqueaderoVisitanteModel registro = new RegistroParqueaderoVisitanteModel();
         registro.setFechaHoraEntrada("2026-01-01 10:00:00");
@@ -71,18 +70,36 @@ class RegistroParqueaderoVisitanteServiceTest {
     }
 
     @Test
-    void crear_registroActivoDuplicado_lanzaExcepcion() {
+    void crear_parqueaderoOcupadoPorOtroVisitante_lanzaExcepcion() {
         when(residenteRepository.findById("res-1")).thenReturn(Optional.of(new ResidenteModel()));
         when(parqueaderoRepository.findById("parq-1")).thenReturn(Optional.of(new ParqueaderoModel()));
-        when(registroRepository.existsByIdResidenteAndIdParqueadero("res-1", "parq-1")).thenReturn(true);
+        when(registroRepository.findByIdResidenteAndFechaHoraSalidaIsNull("res-1")).thenReturn(java.util.List.of());
+        when(registroRepository.countActivosByIdParqueadero("parq-1")).thenReturn(1L);
 
         RegistroParqueaderoVisitanteModel registro = new RegistroParqueaderoVisitanteModel();
         registro.setFechaHoraEntrada("2026-01-01 10:00:00");
 
         assertThatThrownBy(() -> registroParqueaderoVisitanteService.crear(registro, "res-1", "parq-1", null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Ya existe un registro");
+                .hasMessageContaining("ocupado");
 
+        verify(registroRepository, never()).save(any());
+    }
+
+    @Test
+    void crear_parqueaderoDesactivado_lanzaExcepcion() {
+        ParqueaderoModel parqueadero = new ParqueaderoModel();
+        parqueadero.setNumero("P-01");
+        parqueadero.setActivo(false);
+        when(residenteRepository.findById("res-1")).thenReturn(Optional.of(new ResidenteModel()));
+        when(parqueaderoRepository.findById("parq-1")).thenReturn(Optional.of(parqueadero));
+
+        RegistroParqueaderoVisitanteModel registro = new RegistroParqueaderoVisitanteModel();
+        registro.setFechaHoraEntrada("2026-01-01 10:00:00");
+
+        assertThatThrownBy(() -> registroParqueaderoVisitanteService.crear(registro, "res-1", "parq-1", null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("desactivado");
         verify(registroRepository, never()).save(any());
     }
 

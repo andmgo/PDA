@@ -82,6 +82,19 @@ class PaqueteServiceTest {
     }
 
     @Test
+    void registrar_apartamentoDesactivado_rechaza() {
+        ApartamentoModel apto = new ApartamentoModel();
+        apto.setNumero("301");
+        apto.setActivo(false);
+        when(apartamentoRepository.findById("apto-1")).thenReturn(Optional.of(apto));
+
+        assertThatThrownBy(() -> paqueteService.registrar("apto-1", "Juan Pérez", "123456"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("desactivado");
+        verifyNoInteractions(paqueteRepository);
+    }
+
+    @Test
     void registrarPorNumeroApartamento_inexistente_noEncontrado() {
         when(apartamentoRepository.findByNumero("999")).thenReturn(Optional.empty());
 

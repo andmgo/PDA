@@ -29,13 +29,15 @@ public class RegistroVisitanteService {
         if (apartamentoId == null)
             throw new IllegalArgumentException("El ID del apartamento es obligatorio");
 
-        residenteRepository.findById(residenteId)
-                .orElseThrow(() -> new NotFoundException("No se encontró el residente con ID: " + residenteId));
-        apartamentoRepository.findById(apartamentoId)
-                .orElseThrow(() -> new NotFoundException("No se encontró el apartamento con ID: " + apartamentoId));
+        RequiereActivo.residente(residenteRepository.findById(residenteId)
+                .orElseThrow(() -> new NotFoundException("No se encontró el residente con ID: " + residenteId)));
+        RequiereActivo.apartamento(apartamentoRepository.findById(apartamentoId)
+                .orElseThrow(() -> new NotFoundException("No se encontró el apartamento con ID: " + apartamentoId)));
 
-        if (registroVisitanteRepository.existsByIdResidenteAndIdApartamento(residenteId, apartamentoId))
-            throw new IllegalArgumentException("Ya existe un registro para este residente en este apartamento");
+        // Antes: existsByIdResidenteAndIdApartamento → un visitante no podía volver
+        // NUNCA al mismo apartamento. Solo se bloquea a quien sigue adentro.
+        if (!registroVisitanteRepository.findByIdResidenteAndFechaHoraSalidaIsNull(residenteId).isEmpty())
+            throw new IllegalArgumentException("Este visitante ya está dentro del conjunto; registra su salida primero");
 
         if (registro.getFechaHoraEntrada() == null || registro.getFechaHoraEntrada().trim().isEmpty())
             throw new IllegalArgumentException("La fecha y hora de entrada es obligatoria");

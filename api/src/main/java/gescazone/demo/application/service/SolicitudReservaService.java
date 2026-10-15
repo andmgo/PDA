@@ -50,10 +50,10 @@ public class SolicitudReservaService {
             throw new IllegalArgumentException(
                     "Esa fecha ya está dentro del año actual — puedes reservarla directamente, no hace falta una solicitud.");
 
-        usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new NotFoundException("No existe un usuario con el ID: " + idUsuario));
-        salonRepository.findById(idSalon)
-                .orElseThrow(() -> new NotFoundException("No existe un salón con el ID: " + idSalon));
+        RequiereActivo.usuario(usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new NotFoundException("No existe un usuario con el ID: " + idUsuario)));
+        RequiereActivo.salon(salonRepository.findById(idSalon)
+                .orElseThrow(() -> new NotFoundException("No existe un salón con el ID: " + idSalon)));
 
         SolicitudReservaModel solicitud = new SolicitudReservaModel(idUsuario, idSalon, fechaSolicitada, justificacion);
         solicitud.setFechaCreacion(LocalDateTime.now());

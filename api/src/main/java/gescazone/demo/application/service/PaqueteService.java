@@ -26,8 +26,8 @@ public class PaqueteService {
         if (cedulaReceptor == null || cedulaReceptor.isBlank())
             throw new IllegalArgumentException("La cédula de quien recibe el paquete es obligatoria");
 
-        apartamentoRepository.findById(idApartamento)
-                .orElseThrow(() -> new NotFoundException("No existe un apartamento con el ID: " + idApartamento));
+        RequiereActivo.apartamento(apartamentoRepository.findById(idApartamento)
+                .orElseThrow(() -> new NotFoundException("No existe un apartamento con el ID: " + idApartamento)));
 
         PaqueteModel paquete = new PaqueteModel(idApartamento, nombreReceptor.trim(), cedulaReceptor.trim());
         paqueteRepository.save(paquete);

@@ -33,17 +33,21 @@ public class RegistroParqueaderoVisitanteService {
         if (idParqueadero == null)
             throw new IllegalArgumentException("El ID del parqueadero es obligatorio");
 
-        residenteRepository.findById(idResidente)
-                .orElseThrow(() -> new NotFoundException("No se encontró el residente con ID: " + idResidente));
-        parqueaderoRepository.findById(idParqueadero)
-                .orElseThrow(() -> new NotFoundException("No se encontró el parqueadero con ID: " + idParqueadero));
+        RequiereActivo.residente(residenteRepository.findById(idResidente)
+                .orElseThrow(() -> new NotFoundException("No se encontró el residente con ID: " + idResidente)));
+        RequiereActivo.parqueadero(parqueaderoRepository.findById(idParqueadero)
+                .orElseThrow(() -> new NotFoundException("No se encontró el parqueadero con ID: " + idParqueadero)));
 
         if (idApartamento != null)
-            apartamentoRepository.findById(idApartamento)
-                    .orElseThrow(() -> new NotFoundException("No se encontró el apartamento con ID: " + idApartamento));
+            RequiereActivo.apartamento(apartamentoRepository.findById(idApartamento)
+                    .orElseThrow(() -> new NotFoundException("No se encontró el apartamento con ID: " + idApartamento)));
 
-        if (registroRepository.existsByIdResidenteAndIdParqueadero(idResidente, idParqueadero))
-            throw new IllegalArgumentException("Ya existe un registro para este residente en este parqueadero");
+        // Antes: existsByIdResidenteAndIdParqueadero → nunca podía volver a usar ese
+        // parqueadero. Solo se bloquea si sigue adentro o el parqueadero está ocupado.
+        if (!registroRepository.findByIdResidenteAndFechaHoraSalidaIsNull(idResidente).isEmpty())
+            throw new IllegalArgumentException("Este visitante ya está dentro del conjunto; registra su salida primero");
+        if (registroRepository.countActivosByIdParqueadero(idParqueadero) > 0)
+            throw new IllegalArgumentException("Ese parqueadero está ocupado por otro visitante");
 
         if (registro.getFechaHoraEntrada() == null || registro.getFechaHoraEntrada().trim().isEmpty())
             throw new IllegalArgumentException("La fecha y hora de entrada es obligatoria");

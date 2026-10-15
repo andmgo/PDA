@@ -145,8 +145,7 @@ public class VisitaService {
             throw new ValidationException("Indica a qué apartamento va el visitante");
         ApartamentoModel apartamento = apartamentoRepository.findByNumero(datos.numeroApartamento().trim().toUpperCase(Locale.ROOT))
                 .orElseThrow(() -> new NotFoundException("El apartamento " + datos.numeroApartamento().trim() + " no existe"));
-        if (!apartamento.isActivo())
-            throw new ValidationException("El apartamento " + apartamento.getNumero() + " está desactivado");
+        RequiereActivo.apartamento(apartamento);
 
         ResidenteModel visitante = residenteRepository.findByNumeroDocumento(documento)
                 .orElseGet(() -> crearVisitante(documento, datos));

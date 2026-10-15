@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -54,6 +55,16 @@ public class AuthController {
 
     @Value("${internal.api-key}")
     private String internalApiKey;
+
+    /**
+     * Comprobación liviana de que la cuenta del JWT sigue activa. Si fue
+     * desactivada, JwtAuthenticationFilter responde 401 antes de llegar aquí;
+     * gescazone-web la consulta periódicamente para cerrar sesiones abiertas.
+     */
+    @GetMapping("/estado")
+    public ResponseEntity<String> estado() {
+        return ResponseEntity.ok("ACTIVA");
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> datos) {

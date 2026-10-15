@@ -47,6 +47,12 @@ document.getElementById('numeroSalon').addEventListener('input', function () {
             const response = await fetch(`/api/salones/${numero}`);
             if (response.ok) {
                 const salon = await response.json();
+                if (salon.activo === false) {
+                    salonValidado = null;
+                    errorSpan.textContent = 'Este salón está desactivado y no se puede reservar';
+                    successSpan.classList.add('hidden');
+                    return;
+                }
                 salonValidado = salon;
                 document.getElementById('medidasSalonEncontrado').textContent =
                     `${salon.medidas} m² - ${salon.estado?.nombre || 'Sin estado'}`;

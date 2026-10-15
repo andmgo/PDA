@@ -28,6 +28,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     private static final String PREFIJO_BEARER = "Bearer ";
+    /** Cuerpo de la respuesta 401 cuando la cuenta fue desactivada (lo lee gescazone-web). */
+    public static final String CUENTA_DESACTIVADA = "CUENTA_DESACTIVADA";
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -49,6 +51,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 String numeroDocumento = jwtTokenProvider.getNumeroDocumentoFromToken(token);
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(numeroDocumento);
+
+                // Un token emitido ANTES de desactivar la cuenta sigue siendo
+                // válido por firma hasta que vence (24 h). Como el usuario ya se
+                // carga de la BD en cada petición, aquí se corta en seco: 401
+                // con un código que gescazone-web reconoce para cerrar la sesión.
+                if (!userDetails.isEnabled()) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("text/plain;charset=UTF-8");
+                    response.getWriter().write(CUENTA_DESACTIVADA);
+                    return;
+                }
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(

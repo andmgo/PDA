@@ -128,8 +128,8 @@ public class PropiedadService {
         vehiculo.setMarca(textoOpcional(marca));
         vehiculo.setColor(textoOpcional(color));
         if (numeroParqueadero != null && !numeroParqueadero.isBlank()) {
-            ParqueaderoModel parqueadero = parqueaderoRepository.findByNumero(numeroParqueadero.trim().toUpperCase(Locale.ROOT))
-                    .orElseThrow(() -> new NotFoundException("El parqueadero " + numeroParqueadero + " no existe"));
+            ParqueaderoModel parqueadero = RequiereActivo.parqueadero(parqueaderoRepository.findByNumero(numeroParqueadero.trim().toUpperCase(Locale.ROOT))
+                    .orElseThrow(() -> new NotFoundException("El parqueadero " + numeroParqueadero + " no existe")));
             vehiculo.setIdParqueadero(parqueadero.getId());
         }
 
@@ -158,9 +158,7 @@ public class PropiedadService {
 
     private ApartamentoModel apartamentoActivo(String idApartamento) {
         ApartamentoModel apartamento = apartamentoExistente(idApartamento);
-        if (!apartamento.isActivo())
-            throw new ValidationException("El apartamento " + apartamento.getNumero() + " está desactivado");
-        return apartamento;
+        return RequiereActivo.apartamento(apartamento);
     }
 
     private DetalleApartamento armarDetalle(ApartamentoModel apartamento) {

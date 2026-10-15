@@ -25,11 +25,11 @@ public class RegistroAccesoPiscinaService {
     private ResidenteRepository residenteRepository;
 
     public String registrarIngreso(String numeroApartamento, Integer numeroDocumento) {
-        ApartamentoModel apartamento = apartamentoRepository.findByNumero(numeroApartamento)
-                .orElseThrow(() -> new NotFoundException("No existe el apartamento: " + numeroApartamento));
+        ApartamentoModel apartamento = RequiereActivo.apartamento(apartamentoRepository.findByNumero(numeroApartamento)
+                .orElseThrow(() -> new NotFoundException("No existe el apartamento: " + numeroApartamento)));
 
-        ResidenteModel residente = residenteRepository.findByNumeroDocumento(numeroDocumento)
-                .orElseThrow(() -> new NotFoundException("No existe el residente con documento: " + numeroDocumento));
+        ResidenteModel residente = RequiereActivo.residente(residenteRepository.findByNumeroDocumento(numeroDocumento)
+                .orElseThrow(() -> new NotFoundException("No existe el residente con documento: " + numeroDocumento)));
 
         RegistroAccesoPiscinaModel registro = new RegistroAccesoPiscinaModel(
                 apartamento.getId(), residente.getId());
@@ -72,11 +72,11 @@ public class RegistroAccesoPiscinaService {
             .orElseThrow(() -> new NotFoundException("No existe el registro con ID: " + id));
 
     // Validar que existan
-    residenteRepository.findById(idResidente)
-            .orElseThrow(() -> new NotFoundException("Residente no encontrado"));
+    RequiereActivo.residente(residenteRepository.findById(idResidente)
+            .orElseThrow(() -> new NotFoundException("Residente no encontrado")));
 
-    apartamentoRepository.findById(idApartamento)
-            .orElseThrow(() -> new NotFoundException("Apartamento no encontrado"));
+    RequiereActivo.apartamento(apartamentoRepository.findById(idApartamento)
+            .orElseThrow(() -> new NotFoundException("Apartamento no encontrado")));
 
     registro.setIdResidente(idResidente);
     registro.setIdApartamento(idApartamento);

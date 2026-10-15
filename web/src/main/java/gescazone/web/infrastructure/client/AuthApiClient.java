@@ -4,6 +4,7 @@ import gescazone.web.dto.LoginResultado;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import java.util.Map;
@@ -45,6 +46,26 @@ public class AuthApiClient {
                 .body(Map.of("correo", correo))
                 .retrieve()
                 .body(LoginResultado.class);
+    }
+
+    /**
+     * ¿La cuenta dueña de este JWT sigue activa? false solo si el API responde
+     * 401 (cuenta desactivada o token ya inválido). Ante cualquier otro error
+     * (API caída, etc.) devuelve true para no sacar a nadie por una falla ajena.
+     */
+    public boolean cuentaActiva(String jwt) {
+        try {
+            restClient.get()
+                    .uri("/api/auth/estado")
+                    .header("Authorization", "Bearer " + jwt)
+                    .retrieve()
+                    .toBodilessEntity();
+            return true;
+        } catch (HttpClientErrorException.Unauthorized e) {
+            return false;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     /**

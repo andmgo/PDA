@@ -65,10 +65,10 @@ public class ReservaSalonSocialService {
                     "Solo se permiten reservas dentro del año actual (" + LocalDate.now().getYear() +
                     "). Para reservar en otro año, envía una solicitud de excepción para que un administrador la apruebe.");
 
-        salonRepository.findById(reserva.getIdSalon())
-                .orElseThrow(() -> new NotFoundException("El salón especificado no existe"));
-        usuarioRepository.findById(reserva.getIdUsuario())
-                .orElseThrow(() -> new NotFoundException("El usuario especificado no existe"));
+        RequiereActivo.salon(salonRepository.findById(reserva.getIdSalon())
+                .orElseThrow(() -> new NotFoundException("El salón especificado no existe")));
+        RequiereActivo.usuario(usuarioRepository.findById(reserva.getIdUsuario())
+                .orElseThrow(() -> new NotFoundException("El usuario especificado no existe")));
 
         boolean esNuevaReserva = reserva.getId() == null;
         boolean debeValidarDisponibilidad = esNuevaReserva;
@@ -105,10 +105,10 @@ public class ReservaSalonSocialService {
         if (idSalon == null)
             throw new IllegalArgumentException("El ID del salón es obligatorio");
 
-        usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new NotFoundException("No existe un usuario con el ID: " + idUsuario));
-        salonRepository.findById(idSalon)
-                .orElseThrow(() -> new NotFoundException("No existe un salón con el ID: " + idSalon));
+        RequiereActivo.usuario(usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new NotFoundException("No existe un usuario con el ID: " + idUsuario)));
+        RequiereActivo.salon(salonRepository.findById(idSalon)
+                .orElseThrow(() -> new NotFoundException("No existe un salón con el ID: " + idSalon)));
 
         reserva.setIdUsuario(idUsuario);
         reserva.setIdSalon(idSalon);

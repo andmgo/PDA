@@ -48,18 +48,50 @@ class RegistroVisitanteServiceTest {
     }
 
     @Test
-    void crear_yaExisteRegistroActivo_lanzaExcepcion() {
+    void crear_visitanteQueSigueAdentro_lanzaExcepcion() {
         when(residenteRepository.findById("res-1")).thenReturn(Optional.of(new ResidenteModel()));
         when(apartamentoRepository.findById("apto-1")).thenReturn(Optional.of(new ApartamentoModel()));
-        when(registroVisitanteRepository.existsByIdResidenteAndIdApartamento("res-1", "apto-1")).thenReturn(true);
+        when(registroVisitanteRepository.findByIdResidenteAndFechaHoraSalidaIsNull("res-1"))
+                .thenReturn(java.util.List.of(new RegistroVisitanteModel("res-1", "apto-2", "2026-01-01 08:00:00")));
 
         RegistroVisitanteModel registro = new RegistroVisitanteModel();
         registro.setFechaHoraEntrada("2026-01-01 10:00:00");
 
         assertThatThrownBy(() -> registroVisitanteService.crear(registro, "res-1", "apto-1"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Ya existe un registro");
+                .hasMessageContaining("ya está dentro");
 
+        verify(registroVisitanteRepository, never()).save(any());
+    }
+
+    @Test
+    void crear_visitanteQueYaVinoYSalio_puedeVolver() {
+        // Antes fallaba con "Ya existe un registro para este residente en este apartamento"
+        when(residenteRepository.findById("res-1")).thenReturn(Optional.of(new ResidenteModel()));
+        when(apartamentoRepository.findById("apto-1")).thenReturn(Optional.of(new ApartamentoModel()));
+        when(registroVisitanteRepository.findByIdResidenteAndFechaHoraSalidaIsNull("res-1")).thenReturn(java.util.List.of());
+
+        RegistroVisitanteModel registro = new RegistroVisitanteModel();
+        registro.setFechaHoraEntrada("2026-01-01 10:00:00");
+
+        registroVisitanteService.crear(registro, "res-1", "apto-1");
+        verify(registroVisitanteRepository).save(registro);
+    }
+
+    @Test
+    void crear_apartamentoDesactivado_lanzaExcepcion() {
+        ApartamentoModel apto = new ApartamentoModel();
+        apto.setNumero("301");
+        apto.setActivo(false);
+        when(residenteRepository.findById("res-1")).thenReturn(Optional.of(new ResidenteModel()));
+        when(apartamentoRepository.findById("apto-1")).thenReturn(Optional.of(apto));
+
+        RegistroVisitanteModel registro = new RegistroVisitanteModel();
+        registro.setFechaHoraEntrada("2026-01-01 10:00:00");
+
+        assertThatThrownBy(() -> registroVisitanteService.crear(registro, "res-1", "apto-1"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("desactivado");
         verify(registroVisitanteRepository, never()).save(any());
     }
 
@@ -67,7 +99,6 @@ class RegistroVisitanteServiceTest {
     void crear_sinFechaHoraEntrada_lanzaExcepcion() {
         when(residenteRepository.findById("res-1")).thenReturn(Optional.of(new ResidenteModel()));
         when(apartamentoRepository.findById("apto-1")).thenReturn(Optional.of(new ApartamentoModel()));
-        when(registroVisitanteRepository.existsByIdResidenteAndIdApartamento("res-1", "apto-1")).thenReturn(false);
 
         RegistroVisitanteModel registro = new RegistroVisitanteModel();
 
@@ -80,7 +111,6 @@ class RegistroVisitanteServiceTest {
     void crear_valido_guardaConIdsAsignados() {
         when(residenteRepository.findById("res-1")).thenReturn(Optional.of(new ResidenteModel()));
         when(apartamentoRepository.findById("apto-1")).thenReturn(Optional.of(new ApartamentoModel()));
-        when(registroVisitanteRepository.existsByIdResidenteAndIdApartamento("res-1", "apto-1")).thenReturn(false);
 
         RegistroVisitanteModel registro = new RegistroVisitanteModel();
         registro.setFechaHoraEntrada(" 2026-01-01 10:00:00 ");
