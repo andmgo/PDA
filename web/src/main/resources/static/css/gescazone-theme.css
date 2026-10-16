@@ -600,3 +600,35 @@ aside[aria-expanded] .gsz-collapse-btn:hover {
     /* Fila "Agregar varios / Nuevo …" de Gestión de Datos: que baje de línea */
     .flex-shrink-0.mt-6.flex.gap-2 { flex-wrap: wrap; max-width: 100%; }
 }
+
+/* ── Sidebar con UN solo scroll ──
+   Con el menú por secciones (más opciones) no cabe en pantallas bajas, y
+   tanto el <aside> (overflow-y-auto) como la lista interna (max-h-screen +
+   overflow-auto) se desplazaban: dos barras. Ahora el <aside> es una
+   columna que no hace scroll; el encabezado con el logo queda fijo y solo
+   la lista de opciones se desplaza. */
+aside[aria-expanded] {
+    display: flex !important;
+    flex-direction: column;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;   /* el <aside> trae items-center: encogía el encabezado */
+    overflow: hidden !important;
+    /* fixed + inset-y-0 + my-4 medía 100vh y el borde inferior quedaba fuera de pantalla */
+    height: calc(100vh - 2rem) !important;
+    height: calc(100dvh - 2rem) !important;
+}
+aside[aria-expanded] > .gsz-sidebar-header,
+aside[aria-expanded] > hr { flex: 0 0 auto; }
+aside[aria-expanded] > .h-sidenav {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(240, 201, 106, .35) transparent;
+}
+aside[aria-expanded] > .h-sidenav::-webkit-scrollbar { width: 6px; }
+aside[aria-expanded] > .h-sidenav::-webkit-scrollbar-thumb { background: rgba(240, 201, 106, .35); border-radius: 99px; }
+aside[aria-expanded] > .h-sidenav::-webkit-scrollbar-track { background: transparent; }
