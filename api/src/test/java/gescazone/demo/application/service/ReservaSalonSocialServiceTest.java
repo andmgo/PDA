@@ -35,8 +35,86 @@ class ReservaSalonSocialServiceTest {
     @Mock
     private UsuarioRepository usuarioRepository;
 
+    @Mock
+    private PermisoService permisoService;
+
     @InjectMocks
     private ReservaSalonSocialService reservaSalonSocialService;
+
+    // ── Dueño o administración (antes cualquiera con RESERVAS podía borrar la de otro) ──
+
+    private UsuarioModel usuario(String id, String documento, String rol) {
+        UsuarioModel u = new UsuarioModel();
+        u.setId(id);
+        u.setNumeroDocumento(documento);
+        gescazone.demo.domain.model.RolModel r = new gescazone.demo.domain.model.RolModel();
+        r.setNombreRol(rol);
+        u.setRol(r);
+        return u;
+    }
+
+    private ReservaSalonSocialModel reservaDe(String idUsuario, LocalDateTime fecha) {
+        ReservaSalonSocialModel r = new ReservaSalonSocialModel(idUsuario, "salon-1", fecha);
+        r.setId("res-1");
+        return r;
+    }
+
+    @Test
+    void cancelar_reservaDeOtroVecino_rechaza() {
+        when(reservaRepository.findById("res-1"))
+                .thenReturn(Optional.of(reservaDe("u-otro", LocalDateTime.now().plusDays(3))));
+        when(usuarioRepository.findByNumeroDocumento("300000001"))
+                .thenReturn(Optional.of(usuario("u-elena", "300000001", "PROPIETARIO")));
+
+        assertThatThrownBy(() -> reservaSalonSocialService.eliminarReserva("res-1", "300000001"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("tus propias reservas");
+        verify(reservaRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void cancelar_propiaFutura_laBorra() {
+        when(reservaRepository.findById("res-1"))
+                .thenReturn(Optional.of(reservaDe("u-elena", LocalDateTime.now().plusDays(3))));
+        when(usuarioRepository.findByNumeroDocumento("300000001"))
+                .thenReturn(Optional.of(usuario("u-elena", "300000001", "PROPIETARIO")));
+
+        assertThat(reservaSalonSocialService.eliminarReserva("res-1", "300000001")).contains("cancelada");
+        verify(reservaRepository).deleteById("res-1");
+    }
+
+    @Test
+    void cancelar_propiaQueYaPaso_rechaza() {
+        when(reservaRepository.findById("res-1"))
+                .thenReturn(Optional.of(reservaDe("u-elena", LocalDateTime.now().minusDays(1))));
+        when(usuarioRepository.findByNumeroDocumento("300000001"))
+                .thenReturn(Optional.of(usuario("u-elena", "300000001", "PROPIETARIO")));
+
+        assertThatThrownBy(() -> reservaSalonSocialService.eliminarReserva("res-1", "300000001"))
+                .hasMessageContaining("ya pasó");
+    }
+
+    @Test
+    void cancelar_administracion_puedeBorrarLaDeOtro() {
+        when(reservaRepository.findById("res-1"))
+                .thenReturn(Optional.of(reservaDe("u-otro", LocalDateTime.now().plusDays(3))));
+        when(usuarioRepository.findByNumeroDocumento("123456780"))
+                .thenReturn(Optional.of(usuario("u-admin", "123456780", "ADMINISTRADOR")));
+        when(permisoService.tienePermiso("ADMINISTRADOR", "GESTION_DATOS", gescazone.demo.domain.model.NivelPermiso.EDITAR))
+                .thenReturn(true);
+
+        reservaSalonSocialService.eliminarReserva("res-1", "123456780");
+        verify(reservaRepository).deleteById("res-1");
+    }
+
+    @Test
+    void diasOcupados_soloFechas_sinRepetir() {
+        LocalDateTime dia = LocalDateTime.now().plusDays(5).withHour(18);
+        when(reservaRepository.findReservasFuturasPorSalon(eq("salon-1"), any()))
+                .thenReturn(java.util.List.of(reservaDe("a", dia), reservaDe("b", dia.withHour(10))));
+
+        assertThat(reservaSalonSocialService.diasOcupados("salon-1")).containsExactly(dia.toLocalDate());
+    }
 
     private ReservaSalonSocialModel reservaValida(LocalDateTime fecha) {
         return new ReservaSalonSocialModel("usuario-1", "salon-1", fecha);

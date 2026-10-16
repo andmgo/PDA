@@ -92,9 +92,22 @@ public class ReservaSalonSocialRestController {
                 .body(reservaService.crearPropia(authentication.getName(), idSalon, LocalDateTime.parse(fechaHoraStr)));
     }
 
+    /** Reservas de la cuenta del JWT (app: "Mis reservas"). */
+    @GetMapping("/mias")
+    public ResponseEntity<List<ReservaSalonSocialService.MiReserva>> mias(Authentication authentication) {
+        return ResponseEntity.ok(reservaService.misReservas(authentication.getName()));
+    }
+
+    /** Días ocupados de un salón desde hoy, sin datos de quién reservó. */
+    @GetMapping("/salon/{idSalon}/ocupados")
+    public ResponseEntity<List<java.time.LocalDate>> ocupados(@PathVariable String idSalon) {
+        return ResponseEntity.ok(reservaService.diasOcupados(idSalon));
+    }
+
     @PutMapping("/actualizar/{id}")
     public ResponseEntity<String> actualizar(@PathVariable String id,
-                                             @RequestBody Map<String, Object> datos) {
+                                             @RequestBody Map<String, Object> datos,
+                                             Authentication authentication) {
         String idUsuario    = (String) datos.get("idUsuario");
         String idSalon      = (String) datos.get("idSalon");
         String fechaHoraStr = (String) datos.get("fechaYHoraReserva");
@@ -110,12 +123,13 @@ public class ReservaSalonSocialRestController {
                 idUsuario, idSalon, LocalDateTime.parse(fechaHoraStr));
         reserva.setId(id);
 
-        return ResponseEntity.ok(reservaService.guardarReserva(reserva));
+        return ResponseEntity.ok(reservaService.actualizarReserva(reserva, authentication.getName()));
     }
 
+    /** Solo el dueño (si aún no pasó) o la administración. */
     @DeleteMapping("/eliminar/{id}")
-    public ResponseEntity<String> eliminar(@PathVariable String id) {
-        return ResponseEntity.ok(reservaService.eliminarReserva(id));
+    public ResponseEntity<String> eliminar(@PathVariable String id, Authentication authentication) {
+        return ResponseEntity.ok(reservaService.eliminarReserva(id, authentication.getName()));
     }
 
     /**

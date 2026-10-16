@@ -1,6 +1,8 @@
 package gescazone.demo.application.service;
 
 import gescazone.demo.application.exception.NotFoundException;
+import gescazone.demo.application.exception.ValidationException;
+import gescazone.demo.domain.model.NivelPermiso;
 import gescazone.demo.domain.model.ReservaSalonSocialModel;
 import gescazone.demo.domain.model.UsuarioModel;
 import gescazone.demo.domain.repository.ReservaSalonSocialRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -22,6 +25,84 @@ public class ReservaSalonSocialService {
     private SalonSocialRepository salonRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PermisoService permisoService;
+
+    /** Reserva como la ve su dueño en "Mis reservas" (app). */
+    public record MiReserva(String id, String idSalon, String numeroSalon, LocalDateTime fechaYHora, boolean pasada) {}
+
+    /** Reservas de la persona logueada: próximas primero, luego las pasadas (máximo 30). */
+    public List<MiReserva> misReservas(String numeroDocumento) {
+        UsuarioModel usuario = usuarioRepository.findByNumeroDocumento(numeroDocumento)
+                .orElseThrow(() -> new NotFoundException("Usuario autenticado no encontrado"));
+        LocalDateTime ahora = LocalDateTime.now();
+        Comparator<ReservaSalonSocialModel> orden = Comparator
+                .comparing((ReservaSalonSocialModel r) -> r.getFechaYHoraReserva().isBefore(ahora))
+                .thenComparing((a, b) -> a.getFechaYHoraReserva().isBefore(ahora)
+                        ? b.getFechaYHoraReserva().compareTo(a.getFechaYHoraReserva())
+                        : a.getFechaYHoraReserva().compareTo(b.getFechaYHoraReserva()));
+        return reservaRepository.findByIdUsuario(usuario.getId()).stream()
+                .sorted(orden).limit(30)
+                .map(r -> new MiReserva(r.getId(), r.getIdSalon(), numeroSalon(r.getIdSalon()),
+                        r.getFechaYHoraReserva(), r.getFechaYHoraReserva().isBefore(ahora)))
+                .toList();
+    }
+
+    /**
+     * Días ya reservados de un salón (desde hoy), para deshabilitarlos en el
+     * calendario. Sin datos de quién reservó: el propietario no necesita
+     * conocer las reservas de sus vecinos.
+     */
+    public List<LocalDate> diasOcupados(String idSalon) {
+        if (idSalon == null || idSalon.isBlank())
+            throw new ValidationException("Indica el salón");
+        return reservaRepository.findReservasFuturasPorSalon(idSalon, LocalDate.now().atStartOfDay()).stream()
+                .map(r -> r.getFechaYHoraReserva().toLocalDate())
+                .distinct().sorted().toList();
+    }
+
+    /**
+     * Antes cualquiera con el permiso RESERVAS podía borrar o cambiar la
+     * reserva de otro (bastaba conocer su ID). Ahora solo su dueño o quien
+     * administra (GESTION_DATOS editar); el dueño no puede tocar una reserva
+     * que ya pasó.
+     */
+    private void exigirDuenoOAdministracion(ReservaSalonSocialModel reserva, String documentoSolicitante) {
+        UsuarioModel solicitante = usuarioRepository.findByNumeroDocumento(documentoSolicitante)
+                .orElseThrow(() -> new NotFoundException("Usuario autenticado no encontrado"));
+        if (esAdministracion(solicitante)) return;
+        if (!solicitante.getId().equals(reserva.getIdUsuario()))
+            throw new ValidationException("Solo puedes modificar o cancelar tus propias reservas");
+        if (reserva.getFechaYHoraReserva().isBefore(LocalDateTime.now()))
+            throw new ValidationException("Esta reserva ya pasó");
+    }
+
+    private boolean esAdministracion(UsuarioModel usuario) {
+        return usuario.getRol() != null
+                && permisoService.tienePermiso(usuario.getRol().getNombreRol(), "GESTION_DATOS", NivelPermiso.EDITAR);
+    }
+
+    /** Cancelar / eliminar con la regla de dueño o administración. */
+    public String eliminarReserva(String id, String documentoSolicitante) {
+        if (id == null)
+            throw new IllegalArgumentException("El ID no puede ser nulo");
+        ReservaSalonSocialModel reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("No existe una reserva con el ID: " + id));
+        exigirDuenoOAdministracion(reserva, documentoSolicitante);
+        reservaRepository.deleteById(id);
+        return "Reserva cancelada";
+    }
+
+    /** Actualizar con la regla de dueño o administración; el dueño no puede pasarla a otra persona. */
+    public String actualizarReserva(ReservaSalonSocialModel cambios, String documentoSolicitante) {
+        ReservaSalonSocialModel existente = reservaRepository.findById(cambios.getId())
+                .orElseThrow(() -> new NotFoundException("La reserva a actualizar no existe"));
+        exigirDuenoOAdministracion(existente, documentoSolicitante);
+        UsuarioModel solicitante = usuarioRepository.findByNumeroDocumento(documentoSolicitante).orElseThrow();
+        if (!esAdministracion(solicitante)) cambios.setIdUsuario(existente.getIdUsuario());
+        return guardarReserva(cambios);
+    }
 
     public List<ReservaSalonSocialModel> listarReservas() {
         return reservaRepository.findAll();
@@ -134,15 +215,6 @@ public class ReservaSalonSocialService {
         reserva.setIdUsuario(idUsuario);
         reserva.setIdSalon(idSalon);
         return guardarReserva(reserva);
-    }
-
-    public String eliminarReserva(String id) {
-        if (id == null)
-            throw new IllegalArgumentException("El ID no puede ser nulo");
-        reservaRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("No existe una reserva con el ID: " + id));
-        reservaRepository.deleteById(id);
-        return "Reserva eliminada exitosamente";
     }
 
     public List<ReservaSalonSocialModel> buscarPorIdSalon(String idSalon) {
