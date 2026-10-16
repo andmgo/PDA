@@ -165,6 +165,7 @@ public class CarteraService {
                 .orElseThrow(() -> new NotFoundException("El apartamento no existe"));
         List<CargoModel> cargos = carteraRepository.cargosVigentes(List.of(idApartamento));
         List<String> ids = cargos.stream().map(CargoModel::getId).toList();
+        conciliarPendientes(carteraRepository.pagosDeCargos(ids));
         List<PagoModel> pagos = carteraRepository.pagosDeCargos(ids);
         Map<String, BigDecimal> pagado = carteraRepository.pagadoPorCargo(ids);
         LocalDate hoy = hoy();
@@ -261,6 +262,26 @@ public class CarteraService {
     public String procesarEvento(Map<String, Object> evento) {
         if (!pasarela.eventoAutentico(evento)) throw new ValidationException("Evento con firma inválida");
         return pasarela.transaccionDeEvento(evento).map(this::aplicar).orElse("Evento ignorado");
+    }
+
+    /**
+     * Pagos en línea que siguen "en proceso": se le pregunta a la pasarela
+     * por su referencia. Cubre el regreso sin URL (en local Wompi no acepta
+     * http) y un evento que nunca llegó. Un error de la pasarela no impide
+     * mostrar el estado de cuenta.
+     */
+    void conciliarPendientes(List<PagoModel> pagos) {
+        if (!pasarela.configurada()) return;
+        for (PagoModel p : pagos) {
+            if (p.getMedio() != PagoModel.Medio.WOMPI || p.getEstado() != PagoModel.Estado.PENDIENTE) continue;
+            try {
+                pasarela.buscarPorReferencia(p.getReferencia(), p.getFechaCreacion().toLocalDate())
+                        .filter(PasarelaPagos.Transaccion::final_)
+                        .ifPresent(this::aplicar);
+            } catch (RuntimeException e) {
+                // se reintenta en la próxima consulta
+            }
+        }
     }
 
     private String aplicar(PasarelaPagos.Transaccion t) {

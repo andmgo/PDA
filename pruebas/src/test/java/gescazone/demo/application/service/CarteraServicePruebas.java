@@ -209,6 +209,31 @@ class CarteraServicePruebas {
         }
 
         @Test
+        @DisplayName("al consultar el estado de cuenta se concilian los pagos que quedaron en proceso")
+        void conciliaPendientes() {
+            PagoModel pendiente = PagoModel.enLinea("c1", CUOTA, "u1");
+            PagoModel manual = PagoModel.manual("c1", CUOTA, PagoModel.Medio.EFECTIVO, null, "u-admin");
+            when(pasarela.configurada()).thenReturn(true);
+            when(pasarela.buscarPorReferencia(any(), any())).thenReturn(Optional.of(
+                    new PasarelaPagos.Transaccion("tx-9", pendiente.getReferencia(), 35_000_000L, true, true)));
+            when(carteraRepository.pagoPorReferencia(pendiente.getReferencia())).thenReturn(Optional.of(pendiente));
+            when(carteraRepository.cargo("c1")).thenReturn(Optional.of(cargo("c1", "a1", HOY)));
+
+            cartera.conciliarPendientes(List.of(pendiente, manual));
+
+            assertThat(pendiente.getEstado()).isEqualTo(PagoModel.Estado.APROBADO);
+            verify(pasarela, times(1)).buscarPorReferencia(any(), any());
+        }
+
+        @Test
+        @DisplayName("si la pasarela falla, el estado de cuenta igual se muestra")
+        void conciliacionTolerante() {
+            when(pasarela.configurada()).thenReturn(true);
+            when(pasarela.buscarPorReferencia(any(), any())).thenThrow(new IllegalStateException("caída"));
+            cartera.conciliarPendientes(List.of(PagoModel.enLinea("c1", CUOTA, "u1")));
+        }
+
+        @Test
         @DisplayName("un evento con firma inválida no toca ningún pago")
         void eventoFalso() {
             when(pasarela.eventoAutentico(any())).thenReturn(false);

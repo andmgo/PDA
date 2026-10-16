@@ -129,12 +129,26 @@ async function pagarEnLinea(idCargo, boton) {
     try {
         const r = await enviar(`/api/pagos/cargos/${idCargo}/pagar`, 'POST',
             { urlRegreso: window.location.origin + '/pagosYCartera' });
-        window.location.href = r.url; // checkout de Wompi
+        if (window.location.protocol === "https:") {
+            window.location.href = r.url; // checkout de Wompi; vuelve con ?id=…
+            return;
+        }
+        // Sin https Wompi no acepta URL de regreso: el checkout se abre aparte
+        // y, al volver a esta pestaña, Aurum le pregunta a Wompi por el pago.
+        window.open(r.url, "_blank", "noopener");
+        boton.disabled = false;
+        esperandoPago = true;
+        aviso("Completa el pago en la pestaña de Wompi. Al volver aquí verás el saldo actualizado.", false);
     } catch (e) {
         boton.disabled = false;
         aviso(e.message, true);
     }
 }
+
+let esperandoPago = false;
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && esperandoPago) cargarMiCuenta();
+});
 
 /** Wompi vuelve con ?id=<transacción>: se confirma consultando a la pasarela. */
 async function confirmarRegreso() {

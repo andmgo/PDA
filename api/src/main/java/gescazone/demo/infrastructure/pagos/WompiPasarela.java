@@ -37,14 +37,23 @@ public class WompiPasarela implements PasarelaPagos {
     private final String llavePublica;
     private final String secretoIntegridad;
     private final String secretoEventos;
+    private final String llavePrivada;
     private final RestClient cliente;
 
+    /** Constructor para pruebas (sin llave privada). */
+    public WompiPasarela(String llavePublica, String secretoIntegridad, String secretoEventos) {
+        this(llavePublica, secretoIntegridad, secretoEventos, "");
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
     public WompiPasarela(@Value("${wompi.public-key:}") String llavePublica,
                          @Value("${wompi.integrity-secret:}") String secretoIntegridad,
-                         @Value("${wompi.events-secret:}") String secretoEventos) {
+                         @Value("${wompi.events-secret:}") String secretoEventos,
+                         @Value("${wompi.private-key:}") String llavePrivada) {
         this.llavePublica = llavePublica.trim();
         this.secretoIntegridad = secretoIntegridad.trim();
         this.secretoEventos = secretoEventos.trim();
+        this.llavePrivada = llavePrivada.trim();
         String api = this.llavePublica.startsWith("pub_prod_") ? "https://production.wompi.co/v1" : "https://sandbox.wompi.co/v1";
         this.cliente = RestClient.builder().baseUrl(api).build();
     }
@@ -63,7 +72,10 @@ public class WompiPasarela implements PasarelaPagos {
                 .queryParam("amount-in-cents", centavos)
                 .queryParam("reference", pago.getReferencia())
                 .queryParam("signature:integrity", firmaIntegridad(pago.getReferencia(), centavos, "COP", secretoIntegridad));
-        if (urlRegreso != null && !urlRegreso.isBlank()) url.queryParam("redirect-url", urlRegreso);
+        // Wompi (CloudFront) bloquea con 403 el checkout si la URL de regreso no
+        // es https (p. ej. http://localhost en desarrollo): en ese caso no se
+        // envía y el pago se concilia al volver a Aurum (buscarPorReferencia).
+        if (urlRegreso != null && urlRegreso.startsWith("https://")) url.queryParam("redirect-url", urlRegreso);
         if (correoPagador != null && !correoPagador.isBlank()) url.queryParam("customer-data:email", correoPagador);
         return url.encode().build().toUriString();
     }
@@ -78,10 +90,47 @@ public class WompiPasarela implements PasarelaPagos {
     public Optional<Transaccion> consultar(String idTransaccion) {
         if (idTransaccion == null || !idTransaccion.matches("[A-Za-z0-9-]{4,80}")) return Optional.empty();
         try {
-            Map<String, Object> r = cliente.get().uri("/transactions/{id}", idTransaccion).retrieve().body(Map.class);
+            // La consulta por id exige la llave privada (en sandbox también responde sin ella)
+            Map<String, Object> r = conLlavePrivada(cliente.get().uri("/transactions/{id}", idTransaccion))
+                    .retrieve().body(Map.class);
             return Optional.ofNullable(r).map(m -> (Map<String, Object>) m.get("data")).map(WompiPasarela::aTransaccion);
         } catch (RestClientException e) {
             log.warn("No se pudo consultar la transacción {} en Wompi: {}", idTransaccion, e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    private RestClient.RequestHeadersSpec<?> conLlavePrivada(RestClient.RequestHeadersSpec<?> peticion) {
+        return llavePrivada.isEmpty() ? peticion : peticion.header("Authorization", "Bearer " + llavePrivada);
+    }
+
+    /**
+     * GET /transactions?reference=…&from_date=…&until_date=… con la llave
+     * privada. Si hay varias (reintentos), gana una aprobada; si no, la más
+     * reciente. Sin llave privada no se puede buscar.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Optional<Transaccion> buscarPorReferencia(String referencia, java.time.LocalDate desde) {
+        if (llavePrivada.isEmpty() || referencia == null || !referencia.matches("[A-Za-z0-9-]{4,60}")) return Optional.empty();
+        try {
+            java.time.LocalDate hasta = java.time.LocalDate.now().plusDays(1);
+            Map<String, Object> r = conLlavePrivada(cliente.get().uri(u -> u.path("/transactions")
+                    .queryParam("reference", referencia)
+                    .queryParam("from_date", desde.minusDays(1).toString())
+                    .queryParam("until_date", hasta.toString())
+                    .queryParam("page", 1)
+                    .queryParam("page_size", 20)
+                    .build())).retrieve().body(Map.class);
+            if (r == null || !(r.get("data") instanceof List<?> lista)) return Optional.empty();
+            List<Transaccion> suyas = ((List<Map<String, Object>>) lista).stream()
+                    .map(WompiPasarela::aTransaccion)
+                    .filter(t -> referencia.equals(t.referencia()))
+                    .toList();
+            return suyas.stream().filter(Transaccion::aprobada).findFirst()
+                    .or(() -> suyas.isEmpty() ? Optional.empty() : Optional.of(suyas.get(0)));
+        } catch (RestClientException e) {
+            log.warn("No se pudo buscar en Wompi la referencia {}: {}", referencia, e.getMessage());
             return Optional.empty();
         }
     }

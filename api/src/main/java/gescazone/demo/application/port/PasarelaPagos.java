@@ -21,6 +21,13 @@ public interface PasarelaPagos {
     /** Estado real de una transacción, consultado directamente a la pasarela. */
     Optional<Transaccion> consultar(String idTransaccion);
 
+    /**
+     * Transacción hecha con nuestra referencia (para conciliar pagos que se
+     * quedaron "en proceso": sin URL de regreso o sin evento). Vacío si no
+     * hay, o si la pasarela no permite buscar.
+     */
+    Optional<Transaccion> buscarPorReferencia(String referencia, java.time.LocalDate desde);
+
     /** ¿El evento (webhook) viene firmado por la pasarela? */
     boolean eventoAutentico(Map<String, Object> evento);
 

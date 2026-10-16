@@ -4,3 +4,4 @@
 wompi.public-key=pub_test_PEGA_AQUI
 wompi.integrity-secret=test_integrity_PEGA_AQUI
 wompi.events-secret=test_events_PEGA_AQUI
+wompi.private-key=prv_test_PEGA_AQUI

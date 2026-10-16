@@ -26,6 +26,21 @@ class WompiPasarelaPruebas {
     }
 
     @Test
+    @DisplayName("la URL de regreso solo se envía si es https (Wompi bloquea con 403 las http)")
+    void regresoSoloHttps() {
+        PagoModel pago = PagoModel.enLinea("c1", new BigDecimal("80000"), "u1");
+        assertThat(wompi.urlCheckout(pago, null, "http://localhost:8081/pagosYCartera")).doesNotContain("redirect-url");
+        assertThat(wompi.urlCheckout(pago, null, "https://aurum.co/pagosYCartera")).contains("redirect-url=https://aurum.co/pagosYCartera");
+    }
+
+    @Test
+    @DisplayName("sin llave privada no se busca por referencia")
+    void busquedaSinLlavePrivada() {
+        assertThat(wompi.buscarPorReferencia("AUR-1234", java.time.LocalDate.now())).isEmpty();
+        assertThat(new WompiPasarela("pub_test_abc", "i", "e", "prv_test_x").buscarPorReferencia("../x", java.time.LocalDate.now())).isEmpty();
+    }
+
+    @Test
     @DisplayName("cambiar el valor cambia la firma (nadie puede pagar menos)")
     void firmaDependeDelValor() {
         assertThat(WompiPasarela.firmaIntegridad("AUR-1", 35_000_000, "COP", "s"))
