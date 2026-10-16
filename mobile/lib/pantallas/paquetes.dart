@@ -15,7 +15,6 @@ class TarjetaPaquete extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
-    final oscuro = tema.brightness == Brightness.dark;
     final entregado = p['entregado'] == true;
     final llegada = leerFechaHora(p['fechaHoraLlegada']);
     final entrega = leerFechaHora(p['fechaHoraEntrega']);
@@ -30,7 +29,7 @@ class TarjetaPaquete extends StatelessWidget {
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: entregado ? Aurum.grisTenue : (oscuro ? Aurum.lider : Aurum.noche),
+                backgroundColor: entregado ? Aurum.grisTenue : Aurum.noche,
                 child: Icon(Icons.inventory_2_outlined, size: 19, color: entregado ? Aurum.blanco : Aurum.oroClaro),
               ),
               const SizedBox(width: 12),

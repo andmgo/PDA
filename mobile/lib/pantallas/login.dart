@@ -96,16 +96,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
                             style: GoogleFonts.montserrat(fontSize: 13.5, color: Aurum.grisTenue)),
                         const SizedBox(height: 22),
                         if (_error != null) ...[
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Aurum.oroSuave,
-                              borderRadius: BorderRadius.circular(12),
-                              border: const Border(left: BorderSide(color: Aurum.oro, width: 3)),
-                            ),
-                            child: Text(_error!,
-                                style: GoogleFonts.montserrat(fontSize: 13.5, color: Aurum.noche)),
-                          ),
+                          AvisoAurum(_error!),
                           const SizedBox(height: 16),
                         ],
                         TextFormField(

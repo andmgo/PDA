@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../datos/api.dart';
 import '../datos/sesion.dart';
-import '../tema/aurum_tema.dart';
 import 'inicio.dart';
 import 'mis_visitas.dart';
 import 'perfil.dart';
@@ -102,7 +101,6 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         ),
         bottomNavigationBar: NavigationBar(
           selectedIndex: indice,
-          indicatorColor: Aurum.oro.withValues(alpha: .25),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           onDestinationSelected: (i) => setState(() {
             _actual = pestanas[i].clave;

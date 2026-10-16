@@ -119,7 +119,7 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
               child: Row(children: [
                 CircleAvatar(
                   radius: 28,
-                  backgroundColor: tema.brightness == Brightness.dark ? Aurum.lider : Aurum.noche,
+                  backgroundColor: Aurum.noche,
                   child: Text(iniciales,
                       style: GoogleFonts.montserrat(fontWeight: FontWeight.w800, fontSize: 18, color: Aurum.oroClaro)),
                 ),

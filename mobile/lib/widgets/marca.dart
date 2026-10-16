@@ -57,14 +57,19 @@ class EncabezadoAurum extends StatelessWidget {
       decoration: BoxDecoration(
         color: Aurum.noche,
         borderRadius: BorderRadius.circular(24),
-        border: oscuro ? Border.all(color: Aurum.oroClaro.withValues(alpha: .15)) : null,
+        border: Border.all(color: oscuro ? Aurum.filoOscuro : Colors.transparent),
       ),
       child: Stack(
         children: [
+          // Marca de agua: centrada en la altura y completa (antes iba con
+          // bottom negativo y la mitad inferior del isotipo quedaba recortada).
           Positioned(
-            right: -10,
-            bottom: -22,
-            child: Opacity(opacity: .07, child: Image.asset('assets/marca/aurum-isotipo.png', height: 120)),
+            right: 14,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: Opacity(opacity: .07, child: Image.asset('assets/marca/aurum-isotipo.png', height: 84)),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(22, 22, 16, 24),
@@ -131,7 +136,7 @@ class TextoOro extends StatelessWidget {
 }
 
 /// Número de apartamento: etiqueta azul noche con texto oro (como la web).
-/// En modo oscuro la tarjeta ya es azul noche: ahí la etiqueta va en azul líder.
+/// En modo oscuro lleva un filo dorado tenue para separarse de la tarjeta.
 class ChipApto extends StatelessWidget {
   final String numero;
   const ChipApto(this.numero, {super.key});
@@ -140,8 +145,10 @@ class ChipApto extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark ? Aurum.lider : Aurum.noche,
-            borderRadius: BorderRadius.circular(8)),
+          color: Aurum.noche,
+          borderRadius: BorderRadius.circular(8),
+          border: Theme.of(context).brightness == Brightness.dark ? Border.all(color: Aurum.filoOscuro) : null,
+        ),
         child: Text(numero,
             style: GoogleFonts.ibmPlexMono(fontSize: 13, fontWeight: FontWeight.w600, color: Aurum.oroClaro)),
       );
@@ -207,8 +214,9 @@ class TarjetaAccion extends StatelessWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: oscuro ? Aurum.lider : Aurum.oroSuave,
+                      color: oscuro ? Aurum.hundido : Aurum.oroSuave,
                       borderRadius: BorderRadius.circular(12),
+                      border: oscuro ? Border.all(color: Aurum.filoOscuro) : null,
                     ),
                     child: Icon(icono, size: 22, color: oscuro ? Aurum.oroClaro : Aurum.oroTexto),
                   ),
@@ -298,7 +306,9 @@ class Contador extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
       decoration: BoxDecoration(
-          color: oscuro ? Aurum.lider : Aurum.oroSuave, borderRadius: BorderRadius.circular(99)),
+          color: oscuro ? Aurum.hundido : Aurum.oroSuave,
+          borderRadius: BorderRadius.circular(99),
+          border: oscuro ? Border.all(color: Aurum.filoOscuro) : null),
       child: Text('$valor',
           style: GoogleFonts.montserrat(
               fontSize: 12.5, fontWeight: FontWeight.w700, color: oscuro ? Aurum.oroClaro : Aurum.oroTexto)),
@@ -346,14 +356,14 @@ class EtiquetaEstado extends StatelessWidget {
         ? Aurum.noche
         : apagada
             ? Theme.of(context).colorScheme.surfaceContainerHighest
-            : (oscuro ? Aurum.lider : Aurum.oroSuave);
+            : (oscuro ? Aurum.hundido : Aurum.oroSuave);
     final color = destacada ? Aurum.oroClaro : apagada ? Aurum.grisTenue : (oscuro ? Aurum.oroClaro : Aurum.oroTexto);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
       decoration: BoxDecoration(
         color: fondo,
         borderRadius: BorderRadius.circular(99),
-        border: destacada && oscuro ? Border.all(color: Aurum.oroClaro.withValues(alpha: .4)) : null,
+        border: oscuro && !apagada ? Border.all(color: destacada ? Aurum.filoDorado : Aurum.filoOscuro) : null,
       ),
       child: Text(texto.toUpperCase(),
           style: GoogleFonts.montserrat(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: .6, color: color)),
@@ -370,11 +380,16 @@ class AvatarIniciales extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iniciales = nombre.split(' ').where((p) => p.isNotEmpty).take(2).map((p) => p[0]).join().toUpperCase();
-    return CircleAvatar(
-      radius: 20,
-      backgroundColor: apagado
-          ? Aurum.grisTenue
-          : (Theme.of(context).brightness == Brightness.dark ? Aurum.lider : Aurum.noche),
+    final oscuro = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: 40,
+      height: 40,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: apagado ? Aurum.grisTenue : Aurum.noche,
+        border: oscuro && !apagado ? Border.all(color: Aurum.oroClaro.withValues(alpha: .35)) : null,
+      ),
       child: Text(iniciales,
           style: GoogleFonts.montserrat(
               fontWeight: FontWeight.w800, fontSize: 13, color: apagado ? Aurum.blanco : Aurum.oroClaro)),
