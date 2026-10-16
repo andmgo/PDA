@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        Agrupa la API y su proyecto de pruebas unitarias para construirlos
+        juntos (Maven resuelve la dependencia pruebas → api sin instalarla):
+
+            ./mvnw test                 → pruebas de la API y del proyecto pruebas/
+            ./mvnw -pl pruebas -am verify → solo pruebas/ + reporte de cobertura
+
+        La web y la app siguen construyéndose por separado (web/, mobile/).
+    -->
+    <groupId>com.tuempresa</groupId>
+    <artifactId>gescazone</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>gescazone</name>
+
+    <modules>
+        <module>api</module>
+        <module>pruebas</module>
+    </modules>
+</project>

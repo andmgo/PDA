@@ -145,6 +145,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <!-- El jar ejecutable sale como *-exec.jar; el jar normal queda
+                         disponible como dependencia para el proyecto pruebas/ -->
+                    <classifier>exec</classifier>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>

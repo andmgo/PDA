@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.0</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.tuempresa</groupId>
+    <artifactId>gescazone-pruebas</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>gescazone-pruebas</name>
+    <description>
+        Proyecto de pruebas unitarias de la API de Aurum Condominios: reglas de
+        dominio y servicios de aplicación, sin base de datos ni servidor
+        (JUnit 5 + Mockito + AssertJ). Mide cobertura del código de la API
+        con JaCoCo.
+    </description>
+
+    <properties>
+        <java.version>17</java.version>
+        <jacoco.version>0.8.12</jacoco.version>
+    </properties>
+
+    <dependencies>
+        <!-- Código bajo prueba -->
+        <dependency>
+            <groupId>com.tuempresa</groupId>
+            <artifactId>gescazone-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- JUnit 5, Mockito, AssertJ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Pruebas.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>agente</id>
+                        <goals><goal>prepare-agent</goal></goals>
+                    </execution>
+                    <!-- Cobertura del código de la API (dependencia) que ejercitan estas pruebas:
+                         target/site/jacoco-aggregate/index.html -->
+                    <execution>
+                        <id>reporte</id>
+                        <phase>verify</phase>
+                        <goals><goal>report-aggregate</goal></goals>
+                        <configuration>
+                            <includeCurrentProject>true</includeCurrentProject>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
