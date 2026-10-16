@@ -185,6 +185,8 @@ void main() {
                   'autorizadaPor': 'Elena Vásquez',
                 }
               ]);
+            case '/api/accesos/visitas/apartamento/402/habitantes':
+              return json({'numeroApartamento': '402', 'propietarios': ['Pedro Salas']});
             case '/api/accesos/visitas/parqueaderos-libres':
               return json(['V-01', 'V-02']);
             case '/api/accesos/visitas/autorizada/1047888999':
@@ -198,6 +200,9 @@ void main() {
         }));
 
     testWidgets('esperados: un toque llena el formulario y el ingreso lleva la autorización', (tester) async {
+      tester.view.physicalSize = const Size(412 * 3, 1400 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
       Map<String, dynamic>? ingreso;
       await tester.pumpWidget(envolver(PantallaPorteria(api: apiPorteria(alIngresar: (b) => ingreso = b))));
       await tester.pumpAndSettle();
@@ -226,6 +231,7 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Registrar ingreso'));
       await tester.pumpAndSettle();
       expect(ingreso!['idAutorizacion'], 'aut-2');
+      expect(ingreso!['autorizadoPor'], 'Elena Vásquez'); // con visita autorizada lo pone el propietario
       expect(ingreso!['conVehiculo'], isTrue);
       expect(ingreso!['numeroApartamento'], '401');
       expect(find.textContaining('Ingreso registrado: Julián Ospina'), findsOneWidget);
@@ -239,6 +245,32 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.textContaining('autorizó Elena Vásquez'), findsOneWidget);
       expect(find.widgetWithText(TextFormField, 'Julián'), findsOneWidget);
+    });
+
+    testWidgets('sin visita autorizada: muestra quién vive en el apto y exige quién dio el paso', (tester) async {
+      Map<String, dynamic>? ingreso;
+      tester.view.physicalSize = const Size(412 * 3, 1400 * 3);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(envolver(PantallaPorteria(api: apiPorteria(alIngresar: (b) => ingreso = b))));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.widgetWithText(TextFormField, 'Documento'), '12345678');
+      await tester.enterText(find.widgetWithText(TextFormField, 'Apartamento'), '402');
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+      expect(find.text('Viven en el 402: Pedro Salas'), findsOneWidget);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Registrar ingreso'));
+      await tester.pumpAndSettle();
+      expect(find.text('Indica quién dio el paso'), findsOneWidget);
+      expect(ingreso, isNull);
+
+      await tester.tap(find.widgetWithText(ActionChip, 'Pedro Salas'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Registrar ingreso'));
+      await tester.pumpAndSettle();
+      expect(ingreso!['autorizadoPor'], 'Pedro Salas');
     });
 
     testWidgets('dentro: muestra quién autorizó', (tester) async {

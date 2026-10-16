@@ -41,6 +41,10 @@ class _PantallaPorteriaState extends State<PantallaPorteria> with SingleTickerPr
   final _apellido = TextEditingController();
   final _apto = TextEditingController();
   final _celular = TextEditingController();
+  final _autorizo = TextEditingController(); // quién dio el paso
+  bool _autorizoFijo = false; // con visita autorizada lo pone el propietario
+  ({String apto, List<String> nombres})? _habitantes; // libro de portería
+  Timer? _busquedaApto;
   final _placa = TextEditingController();
   bool _vehiculo = false;
   String _parqueadero = '';
@@ -73,8 +77,9 @@ class _PantallaPorteriaState extends State<PantallaPorteria> with SingleTickerPr
   @override
   void dispose() {
     _busqueda?.cancel();
+    _busquedaApto?.cancel();
     _pestanas.dispose();
-    for (final c in [_documento, _nombre, _apellido, _apto, _celular, _placa]) {
+    for (final c in [_documento, _nombre, _apellido, _apto, _celular, _placa, _autorizo]) {
       c.dispose();
     }
     super.dispose();
@@ -169,6 +174,9 @@ class _PantallaPorteriaState extends State<PantallaPorteria> with SingleTickerPr
     _nombre.text = '${a['nombreVisitante']}';
     _apellido.text = '${a['apellidoVisitante']}';
     _apto.text = '${a['numeroApartamento']}';
+    _autorizo.text = '${a['autorizadaPor'] ?? ''}';
+    _autorizoFijo = true;
+    _buscarHabitantes('${a['numeroApartamento']}');
     if (a['placa'] != null) {
       _placa.text = '${a['placa']}';
       _elegirVehiculo(true);
@@ -186,11 +194,40 @@ class _PantallaPorteriaState extends State<PantallaPorteria> with SingleTickerPr
     if (desdeLista) _pestanas.animateTo(0);
   }
 
+  // ── Libro de portería: quién vive en el apartamento (solo nombres) ─────
+
+  void _alEscribirApto(String texto) {
+    _busquedaApto?.cancel();
+    if (_autorizacion == null && _autorizoFijo) setState(() => _autorizoFijo = false);
+    final numero = texto.trim();
+    if (numero.isEmpty) {
+      setState(() => _habitantes = null);
+      return;
+    }
+    _busquedaApto = Timer(const Duration(milliseconds: 400), () => _buscarHabitantes(numero));
+  }
+
+  Future<void> _buscarHabitantes(String numero) async {
+    try {
+      final r = await _llamar(
+          () => widget.api.get('/api/accesos/visitas/apartamento/${Uri.encodeComponent(numero)}/habitantes'));
+      if (r is! Map || !mounted) return;
+      setState(() => _habitantes = (
+            apto: '${r['numeroApartamento']}',
+            nombres: [for (final n in (r['propietarios'] as List? ?? const [])) '$n'],
+          ));
+    } on ApiError {
+      if (mounted) setState(() => _habitantes = null);
+    }
+  }
+
   void _limpiar() {
-    for (final c in [_documento, _nombre, _apellido, _apto, _celular, _placa]) {
+    for (final c in [_documento, _nombre, _apellido, _apto, _celular, _placa, _autorizo]) {
       c.clear();
     }
     _autorizacion = null;
+    _autorizoFijo = false;
+    _habitantes = null;
     _vehiculo = false;
     _parqueadero = '';
     _estado = null;
@@ -210,6 +247,7 @@ class _PantallaPorteriaState extends State<PantallaPorteria> with SingleTickerPr
             'placa': _placa.text.trim(),
             'numeroParqueadero': _parqueadero,
             'idAutorizacion': _autorizacion?['id'],
+            'autorizadoPor': _autorizo.text.trim(),
           }));
       if (mensaje == null || !mounted) return;
       setState(() {
@@ -323,6 +361,7 @@ class _PantallaPorteriaState extends State<PantallaPorteria> with SingleTickerPr
                 controller: _apto,
                 textCapitalization: TextCapitalization.characters,
                 decoration: const InputDecoration(labelText: 'Apartamento'),
+                onChanged: _alEscribirApto,
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Obligatorio' : null,
               ),
             ),
@@ -335,6 +374,31 @@ class _PantallaPorteriaState extends State<PantallaPorteria> with SingleTickerPr
               ),
             ),
           ]),
+          if (_habitantes != null) ...[
+            const SizedBox(height: 10),
+            Text(
+              _habitantes!.nombres.isEmpty
+                  ? 'El ${_habitantes!.apto} no tiene propietarios registrados: confirma con quien esté en el apartamento.'
+                  : 'Viven en el ${_habitantes!.apto}: ${_habitantes!.nombres.join(', ')}',
+              style: GoogleFonts.montserrat(fontSize: 12.5, color: Aurum.grisTenue),
+            ),
+          ],
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: _autorizo,
+            readOnly: _autorizoFijo,
+            maxLength: 150,
+            textCapitalization: TextCapitalization.words,
+            decoration: const InputDecoration(labelText: '¿Quién autorizó el ingreso?', counterText: ''),
+            validator: (v) => (v == null || v.trim().isEmpty) ? 'Indica quién dio el paso' : null,
+          ),
+          if (!_autorizoFijo && (_habitantes?.nombres.isNotEmpty ?? false)) ...[
+            const SizedBox(height: 8),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final n in _habitantes!.nombres)
+                ActionChip(label: Text(n), onPressed: () => setState(() => _autorizo.text = n)),
+            ]),
+          ],
           const SizedBox(height: 14),
           SizedBox(
             width: double.infinity,
