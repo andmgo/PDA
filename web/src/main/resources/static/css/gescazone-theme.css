@@ -31,7 +31,7 @@
     --gsz-border: #E8E4DA;
     /* --gsz-blue/--gsz-blue-deep son de MARCA (botón primario, enlaces) y no
        cambian con el tema — solo lo que sigue abajo se redefine en oscuro. */
-    --gsz-blue: #2E3F6F;
+    --gsz-blue: #1E2A4A;
     --gsz-blue-deep: #1E2A4A;
     --gsz-blue-soft: #ECEEF4;
     --gsz-active-ink: var(--gsz-blue-deep);
@@ -42,11 +42,11 @@
 
     /* Acentos de estado — se mantienen distintos entre sí (éxito, alerta,
        error) pero apagados para no competir con el oro de marca. */
-    --gsz-violet: #2E3F6F; --gsz-violet-soft: #ECEEF4;
+    --gsz-violet: #1E2A4A; --gsz-violet-soft: #ECEEF4;
     --gsz-green:  #2F7D5B; --gsz-green-soft:  #E1F1E8;
     --gsz-amber:  #9A7420; --gsz-amber-soft:  #FBF3DF;
     --gsz-red:    #B23A3A; --gsz-red-soft:    #F8E3E1;
-    --gsz-cyan:   #2E3F6F; --gsz-cyan-soft:   #ECEEF4;
+    --gsz-cyan:   #1E2A4A; --gsz-cyan-soft:   #ECEEF4;
     --gsz-neutral: #5E6475; --gsz-neutral-soft: #F0EEE8;
 
     /* Barra lateral: azul noche en ambos temas (estructura de marca) */
@@ -54,7 +54,9 @@
     --gsz-side-ink: rgba(248, 247, 244, .80);
     --gsz-side-ink-faint: rgba(248, 247, 244, .45);
     --gsz-side-hover: rgba(255, 255, 255, .06);
-    --gsz-side-active: rgba(212, 168, 67, .16);
+    /* Activo de la barra: azul más profundo con filo dorado (el oro
+       translúcido sobre azul noche daba un café grisáceo). */
+    --gsz-side-active: #141D35;
 }
 
 /* Modo oscuro — se activa agregando la clase .dark a <html> (ver
@@ -63,23 +65,29 @@
    --gsz-blue-deep, --aurum-*) se quedan fijos a propósito. */
 :root.dark {
     --gsz-bg: #111A30;
-    --gsz-surface: #1E2A4A;
-    --gsz-surface-2: #24325A;
+    /* Superficies más profundas que la estructura (barra lateral y
+       encabezados en azul noche); sin el azul líder #2E3F6F ni #24325A,
+       que se veían "un azul más claro" que el del login. */
+    --gsz-surface: #172139;
+    --gsz-surface-2: #1B2643;
+    --gsz-hundido: #111A30;
+    --gsz-filo: rgba(240, 201, 106, .16);
+    --gsz-filo-dorado: rgba(240, 201, 106, .45);
     --gsz-ink: #F8F7F4;
     --gsz-ink-muted: #C3C7D3;
     --gsz-ink-faint: #8E96AE;
-    --gsz-border: #2E3F6F;
-    --gsz-blue-soft: #2E3F6F;
+    --gsz-border: rgba(240, 201, 106, .16);
+    --gsz-blue-soft: #1B2643;
     --gsz-active-ink: #F0C96A;
     --gsz-gold-ink: #F0C96A;
-    --gsz-gold-soft: #3A3420;
+    --gsz-gold-soft: #1B2643;
 
-    --gsz-violet: #AEB9DA; --gsz-violet-soft: #2E3F6F;
-    --gsz-green:  #6CC79C; --gsz-green-soft:  #1D3B33;
-    --gsz-amber:  #F0C96A; --gsz-amber-soft:  #3A3420;
+    --gsz-violet: #C3C7D3; --gsz-violet-soft: #1B2643;
+    --gsz-green:  #6CC79C; --gsz-green-soft:  #1B2643;
+    --gsz-amber:  #F0C96A; --gsz-amber-soft:  #1B2643;
     --gsz-red:    #EE8A80; --gsz-red-soft:    #43252A;
-    --gsz-cyan:   #AEB9DA; --gsz-cyan-soft:   #2E3F6F;
-    --gsz-neutral: #C3C7D3; --gsz-neutral-soft: #2A365A;
+    --gsz-cyan:   #C3C7D3; --gsz-cyan-soft:   #1B2643;
+    --gsz-neutral: #C3C7D3; --gsz-neutral-soft: #1B2643;
 
     --gsz-side-bg: #1E2A4A;
 
@@ -357,17 +365,19 @@ body {
     height: auto !important;
 }
 
-/* ── Botón primario (reemplaza from-blue-500 to-violet-500): azul líder →
-   azul noche, como pide el manual para la UI. El oro se reserva para
+/* ── Botón primario (reemplaza from-blue-500 to-violet-500): azul noche
+   plano, el mismo del panel del login (antes degradado desde el azul
+   líder, que se veía más claro). El oro se reserva para
    acentos y llamados a la acción de la landing. ── */
 .gsz-btn-primary {
-    background: linear-gradient(120deg, var(--aurum-lider), var(--aurum-noche)) !important;
+    background: var(--aurum-noche) !important;
     box-shadow: 0 10px 20px -10px rgba(30, 42, 74, .55);
 }
 
 .bg-gradient-to-tl.from-blue-500.to-violet-500,
 .btn-registrar[style*="#3b82f6"] {
-    background-image: linear-gradient(120deg, var(--aurum-lider), var(--aurum-noche)) !important;
+    background-image: none !important;
+    background-color: var(--aurum-noche) !important;
     background-color: var(--aurum-noche) !important;
     box-shadow: 0 10px 20px -10px rgba(30, 42, 74, .55);
 }
@@ -446,10 +456,11 @@ aside[aria-expanded] .gsz-brand-text small {
     text-transform: uppercase;
 }
 
-/* Enlace activo: fondo dorado translúcido + texto oro claro */
+/* Enlace activo: azul hundido con filo dorado + texto oro claro */
 .bg-blue-500\/13 {
     background: var(--gsz-side-active) !important;
     color: var(--aurum-oro-claro) !important;
+    box-shadow: inset 0 0 0 1px rgba(240, 201, 106, .38);
 }
 
 /* Badges de íconos: un solo lenguaje (oro sobre azul noche) en vez de un
@@ -543,7 +554,7 @@ aside[aria-expanded] .gsz-collapse-btn:hover {
 }
 .gsz-estado-ok { background: var(--gsz-blue-soft); color: var(--gsz-blue); }
 .gsz-estado-alerta { background: var(--gsz-gold-soft); color: var(--gsz-gold-ink); }
-.dark .gsz-estado-ok { background: var(--aurum-lider); color: var(--aurum-blanco); }
+.dark .gsz-estado-ok { background: var(--gsz-hundido); color: var(--aurum-oro-claro); box-shadow: inset 0 0 0 1px var(--gsz-filo-dorado); }
 
 /* ── Modal "Propietarios y vehículos" (propiedad.js) ── */
 .modal-content.gsz-propiedad { max-width: 640px; width: 92%; max-height: 88vh; overflow-y: auto; }

@@ -95,7 +95,7 @@ body {
 
 .btn-home {
     display: inline-block;
-    background: linear-gradient(120deg, #2E3F6F, #1E2A4A);
+    background: #1E2A4A;
     color: #F8F7F4;
     padding: 13px 32px;
     border-radius: 10px;

@@ -107,7 +107,7 @@
     background: var(--aurum-noche) !important;
     color: var(--aurum-oro-claro) !important;
 }
-.dark .gsz-contact-row .badge { background: var(--aurum-lider) !important; }
+.dark .gsz-contact-row .badge { background: var(--aurum-noche) !important; box-shadow: inset 0 0 0 1px var(--gsz-filo); }
 
 /* argon-dashboard-tailwind.css también define una clase .badge (con
    padding y font-size en em) — encogía los SVG de estas filas a unos

@@ -83,12 +83,12 @@ body {
 .btn-cerrar { background: #F0EEE8; color: var(--noche); }
 .btn-cerrar:hover { background: #E8E4DA; }
 .btn-aceptar {
-    background: linear-gradient(120deg, var(--lider), var(--noche)); color: var(--blanco);
+    background: var(--noche); color: var(--blanco);
     box-shadow: 0 12px 22px -10px rgba(30, 42, 74, .65);
 }
 .btn-aceptar:hover { transform: translateY(-1px); }
 .login-link { text-align: center; margin-top: 16px; font-size: 13px; color: var(--gris); }
-.login-link a { color: var(--lider); font-weight: 700; text-decoration: none; }
+.login-link a { color: var(--noche); font-weight: 700; text-decoration: none; }
 .login-link a:hover { color: var(--oro); }
 
 .divider {

@@ -31,7 +31,7 @@ body {
     left: 20px;
     font-size: 13px;
     font-weight: 600;
-    color: var(--lider);
+    color: var(--noche);
     text-decoration: none;
 }
 .back-link:hover { color: var(--oro); }
@@ -113,7 +113,7 @@ body {
     font-size: 13.5px; display: none; animation: fadeIn .3s ease-out;
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
-.success-message { background: #ECEEF4; color: var(--noche); border-left: 3px solid var(--lider); }
+.success-message { background: #ECEEF4; color: var(--noche); border-left: 3px solid var(--noche); }
 .success-message.show, .error-message.show { display: block; }
 .error-message { background: #FBF3DF; color: var(--noche); border-left: 3px solid var(--oro); }
 
@@ -140,7 +140,7 @@ body {
 }
 .remember-forgot label { display: flex; align-items: center; gap: 8px; color: var(--noche); cursor: pointer; }
 .remember-forgot input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: var(--oro); }
-.forgot-link { color: var(--lider); text-decoration: none; font-weight: 700; }
+.forgot-link { color: var(--noche); text-decoration: none; font-weight: 700; }
 .forgot-link:hover { color: var(--oro); }
 
 .button-group { display: flex; gap: 10px; }
@@ -150,7 +150,7 @@ body {
     font-family: 'Montserrat', sans-serif; transition: all .2s;
 }
 .btn-aceptar {
-    background: linear-gradient(120deg, var(--lider), var(--noche)); color: var(--blanco);
+    background: var(--noche); color: var(--blanco);
     box-shadow: 0 12px 22px -10px rgba(30, 42, 74, .65);
 }
 .btn-aceptar i { color: var(--oro-claro); margin-right: 4px; }
