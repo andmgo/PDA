@@ -629,3 +629,151 @@ li.gsz-vacio { list-style: none; border: 1px dashed var(--gsz-border); border-ra
 .gsz-habitantes { margin: -4px 0 0; font-size: 13px; line-height: 1.5; color: var(--gsz-ink-muted); }
 .gsz-habitantes:empty { display: none; }
 .gsz-habitantes b { color: var(--gsz-ink); }
+
+/* ══ Indicadores (.gsz-kpi): inicio y pagos y cartera ══ */
+/* ── Resumen de hoy ── */
+.gsz-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+}
+.gsz-kpi {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "titulo icono" "valor icono" "sub sub";
+    align-items: start;
+    gap: 2px 12px;
+    padding: 18px 20px 16px;
+    border-radius: 16px;
+    background: var(--gsz-surface);
+    border: 1px solid var(--gsz-border);
+    box-shadow: 0 1px 2px rgba(30, 42, 74, .04), 0 10px 26px -18px rgba(30, 42, 74, .35);
+    text-decoration: none;
+    color: var(--gsz-ink);
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+/* Filo dorado a la izquierda: detalle de marca, no un color de estado */
+.gsz-kpi::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 18px; bottom: 18px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--aurum-oro);
+}
+.gsz-kpi:hover { transform: translateY(-2px); border-color: var(--aurum-oro); }
+.gsz-kpi-titulo {
+    grid-area: titulo;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gsz-ink-muted);
+}
+.gsz-kpi-valor {
+    grid-area: valor;
+    margin-top: 6px;
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    color: var(--gsz-ink);
+    font-variant-numeric: tabular-nums;
+}
+.gsz-kpi-texto .gsz-kpi-valor { font-size: 26px; padding-top: 6px; text-transform: capitalize; }
+.gsz-kpi-cero .gsz-kpi-valor { color: var(--gsz-ink-faint); }
+.gsz-kpi-sub {
+    grid-area: sub;
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--gsz-ink-faint);
+}
+
+/* ══ Pagos y cartera (Bloque J) ══ */
+.gsz-cartera { display: flex; flex-direction: column; gap: 18px; }
+.gsz-cartera-tabs { align-self: flex-start; }
+.gsz-tab[hidden] { display: none !important; }
+.gsz-tab { display: flex; flex-direction: column; gap: 18px; }
+.gsz-cartera-kpis { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.gsz-cartera-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.gsz-cartera-grid-par { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gsz-cartera-nota { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--gsz-ink-faint); }
+.gsz-estado-vencido { background: var(--gsz-red-soft); color: var(--gsz-red); }
+
+/* Estado de cuenta del propietario */
+.gsz-cuenta { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.gsz-cuenta > .gsz-panel:last-child:not(:nth-child(2)) { grid-column: 2; }
+.gsz-cuenta-resumen {
+    position: relative;
+    grid-row: span 2;
+    display: flex; flex-direction: column; gap: 18px;
+    padding: 24px;
+    border-radius: 18px;
+    background: var(--aurum-noche);
+    color: var(--aurum-blanco);
+}
+.gsz-cuenta-resumen .gsz-kicker { color: var(--aurum-oro-claro); margin: 0 0 4px; }
+.gsz-cuenta-apto { margin: 0; font-size: 30px; font-weight: 800; color: var(--aurum-blanco); }
+.gsz-cuenta-saldo { margin: 0; font-size: 32px; font-weight: 700; color: var(--aurum-blanco); }
+.gsz-cuenta-vencido { margin: 4px 0 0; font-size: 13px; color: var(--aurum-oro-claro); }
+.gsz-cuenta-resumen .gsz-estado { align-self: flex-start; }
+.dark .gsz-cuenta-resumen { box-shadow: inset 0 0 0 1px var(--gsz-filo); }
+
+/* Lista de cobros */
+.gsz-cobros { list-style: none; margin: 0; padding: 0; }
+.gsz-cobro { display: flex; align-items: center; gap: 14px; padding: 12px 0; flex-wrap: wrap; }
+.gsz-cobro + .gsz-cobro { border-top: 1px solid var(--gsz-border); }
+.gsz-cobro-info { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 2px; }
+.gsz-cobro-info b { font-size: 14px; color: var(--gsz-ink); }
+.gsz-cobro-info small { font-size: 12px; color: var(--gsz-ink-faint); }
+.gsz-cobro-pagos { color: var(--gsz-ink-muted) !important; line-height: 1.55; }
+.gsz-cobro-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.gsz-cobro-valor .gsz-dinero { font-size: 15px; color: var(--gsz-ink); }
+.gsz-cobro-boton { padding: 8px 16px; font-size: 13px; }
+
+/* Tabla de cartera */
+.gsz-tabla-envoltura { overflow-x: auto; margin: 0 -4px; }
+.gsz-tabla { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.gsz-tabla th {
+    padding: 10px 12px; text-align: left; white-space: nowrap;
+    font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--gsz-ink-faint); border-bottom: 1px solid var(--gsz-border);
+}
+.gsz-tabla td { padding: 11px 12px; border-bottom: 1px solid var(--gsz-border); color: var(--gsz-ink); vertical-align: middle; }
+.gsz-tabla .num { text-align: right; white-space: nowrap; }
+.gsz-tabla tbody tr { cursor: pointer; transition: background .12s ease; }
+.gsz-tabla tbody tr:hover, .gsz-tabla tbody tr.activa { background: var(--gsz-surface-2); }
+.gsz-tabla tbody tr.activa td:first-child { box-shadow: inset 3px 0 0 var(--aurum-oro); }
+.gsz-tabla-tenue { color: var(--gsz-ink-muted) !important; font-size: 12.5px; }
+.gsz-tabla-ver { font-size: 12.5px; font-weight: 700; color: var(--gsz-gold-ink); }
+
+/* Detalle del apartamento + pago manual */
+.gsz-detalle { position: sticky; top: 16px; }
+.gsz-detalle-sub { font-size: 13px; font-weight: 600; color: var(--gsz-ink-faint); }
+.gsz-detalle-historial { margin: 16px 0 4px; }
+.gsz-pago-manual {
+    margin: 4px 0 12px; padding: 14px;
+    border-radius: 14px; background: var(--gsz-surface-2);
+    border: 1px solid var(--gsz-border);
+}
+.gsz-pago-manual .gsz-kicker { margin: 0; }
+.gsz-pago-manual-acciones { display: flex; justify-content: flex-end; gap: 10px; }
+
+@media (max-width: 1100px) {
+    .gsz-cartera-grid, .gsz-cartera-grid-par, .gsz-cuenta { grid-template-columns: 1fr; }
+    .gsz-cuenta > .gsz-panel:last-child:not(:nth-child(2)) { grid-column: auto; }
+    .gsz-cuenta-resumen { grid-row: auto; flex-direction: row; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; }
+    .gsz-detalle { position: static; }
+}
+@media (max-width: 680px) {
+    .gsz-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .gsz-kpi { padding: 14px 14px 12px; }
+    .gsz-kpi-valor { font-size: 24px; }
+    .gsz-cartera-tabs { align-self: stretch; }
+    .gsz-cobro-valor { align-items: flex-start; }
+}
+/* Montos: Montserrat con cifras de ancho fijo (más sobrio que la monoespaciada) */
+.gsz-dinero { font-variant-numeric: tabular-nums; font-weight: 700; letter-spacing: -.01em; white-space: nowrap; }
+.gsz-cartera-kpis .gsz-kpi-valor { font-size: 28px; }
+.gsz-tabla .gsz-estado { white-space: nowrap; }

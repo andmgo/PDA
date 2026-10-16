@@ -136,7 +136,8 @@ public class CarteraService {
         if (aptos.isEmpty()) return;
         LocalDate vence = fecha.isBefore(hoy()) ? hoy() : fecha; // se paga a más tardar el día de la reserva
         carteraRepository.guardarCargo(CargoModel.reserva(aptos.get(0), idReserva,
-                "Reserva salón " + numeroSalon + " · " + fecha, valor, vence));
+                "Reserva salón " + numeroSalon + " · " + fecha.format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy",
+                        Locale.forLanguageTag("es-CO"))), valor, vence));
     }
 
     /** Al cancelar una reserva: se anula su cobro, salvo que ya tenga pagos. */

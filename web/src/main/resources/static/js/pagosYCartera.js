@@ -1,248 +1,308 @@
 // ══════════════════════════════════════════════════════════════════════════════
-//  pagosYCartera.js
-//  Al cargar la página se detecta si viene de un callback OAuth2 exitoso
-//  (?oauth=ok) para abrir el modal de agregar método de pago.
-//  El botón "Agregar Método" inicia el flujo OAuth2 en vez de abrir el modal
-//  directamente, como verificación de identidad adicional.
+//  pagosYCartera.js — Pagos y cartera (Bloque J)
+//   Mi cuenta ............ GET /api/pagos/mi-cuenta, POST /api/pagos/cargos/{id}/pagar
+//   Vuelta de Wompi ...... ?id=<transacción> → POST /api/pagos/confirmar
+//   Administración ....... /api/cartera/** (resumen, detalle, pagos, valores, cuotas)
 // ══════════════════════════════════════════════════════════════════════════════
 
-const propietarios = {
-    1: {
-        nombre: "Carlos Mendoza",
-        apartamento: "Apartamento 101",
-        area: "85 m²",
-        cuota: "$350.000",
-        saldo: "$0",
-        estado: "AL DÍA",
-        estadoColor: "text-emerald-500",
-        facturas: [
-          { mes: "Octubre 2025", codigo: "#ADM-1025", monto: "$350.000", estado: "Pagado", pagado: true },
-          { mes: "Septiembre 2025", codigo: "#ADM-0925", monto: "$350.000", estado: "Pagado", pagado: true },
-          { mes: "Agosto 2025", codigo: "#ADM-0825", monto: "$350.000", estado: "Pagado", pagado: true }
-        ],
-        transacciones: [
-          { concepto: "Pago Administración", fecha: "05 Oct 2025, 10:30 AM", monto: "+ $350.000", tipo: "ingreso" },
-          { concepto: "Pago Administración", fecha: "05 Sep 2025, 09:15 AM", monto: "+ $350.000", tipo: "ingreso" }
-        ],
-        facturacion: {
-          nombre: "Carlos Mendoza",
-          documento: "CC 1.234.567",
-          email: "carlos.mendoza@email.com",
-          telefono: "+57 300 123 4567"
-        }
-    },
-    2: {
-        nombre: "María González",
-        apartamento: "Apartamento 205",
-        area: "92 m²",
-        cuota: "$380.000",
-        saldo: "$760.000",
-        estado: "MORA",
-        estadoColor: "text-red-500",
-        facturas: [
-          { mes: "Octubre 2025", codigo: "#ADM-1025", monto: "$380.000", estado: "Pendiente", pagado: false },
-          { mes: "Septiembre 2025", codigo: "#ADM-0925", monto: "$380.000", estado: "Pendiente", pagado: false },
-          { mes: "Agosto 2025", codigo: "#ADM-0825", monto: "$380.000", estado: "Pagado", pagado: true }
-        ],
-        transacciones: [
-          { concepto: "Pago Administración", fecha: "08 Ago 2025, 02:45 PM", monto: "+ $380.000", tipo: "ingreso" },
-          { concepto: "Pago Administración", fecha: "05 Jul 2025, 11:20 AM", monto: "+ $380.000", tipo: "ingreso" }
-        ],
-        facturacion: {
-          nombre: "María González",
-          documento: "CC 9.876.543",
-          email: "maria.gonzalez@email.com",
-          telefono: "+57 310 987 6543"
-        }
-    },
-    3: {
-        nombre: "Juan Pérez",
-        apartamento: "Apartamento 308",
-        area: "78 m²",
-        cuota: "$320.000",
-        saldo: "$320.000",
-        estado: "PENDIENTE",
-        estadoColor: "text-orange-500",
-        facturas: [
-          { mes: "Octubre 2025", codigo: "#ADM-1025", monto: "$320.000", estado: "Pendiente", pagado: false },
-          { mes: "Septiembre 2025", codigo: "#ADM-0925", monto: "$320.000", estado: "Pagado", pagado: true },
-          { mes: "Agosto 2025", codigo: "#ADM-0825", monto: "$320.000", estado: "Pagado", pagado: true }
-        ],
-        transacciones: [
-          { concepto: "Pago Administración", fecha: "03 Sep 2025, 04:15 PM", monto: "+ $320.000", tipo: "ingreso" },
-          { concepto: "Pago Administración", fecha: "02 Ago 2025, 08:30 AM", monto: "+ $320.000", tipo: "ingreso" }
-        ],
-        facturacion: {
-          nombre: "Juan Pérez",
-          documento: "CC 5.555.555",
-          email: "juan.perez@email.com",
-          telefono: "+57 320 555 5555"
-        }
-    }
+const ES_ADMIN = document.body.dataset.admin === 'true';
+let pasarelaHabilitada = false;
+let cartera = null;
+let filtroCartera = 'todos';
+let aptoAbierto = null;
+
+const pesos = v => Number(v || 0).toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+const fecha = iso => {
+    if (!iso) return '—';
+    const [a, m, d] = String(iso).slice(0, 10).split('-').map(Number);
+    return new Date(a, m - 1, d).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
-// ── Render de propietario ─────────────────────────────────────────────────────
-
-function actualizarPropietario() {
-    const select = document.getElementById('propietarioSelect');
-    const propietarioId = select.value;
-    const datos = propietarios[propietarioId];
-
-    document.getElementById('nombrePropietario').textContent  = datos.nombre;
-    document.getElementById('infoPropietario').textContent    = datos.apartamento;
-    document.getElementById('areaPropietario').textContent    = datos.area;
-    document.getElementById('cuotaMensual').textContent       = datos.cuota;
-    document.getElementById('saldoActual').textContent        = datos.saldo;
-
-    const estadoEl = document.getElementById('estadoCartera');
-    estadoEl.textContent  = datos.estado;
-    estadoEl.className    = datos.estadoColor;
-    estadoEl.style.fontSize   = '1.5rem';
-    estadoEl.style.fontWeight = '700';
-
-    // Facturas
-    const listaFacturas = document.getElementById('listaFacturas');
-    listaFacturas.innerHTML = datos.facturas.map(function(f) {
-        return '<div class="gsz-factura">' +
-          '<div class="flex justify-between items-center mb-2">' +
-            '<div>' +
-              '<p class="font-semibold text-sm text-slate-700">' + f.mes + '</p>' +
-              '<p class="text-xs text-slate-500">' + f.codigo + '</p>' +
-            '</div>' +
-            '<div style="text-align: right;">' +
-              '<p class="font-semibold gsz-mono">' + f.monto + '</p>' +
-              '<span class="badge ' + (f.pagado ? 'badge-success' : 'badge-warning') + '">' + f.estado + '</span>' +
-            '</div>' +
-          '</div>' +
-          (f.pagado ? '' : '<button onclick="simularPago(\'' + f.mes + '\', \'' + datos.cuota + '\')" class="btn-primary w-full mt-2">Pagar Ahora</button>') +
-        '</div>';
-    }).join('');
-
-    // Transacciones
-    const listaTransacciones = document.getElementById('listaTransacciones');
-    listaTransacciones.innerHTML = datos.transacciones.map(function(t) {
-        return '<div class="flex items-center" style="gap: 0.75rem; padding: 1rem 0; border-bottom: 1px solid #f0f2f5;">' +
-          '<div class="transaction-icon ' + (t.tipo === 'ingreso' ? 'icon-green' : 'icon-red') + '">' +
-            '<i class="fas fa-arrow-' + (t.tipo === 'ingreso' ? 'up' : 'down') + '"></i>' +
-          '</div>' +
-          '<div style="flex: 1;">' +
-            '<p class="font-semibold text-sm text-slate-700">' + t.concepto + '</p>' +
-            '<p class="text-xs text-slate-500">' + t.fecha + '</p>' +
-          '</div>' +
-          '<p class="font-semibold gsz-mono ' + (t.tipo === 'ingreso' ? 'text-emerald-500' : 'text-red-500') + '">' + t.monto + '</p>' +
-        '</div>';
-    }).join('');
-
-    // Info facturación
-    const infoFacturacion = document.getElementById('infoFacturacion');
-    infoFacturacion.innerHTML =
-        '<div class="info-billing">' +
-        '<h3 class="mb-4 font-semibold text-slate-700">' + datos.facturacion.nombre + '</h3>' +
-        '<div style="line-height: 1.8;">' +
-          '<p class="text-sm"><span class="text-slate-500">Documento:</span> <span class="font-semibold text-slate-700" style="margin-left: 0.5rem;">' + datos.facturacion.documento + '</span></p>' +
-          '<p class="text-sm"><span class="text-slate-500">Email:</span> <span class="font-semibold text-slate-700" style="margin-left: 0.5rem;">' + datos.facturacion.email + '</span></p>' +
-          '<p class="text-sm"><span class="text-slate-500">Teléfono:</span> <span class="font-semibold text-slate-700" style="margin-left: 0.5rem;">' + datos.facturacion.telefono + '</span></p>' +
-        '</div>' +
-        '<div style="margin-top: 1rem;">' +
-          '<button class="btn-outline w-full"><i class="fas fa-edit"></i> Editar</button>' +
-        '</div>' +
-        '</div>';
+function esc(t) {
+    const d = document.createElement('div');
+    d.textContent = t == null ? '' : String(t);
+    return d.innerHTML;
 }
 
-function simularPago(mes, monto) {
-    alert('¡Pago simulado!\n\nConcepto: Administración ' + mes + '\nMonto: ' + monto +
-          '\n\nEsta es una simulación educativa. En un sistema real, aquí se procesaría el pago real.');
+function aviso(texto, esError, idCaja = 'carteraAviso') {
+    const caja = document.getElementById(idCaja);
+    if (!caja) return;
+    caja.textContent = texto || '';
+    caja.className = 'gsz-aviso' + (texto ? (esError ? ' error' : ' ok') : '');
+    if (texto && idCaja === 'carteraAviso') caja.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
-// ── OAuth2: Agregar Método de Pago ────────────────────────────────────────────
-
-/**
- * Llamado por el botón "Agregar Método".
- * En lugar de abrir el modal directamente, inicia el flujo OAuth2 con Google
- * como paso de verificación de identidad.
- * Cuando Google devuelva el control (?oauth=ok), abrirModal() se ejecuta.
- */
-function iniciarAgregarMetodoPago() {
-    // Redirige al endpoint que inicia el flujo OAuth2
-    // OAuth2ActionController (/oauth2/iniciar) guarda la acción en sesión
-    // y redirige a /oauth2/authorization/google
-    window.location.href = '/oauth2/iniciar?accion=PAGO';
+async function pedir(url, opciones = {}) {
+    const r = await fetch(url, opciones);
+    const t = await r.text();
+    if (!r.ok) throw new Error(t || 'Error ' + r.status);
+    try { return JSON.parse(t); } catch (e) { return t; }
 }
 
-/**
- * Abre el modal de agregar tarjeta.
- * Se llama directamente al retornar de OAuth2 con ?oauth=ok,
- * o puede llamarse desde abrirModal() si ya pasó la verificación.
- */
-function abrirModalAgregarTarjeta() {
-    const modal = document.getElementById('modalAgregarMetodo');
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
-}
-
-function cerrarModalAgregarTarjeta() {
-    const modal = document.getElementById('modalAgregarMetodo');
-    if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-}
-
-function guardarNuevoMetodo() {
-    const numero = document.getElementById('inputNumeroTarjeta')?.value?.trim();
-    const tipo   = document.getElementById('inputTipoTarjeta')?.value;
-
-    if (!numero || numero.length < 16) {
-        alert('Por favor ingrese un número de tarjeta válido (16 dígitos).');
-        return;
-    }
-
-    // Aquí iría la llamada real a /api/pagos/metodos para guardar en MongoDB
-    alert('Método de pago agregado correctamente.\nTarjeta ' + tipo + ' terminada en ' + numero.slice(-4));
-    cerrarModalAgregarTarjeta();
-}
-
-// ── Detección del retorno OAuth2 al cargar la página ─────────────────────────
-
-window.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('propietarioSelect').addEventListener('change', actualizarPropietario);
-    actualizarPropietario();
-
-    const params = new URLSearchParams(window.location.search);
-    const oauth  = params.get('oauth');
-    const motivo = params.get('motivo');
-
-    if (oauth === 'ok') {
-        // Google verificó la identidad → abrir modal de agregar tarjeta
-        abrirModalAgregarTarjeta();
-        // Limpiar el query string de la URL sin recargar
-        history.replaceState(null, '', '/pagosYCartera');
-    } else if (oauth === 'error') {
-        const mensajes = {
-            'no_correo':          'No se pudo obtener el correo de Google.',
-            'correo_no_coincide': 'La cuenta de Google no coincide con tu usuario del sistema.',
-        };
-        alert('Error al verificar identidad con Google: ' +
-              (mensajes[motivo] || 'Inténtalo de nuevo.'));
-        history.replaceState(null, '', '/pagosYCartera');
-    }
+const enviar = (url, metodo, cuerpo) => pedir(url, {
+    method: metodo, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cuerpo || {})
 });
 
-// ── Cerrar sesión ─────────────────────────────────────────────────────────────
+const ESTADOS = {
+    PAGADO: ['gsz-estado-ok', 'Pagado'],
+    PENDIENTE: ['gsz-estado-alerta', 'Pendiente'],
+    VENCIDO: ['gsz-estado-vencido', 'Vencido']
+};
+const MEDIOS = { WOMPI: 'En línea', TRANSFERENCIA: 'Transferencia', CONSIGNACION: 'Consignación', EFECTIVO: 'Efectivo' };
 
-function confirmarCerrarSesion(event) {
+function cambiarTab(boton) {
+    boton.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('activo', b === boton));
+    document.querySelectorAll('.gsz-tab').forEach(t => t.hidden = t.id !== 'tab-' + boton.dataset.tab);
+    if (boton.dataset.tab === 'conjunto') cargarCartera();
+    if (boton.dataset.tab === 'valores') cargarValores();
+}
+
+// ── Mi cuenta ───────────────────────────────────────────────────────────────
+
+async function cargarMiCuenta() {
+    const caja = document.getElementById('miCuenta');
+    try {
+        const [cuentas, pasarela] = await Promise.all([pedir('/api/pagos/mi-cuenta'), pedir('/api/pagos/pasarela')]);
+        pasarelaHabilitada = !!pasarela.habilitada;
+        if (!cuentas.length) {
+            caja.innerHTML = `<div class="gsz-panel"><div class="gsz-vacio">
+                <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/></svg>
+                No tienes apartamentos vinculados, así que no hay estado de cuenta.${ES_ADMIN ? ' Revisa la pestaña “Cartera del conjunto”.' : ''}</div></div>`;
+            if (ES_ADMIN) document.querySelector('[data-tab="conjunto"]').click();
+            return;
+        }
+        caja.innerHTML = cuentas.map(cuentaHtml).join('');
+    } catch (e) {
+        caja.innerHTML = `<div class="gsz-panel"><div class="gsz-vacio">No se pudo cargar tu estado de cuenta: ${esc(e.message)}</div></div>`;
+    }
+}
+
+function cuentaHtml(c) {
+    const pendientes = c.cargos.filter(x => x.estado !== 'PAGADO');
+    const pagados = c.cargos.filter(x => x.estado === 'PAGADO');
+    return `<div class="gsz-cuenta">
+        <section class="gsz-cuenta-resumen ${c.enMora ? 'mora' : ''}">
+            <div>
+                <p class="gsz-kicker">Apartamento</p>
+                <p class="gsz-cuenta-apto">${esc(c.numeroApartamento)}</p>
+            </div>
+            <div>
+                <p class="gsz-kicker">Saldo pendiente</p>
+                <p class="gsz-cuenta-saldo gsz-dinero">${pesos(c.saldo)}</p>
+                ${c.saldoVencido > 0 ? `<p class="gsz-cuenta-vencido">${pesos(c.saldoVencido)} vencido</p>` : ''}
+            </div>
+            <span class="gsz-estado ${c.enMora ? 'gsz-estado-vencido' : 'gsz-estado-ok'}">${c.enMora ? 'En mora' : 'Al día'}</span>
+        </section>
+        <section class="gsz-panel">
+            <div class="gsz-panel-head"><div><p class="gsz-kicker">Por pagar</p><h2 class="gsz-card-titulo">Cobros pendientes</h2></div></div>
+            ${pendientes.length ? `<ul class="gsz-cobros">${pendientes.map(x => cobroHtml(x, true)).join('')}</ul>`
+                : '<div class="gsz-vacio">No tienes cobros pendientes. ¡Estás al día!</div>'}
+            ${pendientes.length && !pasarelaHabilitada ? `<p class="gsz-cartera-nota">El pago en línea se habilitará pronto. Mientras tanto, paga por transferencia y envía el comprobante a la administración: ellos lo registran aquí.</p>` : ''}
+        </section>
+        ${pagados.length ? `<section class="gsz-panel">
+            <div class="gsz-panel-head"><div><p class="gsz-kicker">Historial</p><h2 class="gsz-card-titulo">Pagados</h2></div></div>
+            <ul class="gsz-cobros">${pagados.map(x => cobroHtml(x, false)).join('')}</ul>
+        </section>` : ''}
+    </div>`;
+}
+
+function cobroHtml(x, conAccion, admin = false) {
+    const [clase, texto] = ESTADOS[x.estado] || ['', x.estado];
+    const abonos = x.pagos.filter(p => p.estado === 'APROBADO');
+    return `<li class="gsz-cobro">
+        <div class="gsz-cobro-info">
+            <b>${esc(x.descripcion)}</b>
+            <small>Vence ${fecha(x.fechaVencimiento)}${x.pagado > 0 && x.saldo > 0 ? ` · abonado ${pesos(x.pagado)}` : ''}</small>
+            ${abonos.length ? `<small class="gsz-cobro-pagos">${abonos.map(p => `${MEDIOS[p.medio] || p.medio} ${pesos(p.valor)} · ${fecha(p.fecha)}${p.soporte ? ' · ' + esc(p.soporte) : ''}`).join('<br>')}</small>` : ''}
+        </div>
+        <div class="gsz-cobro-valor">
+            <span class="gsz-dinero">${pesos(x.estado === 'PAGADO' ? x.valor : x.saldo)}</span>
+            <span class="gsz-estado ${clase}">${texto}</span>
+        </div>
+        ${conAccion && !admin && pasarelaHabilitada ? `<button type="button" class="gsz-btn gsz-btn-noche gsz-cobro-boton" onclick="pagarEnLinea('${x.id}', this)">Pagar</button>` : ''}
+        ${conAccion && admin ? `<button type="button" class="gsz-btn gsz-btn-borde gsz-cobro-boton" onclick="abrirPagoManual('${x.id}', ${x.saldo}, '${esc(x.descripcion).replace(/'/g, '&#39;')}')">Registrar pago</button>` : ''}
+    </li>`;
+}
+
+async function pagarEnLinea(idCargo, boton) {
+    boton.disabled = true;
+    try {
+        const r = await enviar(`/api/pagos/cargos/${idCargo}/pagar`, 'POST',
+            { urlRegreso: window.location.origin + '/pagosYCartera' });
+        window.location.href = r.url; // checkout de Wompi
+    } catch (e) {
+        boton.disabled = false;
+        aviso(e.message, true);
+    }
+}
+
+/** Wompi vuelve con ?id=<transacción>: se confirma consultando a la pasarela. */
+async function confirmarRegreso() {
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (!id) return;
+    history.replaceState(null, '', window.location.pathname);
+    try {
+        const r = await enviar('/api/pagos/confirmar', 'POST', { idTransaccion: id });
+        const textos = {
+            APROBADO: ['¡Pago aprobado! Ya quedó registrado en tu estado de cuenta.', false],
+            RECHAZADO: ['El pago fue rechazado o anulado por la entidad. No se descontó nada; puedes intentarlo de nuevo.', true],
+            PENDIENTE: ['Tu pago está en proceso. Se reflejará apenas la entidad lo confirme.', false]
+        };
+        const [t, error] = textos[r.estado] || ['Estado del pago: ' + r.estado, false];
+        aviso(t, error);
+    } catch (e) {
+        aviso('No se pudo confirmar el pago: ' + e.message, true);
+    }
+}
+
+// ── Cartera del conjunto (administración) ────────────────────────────────────
+
+async function cargarCartera() {
+    try {
+        cartera = await pedir('/api/cartera/resumen');
+        document.getElementById('kpiPorCobrar').textContent = pesos(cartera.porCobrar);
+        document.getElementById('kpiVencido').textContent = pesos(cartera.vencido);
+        document.getElementById('kpiMora').textContent = cartera.apartamentosEnMora;
+        document.getElementById('kpiAlDia').textContent = cartera.apartamentosAlDia;
+        pintarCartera();
+        if (aptoAbierto) verApartamento(aptoAbierto);
+    } catch (e) {
+        aviso('No se pudo cargar la cartera: ' + e.message, true);
+    }
+}
+
+function filtrarCartera(boton) {
+    filtroCartera = boton.dataset.filtro;
+    boton.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('activo', b === boton));
+    pintarCartera();
+}
+
+function pintarCartera() {
+    const filas = cartera.apartamentos.filter(a => filtroCartera === 'todos' || a.enMora);
+    document.getElementById('tablaCartera').innerHTML = filas.length ? filas.map(a => `
+        <tr class="${a.idApartamento === aptoAbierto ? 'activa' : ''}" onclick="verApartamento('${a.idApartamento}')">
+            <td><span class="gsz-apto">${esc(a.numeroApartamento)}</span></td>
+            <td class="gsz-tabla-tenue">${a.propietarios.length ? a.propietarios.map(esc).join(', ') : '—'}</td>
+            <td class="num gsz-dinero">${pesos(a.saldo)}</td>
+            <td class="num gsz-dinero">${a.saldoVencido > 0 ? pesos(a.saldoVencido) : '—'}</td>
+            <td><span class="gsz-estado ${a.enMora ? 'gsz-estado-vencido' : 'gsz-estado-ok'}">${a.enMora ? 'En mora' : 'Al día'}</span></td>
+            <td class="num"><span class="gsz-tabla-ver">Ver ›</span></td>
+        </tr>`).join('')
+        : '<tr><td colspan="6"><div class="gsz-vacio">Ningún apartamento en mora.</div></td></tr>';
+}
+
+async function verApartamento(id) {
+    aptoAbierto = id;
+    pintarCartera();
+    const panel = document.getElementById('detalleApto');
+    try {
+        const c = await pedir(`/api/cartera/apartamentos/${id}`);
+        const pendientes = c.cargos.filter(x => x.estado !== 'PAGADO');
+        const pagados = c.cargos.filter(x => x.estado === 'PAGADO');
+        panel.innerHTML = `
+            <div class="gsz-panel-head">
+                <div><p class="gsz-kicker">Apartamento ${esc(c.numeroApartamento)}</p>
+                <h2 class="gsz-card-titulo">${pesos(c.saldo)} <small class="gsz-detalle-sub">de saldo</small></h2></div>
+                <span class="gsz-estado ${c.enMora ? 'gsz-estado-vencido' : 'gsz-estado-ok'}">${c.enMora ? 'En mora' : 'Al día'}</span>
+            </div>
+            <p class="gsz-card-sub">${c.propietarios.length ? c.propietarios.map(esc).join(', ') : 'Sin propietarios registrados'}</p>
+            <div id="avisoDetalle" class="gsz-aviso" role="status"></div>
+            <div id="formPagoManual"></div>
+            ${pendientes.length ? `<ul class="gsz-cobros">${pendientes.map(x => cobroHtml(x, true, true)).join('')}</ul>` : '<div class="gsz-vacio">Sin cobros pendientes.</div>'}
+            ${pagados.length ? `<p class="gsz-kicker gsz-detalle-historial">Pagados</p><ul class="gsz-cobros">${pagados.slice(0, 8).map(x => cobroHtml(x, false, true)).join('')}</ul>` : ''}`;
+    } catch (e) {
+        panel.innerHTML = `<div class="gsz-vacio">No se pudo cargar el apartamento: ${esc(e.message)}</div>`;
+    }
+}
+
+function abrirPagoManual(idCargo, saldo, descripcion) {
+    const caja = document.getElementById('formPagoManual');
+    caja.innerHTML = `<form class="gsz-pago-manual gsz-form-stack" onsubmit="return registrarPagoManual(event, '${idCargo}')">
+        <p class="gsz-kicker">Registrar pago · ${descripcion}</p>
+        <div class="gsz-campos-2">
+            <label class="gsz-campo"><span>Valor</span><input type="text" id="pmValor" class="gsz-dinero" inputmode="numeric" value="${Math.round(saldo)}" required /></label>
+            <label class="gsz-campo"><span>Medio</span>
+                <select id="pmMedio">
+                    <option value="TRANSFERENCIA">Transferencia</option>
+                    <option value="CONSIGNACION">Consignación</option>
+                    <option value="EFECTIVO">Efectivo</option>
+                </select></label>
+        </div>
+        <label class="gsz-campo"><span>N.º de comprobante <em>(no aplica para efectivo)</em></span><input type="text" id="pmSoporte" maxlength="120" placeholder="Ej: BCO-77812" /></label>
+        <div class="gsz-pago-manual-acciones">
+            <button type="button" class="gsz-btn gsz-btn-borde" onclick="document.getElementById('formPagoManual').innerHTML=''">Cancelar</button>
+            <button type="submit" class="gsz-btn gsz-btn-noche">Registrar pago</button>
+        </div>
+    </form>`;
+    caja.querySelector('#pmValor').focus();
+}
+
+async function registrarPagoManual(event, idCargo) {
     event.preventDefault();
-    if (confirm('¿Está seguro que desea cerrar sesión?')) {
-        sessionStorage.clear();
-        // FIX: Spring Security 6 requiere POST para logout.
-        // Un GET a /logout es rechazado (CSRF) y deja al usuario en la página de error.
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/logout';
-        document.body.appendChild(form);
-        form.submit();
+    const v = id => document.getElementById(id).value.trim();
+    try {
+        const m = await enviar('/api/cartera/pagos', 'POST', { idCargo, valor: v('pmValor'), medio: v('pmMedio'), soporte: v('pmSoporte') });
+        aviso(m, false);
+        await cargarCartera();
+    } catch (e) {
+        aviso(e.message, true, 'avisoDetalle');
     }
     return false;
 }
+
+// ── Valores y cuotas (administración) ────────────────────────────────────────
+
+async function cargarValores() {
+    try {
+        const c = await pedir('/api/cartera/configuracion');
+        document.getElementById('valCuota').value = c.cuotaAdministracion > 0 ? pesos(c.cuotaAdministracion) : '';
+        document.getElementById('valReserva').value = c.valorReserva > 0 ? pesos(c.valorReserva) : '';
+        document.getElementById('valDia').value = c.diaVencimiento;
+        const mes = document.getElementById('mesCuotas');
+        if (!mes.value) mes.value = new Date().toISOString().slice(0, 7);
+        document.getElementById('notaCuotas').textContent = c.cuotaAdministracion > 0
+            ? `Se cobrará ${pesos(c.cuotaAdministracion)} a cada apartamento, con vencimiento el día ${c.diaVencimiento} del mes.`
+            : 'Primero define el valor de la cuota.';
+    } catch (e) {
+        aviso('No se pudieron cargar los valores: ' + e.message, true);
+    }
+}
+
+async function guardarValores(event) {
+    event.preventDefault();
+    try {
+        await enviar('/api/cartera/configuracion', 'PUT', {
+            cuotaAdministracion: document.getElementById('valCuota').value,
+            valorReserva: document.getElementById('valReserva').value || '0',
+            diaVencimiento: document.getElementById('valDia').value
+        });
+        aviso('Valores guardados.', false);
+        cargarValores();
+    } catch (e) {
+        aviso(e.message, true);
+    }
+    return false;
+}
+
+async function generarCuotas(event) {
+    event.preventDefault();
+    const mes = document.getElementById('mesCuotas').value;
+    if (!confirm(`¿Generar la cuota de administración de ${mes} para todos los apartamentos activos?`)) return false;
+    try {
+        aviso(await enviar('/api/cartera/cuotas', 'POST', { periodo: mes }), false);
+    } catch (e) {
+        aviso(e.message, true);
+    }
+    return false;
+}
+
+function confirmarCerrarSesion(event) {
+    event.preventDefault();
+    if (confirm('¿Está seguro que desea cerrar sesión?')) window.location.href = '/logout';
+    return false;
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+    await confirmarRegreso();
+    cargarMiCuenta();
+});
