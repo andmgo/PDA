@@ -17,7 +17,11 @@ class PantallaInicio extends StatefulWidget {
   final Sesion sesion;
   final VoidCallback alCerrarSesion;
 
-  const PantallaInicio({super.key, required this.api, required this.sesion, required this.alCerrarSesion});
+  /// Se llama cuando el API devuelve permisos distintos a los guardados.
+  final void Function(Sesion)? alActualizarSesion;
+
+  const PantallaInicio(
+      {super.key, required this.api, required this.sesion, required this.alCerrarSesion, this.alActualizarSesion});
 
   @override
   State<PantallaInicio> createState() => _PantallaInicioState();
@@ -31,7 +35,10 @@ class _PantallaInicioState extends State<PantallaInicio> {
   String? _error;
   bool _cargando = true;
 
-  Sesion get _s => widget.sesion;
+  // Arranca con la sesión guardada y se refresca con GET /api/auth/sesion en
+  // cada carga: si el administrador cambió los permisos del rol (o se creó
+  // un permiso nuevo), el inicio se ajusta sin volver a iniciar sesión.
+  late Sesion _s = widget.sesion;
   bool get _porteria => _s.puedeVer('CONTROL_ACCESOS');
   bool get _paquetes => _s.puedeVer('PAQUETES');
   bool get _visitas => _s.puedeVer('VISITAS');
@@ -55,6 +62,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
       _error = null;
     });
     try {
+      await _refrescarSesion();
       final resultados = await Future.wait([
         widget.api.get('/api/propiedad/mia'),
         if (_porteria) widget.api.get('/api/accesos/visitas/dentro'),
@@ -74,6 +82,18 @@ class _PantallaInicioState extends State<PantallaInicio> {
       return; // la app ya volvió al inicio de sesión
     }
     if (mounted) setState(() => _cargando = false);
+  }
+
+  Future<void> _refrescarSesion() async {
+    try {
+      final actual = await widget.api.get('/api/auth/sesion');
+      if (actual is! Map<String, dynamic>) return;
+      final nueva = _s.actualizadaCon(actual);
+      _s = nueva;
+      widget.alActualizarSesion?.call(nueva);
+    } on ApiError {
+      // sin conexión o API vieja: se siguen usando los permisos guardados
+    }
   }
 
   Future<void> _confirmarSalir() async {

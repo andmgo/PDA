@@ -58,6 +58,13 @@ class _AurumAppState extends State<AurumApp> {
     });
   }
 
+  /// Permisos refrescados desde el API: se guardan para la próxima apertura.
+  Future<void> _actualizarSesion(Sesion sesion) async {
+    widget.api.sesion = sesion;
+    await widget.almacen.guardar(sesion);
+    if (mounted) setState(() => _sesion = sesion);
+  }
+
   Future<void> _cerrarSesion({String? aviso}) async {
     widget.api.sesion = null;
     await widget.almacen.borrar();
@@ -79,7 +86,11 @@ class _AurumAppState extends State<AurumApp> {
           key: ValueKey(_avisoLogin), api: widget.api, alIniciarSesion: _iniciarSesion, aviso: _avisoLogin);
     } else {
       pantalla = PantallaInicio(
-          key: ValueKey(_sesion!.token), api: widget.api, sesion: _sesion!, alCerrarSesion: _cerrarSesion);
+          key: ValueKey(_sesion!.token),
+          api: widget.api,
+          sesion: _sesion!,
+          alCerrarSesion: _cerrarSesion,
+          alActualizarSesion: _actualizarSesion);
     }
 
     return MaterialApp(

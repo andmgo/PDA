@@ -49,22 +49,22 @@ public class AuthApiClient {
     }
 
     /**
-     * ¿La cuenta dueña de este JWT sigue activa? false solo si el API responde
-     * 401 (cuenta desactivada o token ya inválido). Ante cualquier otro error
-     * (API caída, etc.) devuelve true para no sacar a nadie por una falla ajena.
+     * Datos y permisos actuales de la cuenta del JWT (GET /api/auth/sesion).
+     * Vacío si el API responde 401 (cuenta desactivada o token inválido);
+     * null ante cualquier otra falla (API caída…), para no sacar a nadie ni
+     * tocar sus permisos por un error ajeno.
      */
-    public boolean cuentaActiva(String jwt) {
+    public java.util.Optional<LoginResultado> sesionActual(String jwt) {
         try {
-            restClient.get()
-                    .uri("/api/auth/estado")
+            return java.util.Optional.ofNullable(restClient.get()
+                    .uri("/api/auth/sesion")
                     .header("Authorization", "Bearer " + jwt)
                     .retrieve()
-                    .toBodilessEntity();
-            return true;
+                    .body(LoginResultado.class));
         } catch (HttpClientErrorException.Unauthorized e) {
-            return false;
+            return java.util.Optional.empty();
         } catch (Exception e) {
-            return true;
+            return null;
         }
     }
 

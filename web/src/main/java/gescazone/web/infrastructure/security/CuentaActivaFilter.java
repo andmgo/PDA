@@ -14,7 +14,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * Saca de inmediato a quien fue desactivado con la sesión ya abierta. Antes
+ * Saca de inmediato a quien fue desactivado con la sesión ya abierta, y
+ * mantiene al día rol y permisos (GET /api/auth/sesion). Antes
  * solo se bloqueaba el login: una sesión iniciada seguía funcionando hasta
  * cerrarse sola. En cada navegación (no en recursos estáticos) se le pregunta
  * al API si la cuenta sigue activa, como máximo una vez cada INTERVALO_MS
@@ -45,7 +46,8 @@ public class CuentaActivaFilter extends OncePerRequestFilter {
             Long ultima = (Long) session.getAttribute(ATRIBUTO_ULTIMA_VERIFICACION);
             long ahora = System.currentTimeMillis();
             if (ultima == null || ahora - ultima > INTERVALO_MS) {
-                if (!authApiClient.cuentaActiva(sesionUsuario.getJwt())) {
+                var actual = authApiClient.sesionActual(sesionUsuario.getJwt());
+                if (actual != null && actual.isEmpty()) {
                     SecurityContextHolder.clearContext();
                     session.invalidate();
                     if (request.getRequestURI().startsWith("/api/")) {
@@ -54,6 +56,13 @@ public class CuentaActivaFilter extends OncePerRequestFilter {
                         response.sendRedirect("/login?error=disabled");
                     }
                     return;
+                }
+                if (actual != null) {
+                    // De paso trae los permisos vigentes: si el administrador
+                    // cambió los del rol, el menú y las rutas se ajustan sin
+                    // volver a iniciar sesión.
+                    sesionUsuario.actualizar(actual.get());
+                    session.setAttribute("rolUsuario", sesionUsuario.getNombreRolParaVista());
                 }
                 session.setAttribute(ATRIBUTO_ULTIMA_VERIFICACION, ahora);
             }

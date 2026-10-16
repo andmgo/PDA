@@ -91,7 +91,8 @@ void main() {
     expect(find.text('ABC123'), findsOneWidget);
     expect(find.text('OLD999'), findsNothing); // los vehículos desactivados no se muestran
     expect(find.text('Dentro del conjunto'), findsNothing);
-    expect(pedidas, ['/api/propiedad/mia']); // no pide datos de portería sin permiso
+    // refresca permisos y luego solo Mi hogar: no pide datos de portería sin permiso
+    expect(pedidas, ['/api/auth/sesion', '/api/propiedad/mia']);
   });
 
   testWidgets('inicio de portería: muestra quién está dentro y paquetes pendientes', (tester) async {

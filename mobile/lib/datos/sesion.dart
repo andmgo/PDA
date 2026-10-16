@@ -42,6 +42,10 @@ class Sesion {
         },
       );
 
+  /// Misma sesión (mismo token) con los datos y permisos vigentes que
+  /// devuelve GET /api/auth/sesion.
+  Sesion actualizadaCon(Map<String, dynamic> actual) => Sesion.desdeJson({...actual, 'token': token});
+
   Map<String, dynamic> aJson() => {
         'token': token,
         'numeroDocumento': numeroDocumento,

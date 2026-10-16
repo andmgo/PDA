@@ -66,6 +66,26 @@ public class AuthController {
         return ResponseEntity.ok("ACTIVA");
     }
 
+    /**
+     * Datos y permisos ACTUALES de la cuenta del JWT (mismo formato que el
+     * login, sin token). La web y la app los guardaban solo al iniciar sesión:
+     * si un administrador cambiaba los permisos del rol, o se creaba un
+     * permiso nuevo, no se enteraban hasta volver a entrar.
+     */
+    @GetMapping("/sesion")
+    public ResponseEntity<?> sesion(Authentication authentication) {
+        UsuarioModel usuario = usuarioService.consultar(authentication.getName());
+        String nombreRol = usuario.getRol().getNombreRol();
+        return ResponseEntity.ok(Map.of(
+                "numeroDocumento", usuario.getNumeroDocumento(),
+                "nombre", usuario.getNombre(),
+                "apellido", usuario.getApellido(),
+                "correo", usuario.getCorreo(),
+                "nombreRol", nombreRol,
+                "permisos", permisoService.permisosDeRol(nombreRol).stream().map(this::celdaAMapa).toList()
+        ));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> datos) {
         String numeroDocumento = datos.get("numeroDocumento");

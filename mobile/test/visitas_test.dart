@@ -320,4 +320,34 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Ingreso'), findsOneWidget); // pestañas de portería
   });
+
+  testWidgets('inicio: refresca los permisos guardados (permiso nuevo aparece sin volver a entrar)', (tester) async {
+    // Sesión guardada ANTES de existir VISITAS y MIS_PAQUETES
+    final vieja = Sesion.desdeJson({
+      'token': 't', 'numeroDocumento': '1', 'nombre': 'Andrea', 'apellido': 'L', 'correo': '',
+      'nombreRol': 'ADMINISTRADOR',
+      'permisos': [{'codigo': 'CONTROL_ACCESOS', 'puedeVer': true, 'puedeEditar': true}],
+    });
+    Sesion? guardada;
+    final api = Api(cliente: MockClient((r) async => switch (r.url.path) {
+          '/api/auth/sesion' => json({
+              'numeroDocumento': '1', 'nombre': 'Andrea', 'apellido': 'L', 'correo': '',
+              'nombreRol': 'ADMINISTRADOR',
+              'permisos': [
+                for (final p in ['CONTROL_ACCESOS', 'VISITAS', 'MIS_PAQUETES'])
+                  {'codigo': p, 'puedeVer': true, 'puedeEditar': true},
+              ],
+            }),
+          _ => json([]),
+        }))
+      ..sesion = vieja;
+    await tester.pumpWidget(envolver(PantallaInicio(
+        api: api, sesion: vieja, alCerrarSesion: () {}, alActualizarSesion: (s) => guardada = s)));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Mis paquetes'), 200);
+    expect(find.text('Mis visitas'), findsOneWidget);
+    expect(guardada?.token, 't'); // mismo token
+    expect(guardada?.puedeVer('MIS_PAQUETES'), isTrue);
+  });
 }
