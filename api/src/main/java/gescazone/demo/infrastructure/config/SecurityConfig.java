@@ -150,8 +150,17 @@ public class SecurityConfig {
                 .requestMatchers("/api/usuarios/**")
                     .access(permiso("USUARIOS", NivelPermiso.VER))
 
-                .requestMatchers("/api/pagos/**", "/api/metodos-pago/**")
+                // Pagos y cartera (Bloque J). El evento de Wompi es público pero
+                // CarteraService solo lo acepta con firma válida.
+                .requestMatchers(HttpMethod.POST, "/api/pagos/wompi/eventos").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/pagos/cargos/*/pagar")
+                    .access(permiso("PAGOS_Y_CARTERA", NivelPermiso.EDITAR))
+                .requestMatchers("/api/pagos/**")
                     .access(permiso("PAGOS_Y_CARTERA", NivelPermiso.VER))
+                .requestMatchers(HttpMethod.GET, "/api/cartera/**")
+                    .access(permiso("ADMIN_CARTERA", NivelPermiso.VER))
+                .requestMatchers("/api/cartera/**")
+                    .access(permiso("ADMIN_CARTERA", NivelPermiso.EDITAR))
 
                 .requestMatchers("/api/accesos/**")
                     .access(permiso("CONTROL_ACCESOS", NivelPermiso.VER))

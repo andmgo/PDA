@@ -38,6 +38,9 @@ class ReservaSalonSocialServiceTest {
     @Mock
     private PermisoService permisoService;
 
+    @Mock
+    private CarteraService carteraService;
+
     @InjectMocks
     private ReservaSalonSocialService reservaSalonSocialService;
 

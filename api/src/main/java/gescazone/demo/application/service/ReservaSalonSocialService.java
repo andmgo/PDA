@@ -10,6 +10,7 @@ import gescazone.demo.domain.repository.SalonSocialRepository;
 import gescazone.demo.domain.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,6 +29,9 @@ public class ReservaSalonSocialService {
 
     @Autowired
     private PermisoService permisoService;
+
+    @Autowired
+    private CarteraService carteraService;
 
     /** Reserva como la ve su dueño en "Mis reservas" (app). */
     public record MiReserva(String id, String idSalon, String numeroSalon, LocalDateTime fechaYHora, boolean pasada) {}
@@ -84,12 +88,14 @@ public class ReservaSalonSocialService {
     }
 
     /** Cancelar / eliminar con la regla de dueño o administración. */
+    @Transactional
     public String eliminarReserva(String id, String documentoSolicitante) {
         if (id == null)
             throw new IllegalArgumentException("El ID no puede ser nulo");
         ReservaSalonSocialModel reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("No existe una reserva con el ID: " + id));
         exigirDuenoOAdministracion(reserva, documentoSolicitante);
+        carteraService.anularCobroReserva(id); // falla si ya está pagada
         reservaRepository.deleteById(id);
         return "Reserva cancelada";
     }
@@ -118,10 +124,15 @@ public class ReservaSalonSocialService {
      * Reserva a nombre de quien inició sesión: el usuario sale del documento
      * del JWT (nunca de un ID enviado por el cliente).
      */
+    @Transactional
     public String crearPropia(String numeroDocumentoAutenticado, String idSalon, LocalDateTime fechaYHora) {
         UsuarioModel usuario = usuarioRepository.findByNumeroDocumento(numeroDocumentoAutenticado)
                 .orElseThrow(() -> new NotFoundException("Usuario autenticado no encontrado"));
-        return guardarReserva(new ReservaSalonSocialModel(usuario.getId(), idSalon, fechaYHora));
+        ReservaSalonSocialModel reserva = new ReservaSalonSocialModel(usuario.getId(), idSalon, fechaYHora);
+        String mensaje = guardarReserva(reserva);
+        // Cobro de la reserva a su apartamento (si hay valor configurado)
+        carteraService.cobrarReserva(reserva.getId(), usuario.getId(), numeroSalon(idSalon), fechaYHora.toLocalDate());
+        return mensaje;
     }
 
     /** Documento legible del usuario de una reserva (para listados); el ID si ya no existe. */
@@ -195,7 +206,8 @@ public class ReservaSalonSocialService {
             }
         }
 
-        reservaRepository.save(reserva);
+        ReservaSalonSocialModel guardada = reservaRepository.save(reserva);
+        if (guardada != null && reserva.getId() == null) reserva.setId(guardada.getId());
         return esNuevaReserva ? "Reserva creada exitosamente" : "Reserva actualizada exitosamente";
     }
 
