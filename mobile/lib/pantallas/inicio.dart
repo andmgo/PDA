@@ -5,6 +5,7 @@ import '../datos/api.dart';
 import '../datos/sesion.dart';
 import '../tema/aurum_tema.dart';
 import '../widgets/marca.dart';
+import 'lector_placas.dart';
 import 'mis_visitas.dart';
 import 'paquetes.dart';
 import 'porteria.dart';
@@ -304,11 +305,11 @@ class _PantallaInicioState extends State<PantallaInicio> {
             titulo: 'Control de accesos',
             subtitulo: 'Ingreso de visitantes',
             alTocar: () => _abrir(PantallaPorteria(api: widget.api))),
-        const TarjetaAccion(
+        TarjetaAccion(
             icono: Icons.document_scanner_outlined,
             titulo: 'Lector de placas',
             subtitulo: 'Con la cámara',
-            proximamente: 'Fase 8'),
+            alTocar: () => _abrir(PantallaLectorPlacas(api: widget.api))),
       ],
       if (_paquetes)
         TarjetaAccion(

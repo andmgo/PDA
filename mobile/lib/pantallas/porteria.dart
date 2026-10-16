@@ -18,7 +18,14 @@ import '../widgets/marca.dart';
 class PantallaPorteria extends StatefulWidget {
   final Api api;
   final int pestanaInicial;
-  const PantallaPorteria({super.key, required this.api, this.pestanaInicial = 0});
+
+  /// Desde el lector de placas: abre el ingreso ya lleno con la autorización
+  /// del propietario, o con la placa leída (en vehículo).
+  final Map<String, dynamic>? autorizacionInicial;
+  final String? placaInicial;
+
+  const PantallaPorteria(
+      {super.key, required this.api, this.pestanaInicial = 0, this.autorizacionInicial, this.placaInicial});
 
   @override
   State<PantallaPorteria> createState() => _PantallaPorteriaState();
@@ -53,6 +60,14 @@ class _PantallaPorteriaState extends State<PantallaPorteria> with SingleTickerPr
   void initState() {
     super.initState();
     _cargarListas();
+    final autorizacion = widget.autorizacionInicial;
+    if (autorizacion != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _usar(autorizacion, desdeLista: true));
+    } else if (widget.placaInicial != null) {
+      _placa.text = widget.placaInicial!;
+      _vehiculo = true;
+      _cargarLibres();
+    }
   }
 
   @override
