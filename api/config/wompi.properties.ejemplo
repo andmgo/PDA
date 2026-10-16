@@ -1,0 +1,6 @@
+# Copia este archivo como "wompi.properties" (en esta misma carpeta api/config/)
+# y pega tus llaves de PRUEBA del comercio "Aurum Condominios" en Wompi.
+# Este archivo y wompi.properties NO se suben a git.
+wompi.public-key=pub_test_PEGA_AQUI
+wompi.integrity-secret=test_integrity_PEGA_AQUI
+wompi.events-secret=test_events_PEGA_AQUI

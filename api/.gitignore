@@ -34,3 +34,5 @@ build/
 
 ### Logs de debug local (mvnw spring-boot:run) ###
 *.log
+config/*
+!config/*.ejemplo
