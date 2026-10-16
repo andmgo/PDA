@@ -1,21 +1,36 @@
-# Despliegue en Render
+# Despliegue: Render + Neon (gratis, sin vencimiento)
 
-Aurum se publica en [Render](https://render.com) con el archivo `render.yaml`
-(un "Blueprint"): Render crea la base de datos PostgreSQL, la API y la web, y
-vuelve a publicar solo cada vez que se hace push a `main`.
+- **Base de datos PostgreSQL → [Neon](https://neon.com)**: plan gratis
+  permanente (no es una prueba, sin tarjeta), 1 GB. Se suspende tras 5 min
+  sin uso y despierta solo en la siguiente consulta.
+- **API y web → [Render](https://render.com)** con `render.yaml` (un
+  "Blueprint"): plan gratis que no vence; vuelve a publicar solo con cada
+  push a `main`.
 
 | Servicio | Qué es | URL esperada |
 |---|---|---|
-| `aurum-db` | PostgreSQL (Flyway crea las tablas al arrancar la API) | interna |
+| Neon `neondb` | PostgreSQL (Flyway crea las tablas al arrancar la API) | la da Neon |
 | `aurum-condominios-api` | API Spring Boot (`Dockerfile`) | `https://aurum-condominios-api.onrender.com` |
 | `aurum-condominios-web` | Web Spring Boot + Thymeleaf (`Dockerfile.web`) | `https://aurum-condominios-web.onrender.com` |
 
 ## Primera vez
 
+### A. Base de datos en Neon
+
+1. Crear cuenta en neon.com (con GitHub o Google).
+2. Crear un proyecto: nombre **aurum**, Postgres 16 o superior, región
+   **AWS US West 2 (Oregon)** (la misma de Render, para que sea rápida).
+3. En el proyecto, **Connect**: copiar la cadena de conexión
+   (`postgresql://neondb_owner:…@ep-….neon.tech/neondb?sslmode=require`).
+   No pegarla en ningún archivo del repositorio.
+
+### B. API y web en Render
+
 1. Crear cuenta en render.com con **GitHub** y autorizar el repositorio `PDA`.
 2. **New → Blueprint** → elegir el repositorio y la rama `main`. Render lee
-   `render.yaml` y muestra los tres recursos.
+   `render.yaml` y muestra los dos servicios.
 3. Render pide los valores marcados como secretos. Para la demostración:
+   - `DATABASE_URL`: la cadena de conexión de Neon (paso A.3).
    - `WOMPI_PUBLIC_KEY`, `WOMPI_INTEGRITY_SECRET`, `WOMPI_EVENTS_SECRET`,
      `WOMPI_PRIVATE_KEY`: las llaves **de prueba** de Wompi (las mismas de
      `api/config/wompi.properties`). Se pueden dejar vacías: el pago en línea
@@ -53,14 +68,16 @@ parqueaderos, vehículos y la cartera de los dos últimos meses
 
 - Cada servicio se **duerme tras 15 minutos sin uso**; la primera visita
   después tarda ~1 minuto en despertar (la web y luego la API).
-- La base de datos gratis **vence a los 30 días** (14 días de gracia para
-  pasarla a un plan pagado). Para uso continuo: plan pagado de la base y
-  `plan: starter` en los servicios.
+- Render da **750 horas gratis al mes** por cuenta; como los servicios se
+  duermen cuando nadie los usa, para una demostración alcanza. Si se agotan,
+  se pausan hasta el mes siguiente.
+- Neon gratis: 1 GB de datos y 100 horas de cómputo al mes (solo cuenta
+  mientras hay consultas).
 - 512 MB de memoria por servicio: los Dockerfile ya limitan la JVM.
 
 ## Cómo funciona la conexión a la base
 
-Render entrega `DATABASE_URL=postgresql://usuario:clave@host:puerto/db`. El
-`Dockerfile` de la API la convierte al formato JDBC
-(`jdbc:postgresql://host:puerto/db`) y el usuario y la clave van en
-`DB_USER` / `DB_PASSWORD`.
+Neon entrega `DATABASE_URL=postgresql://usuario:clave@host/db?sslmode=require`.
+`api/docker-entrypoint.sh` la convierte al formato JDBC
+(`jdbc:postgresql://host/db?sslmode=require`) y saca de ella el usuario y la
+clave (`DB_USER` / `DB_PASSWORD`).

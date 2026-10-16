@@ -12,6 +12,8 @@ COPY --from=build /app/target/*-exec.jar app.jar
 # Instancias pequeñas (512 MB): la JVM se ajusta a la memoria del contenedor.
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=70 -XX:+UseSerialGC -Xss512k"
 EXPOSE 8080
-# Render entrega la base como DATABASE_URL=postgresql://usuario:clave@host:puerto/db;
-# Java necesita jdbc:postgresql://host:puerto/db (usuario y clave van en DB_USER/DB_PASSWORD).
-ENTRYPOINT ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then export DB_URL=\"jdbc:postgresql://${DATABASE_URL#*@}\"; fi; exec java -jar app.jar --server.port=${PORT:-8080}"]
+# DATABASE_URL (Neon/Render) → JDBC: ver api/docker-entrypoint.sh.
+# tr quita los fin de línea de Windows por si el archivo llega con CRLF.
+COPY api/docker-entrypoint.sh /app/arranque.tmp
+RUN tr -d '\r' < /app/arranque.tmp > /app/arranque.sh && rm /app/arranque.tmp && chmod +x /app/arranque.sh
+ENTRYPOINT ["/app/arranque.sh"]
