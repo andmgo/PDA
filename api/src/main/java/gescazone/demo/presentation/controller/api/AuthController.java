@@ -68,7 +68,11 @@ public class AuthController {
 
     /**
      * Datos y permisos ACTUALES de la cuenta del JWT (mismo formato que el
-     * login, sin token). La web y la app los guardaban solo al iniciar sesión:
+     * login) y un token renovado: mientras la web o la app sigan
+     * consultando, la sesión no vence por las 24 h fijas del token (antes a
+     * un vigilante con la página abierta todo el turno lo sacaba con
+     * "cuenta desactivada"). Una cuenta desactivada recibe 401 antes de
+     * llegar aquí, así que no se le renueva nada. La web y la app los guardaban solo al iniciar sesión:
      * si un administrador cambiaba los permisos del rol, o se creaba un
      * permiso nuevo, no se enteraban hasta volver a entrar.
      */
@@ -77,6 +81,7 @@ public class AuthController {
         UsuarioModel usuario = usuarioService.consultar(authentication.getName());
         String nombreRol = usuario.getRol().getNombreRol();
         return ResponseEntity.ok(Map.of(
+                "token", jwtTokenProvider.generateToken(authentication),
                 "numeroDocumento", usuario.getNumeroDocumento(),
                 "nombre", usuario.getNombre(),
                 "apellido", usuario.getApellido(),

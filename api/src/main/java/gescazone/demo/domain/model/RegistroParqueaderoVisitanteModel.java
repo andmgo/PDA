@@ -83,4 +83,10 @@ public class RegistroParqueaderoVisitanteModel {
 
     public String getIdRegistradoPor() { return idRegistradoPor; }
     public void setIdRegistradoPor(String idRegistradoPor) { this.idRegistradoPor = idRegistradoPor; }
+
+    /** Quién dio el paso al visitante (residente que autorizó). */
+    private String autorizadoPor;
+
+    public String getAutorizadoPor() { return autorizadoPor; }
+    public void setAutorizadoPor(String autorizadoPor) { this.autorizadoPor = autorizadoPor; }
 }

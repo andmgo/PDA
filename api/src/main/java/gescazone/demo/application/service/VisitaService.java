@@ -17,6 +17,7 @@ import gescazone.demo.domain.repository.ParqueaderoRepository;
 import gescazone.demo.domain.repository.RegistroParqueaderoVisitanteRepository;
 import gescazone.demo.domain.repository.RegistroVisitanteRepository;
 import gescazone.demo.domain.repository.ResidenteRepository;
+import gescazone.demo.domain.repository.UsuarioApartamentoRepository;
 import gescazone.demo.domain.repository.UsuarioRepository;
 import gescazone.demo.domain.repository.VehiculoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,16 +65,22 @@ public class VisitaService {
     /**
      * @param idAutorizacion       visita autorizada por el propietario (opcional): completa los datos que falten
      * @param documentoRegistrador documento del funcionario que registra (sale del JWT, para auditoría)
+     * @param autorizadoPor        quién dio el paso (residente que autorizó); obligatorio si no hay
+     *                             visita autorizada previamente
      */
     public record Ingreso(String numeroDocumento, String nombre, String apellido, String celular,
                           String numeroApartamento, boolean conVehiculo, String placa, String numeroParqueadero,
-                          String idAutorizacion, String documentoRegistrador) {
+                          String idAutorizacion, String documentoRegistrador, String autorizadoPor) {
         public Ingreso(String numeroDocumento, String nombre, String apellido, String celular,
-                       String numeroApartamento, boolean conVehiculo, String placa, String numeroParqueadero) {
+                       String numeroApartamento, boolean conVehiculo, String placa, String numeroParqueadero,
+                       String autorizadoPor) {
             this(numeroDocumento, nombre, apellido, celular, numeroApartamento, conVehiculo, placa, numeroParqueadero,
-                    null, null);
+                    null, null, autorizadoPor);
         }
     }
+
+    /** Quién vive en un apartamento, para que portería sepa a quién pedir autorización. */
+    public record Habitantes(String numeroApartamento, List<String> propietarios) {}
 
     static final DateTimeFormatter FORMATO = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final String TIPO_VISITANTE = "Visitante";
@@ -90,6 +97,7 @@ public class VisitaService {
     @Autowired private VehiculoRepository vehiculoRepository;
     @Autowired private VisitaAutorizadaService visitaAutorizadaService;
     @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private UsuarioApartamentoRepository usuarioApartamentoRepository;
 
     // ── Consultas ──────────────────────────────────────────────────────────
 
@@ -181,6 +189,17 @@ public class VisitaService {
         }
         RequiereActivo.apartamento(apartamento);
 
+        // Quién dio el paso: con visita autorizada, el propietario que la creó;
+        // si no, el vigilante debe indicar quién autorizó (citófono, en persona).
+        String autorizadoPor = autorizacion != null
+                ? java.util.Objects.requireNonNullElse(visitaAutorizadaService.nombreAutor(autorizacion.getId()),
+                        "Visita autorizada por el propietario")
+                : (vacio(datos.autorizadoPor()) ? null : datos.autorizadoPor().trim());
+        if (autorizadoPor == null)
+            throw new ValidationException("Indica quién autorizó el ingreso (el residente que dio el paso)");
+        if (autorizadoPor.length() > 150)
+            throw new ValidationException("El nombre de quien autorizó es demasiado largo");
+
         ResidenteModel visitante = residenteRepository.findByNumeroDocumento(documento)
                 .orElseGet(() -> crearVisitante(documento, nombreIngresado, apellidoIngresado, datos.celular()));
         if (!visitante.isActivo())
@@ -196,13 +215,13 @@ public class VisitaService {
         String idAutorizacion = autorizacion == null ? null : autorizacion.getId();
         String idRegistrador = vacio(datos.documentoRegistrador()) ? null
                 : usuarioRepository.findByNumeroDocumento(datos.documentoRegistrador()).map(UsuarioModel::getId).orElse(null);
-        String conAutorizacion = autorizacion == null ? ""
-                : " · autorizado por " + visitaAutorizadaService.nombreAutor(autorizacion.getId());
+        String conAutorizacion = " · autorizó " + autorizadoPor;
 
         if (!datos.conVehiculo()) {
             RegistroVisitanteModel registro = new RegistroVisitanteModel(visitante.getId(), apartamento.getId(), ahora);
             registro.setIdVisitaAutorizada(idAutorizacion);
             registro.setIdRegistradoPor(idRegistrador);
+            registro.setAutorizadoPor(autorizadoPor);
             registroVisitanteRepository.save(registro);
             return "Ingreso registrado: " + nombre + " → apartamento " + apartamento.getNumero() + conAutorizacion;
         }
@@ -222,9 +241,34 @@ public class VisitaService {
         registro.setIdApartamento(apartamento.getId());
         registro.setIdVisitaAutorizada(idAutorizacion);
         registro.setIdRegistradoPor(idRegistrador);
+        registro.setAutorizadoPor(autorizadoPor);
         registroParqueaderoRepository.save(registro);
         return "Ingreso registrado: " + nombre + " (" + placa + ") → apartamento " + apartamento.getNumero()
                 + ", parqueadero " + parqueadero.getNumero() + conAutorizacion;
+    }
+
+    /** Registros viejos no tienen autorizado_por: se usa el autor de la visita autorizada. */
+    private String quienAutorizo(String autorizadoPor, String idVisitaAutorizada) {
+        return autorizadoPor != null ? autorizadoPor : visitaAutorizadaService.nombreAutor(idVisitaAutorizada);
+    }
+
+    /**
+     * Libro de portería, consulta puntual: solo los NOMBRES de los
+     * propietarios de UN apartamento (sin documento, correo ni teléfono),
+     * lo mínimo para saber a quién pedir la autorización.
+     */
+    public Habitantes habitantes(String numeroApartamento) {
+        if (vacio(numeroApartamento)) throw new ValidationException("Indica el apartamento");
+        ApartamentoModel apartamento = apartamentoRepository.findByNumero(numeroApartamento.trim().toUpperCase(Locale.ROOT))
+                .orElseThrow(() -> new NotFoundException("El apartamento " + numeroApartamento.trim() + " no existe"));
+        List<String> nombres = usuarioApartamentoRepository.findUsuarioIdsByApartamento(apartamento.getId()).stream()
+                .map(usuarioRepository::findById)
+                .flatMap(java.util.Optional::stream)
+                .filter(UsuarioModel::isActivo)
+                .map(u -> u.getNombre() + " " + u.getApellido())
+                .sorted()
+                .toList();
+        return new Habitantes(apartamento.getNumero(), nombres);
     }
 
     public String registrarSalida(Tipo tipo, String idRegistro) {
@@ -295,7 +339,7 @@ public class VisitaService {
         ResidenteModel v = residenteRepository.findById(r.getIdResidente()).orElse(null);
         return new Visita(r.getId(), Tipo.PEATON, v == null ? null : v.getNumeroDocumento(), nombre(v),
                 numeroApartamento(r.getIdApartamento()), null, null, r.getFechaHoraEntrada(), r.getFechaHoraSalida(),
-                visitaAutorizadaService.nombreAutor(r.getIdVisitaAutorizada()));
+                quienAutorizo(r.getAutorizadoPor(), r.getIdVisitaAutorizada()));
     }
 
     private Visita aVisita(RegistroParqueaderoVisitanteModel r) {
@@ -303,7 +347,7 @@ public class VisitaService {
         String parqueadero = parqueaderoRepository.findById(r.getIdParqueadero()).map(ParqueaderoModel::getNumero).orElse(null);
         return new Visita(r.getId(), Tipo.VEHICULO, v == null ? null : v.getNumeroDocumento(), nombre(v),
                 numeroApartamento(r.getIdApartamento()), r.getPlaca(), parqueadero, r.getFechaHoraEntrada(), r.getFechaHoraSalida(),
-                visitaAutorizadaService.nombreAutor(r.getIdVisitaAutorizada()));
+                quienAutorizo(r.getAutorizadoPor(), r.getIdVisitaAutorizada()));
     }
 
     private String nombre(ResidenteModel v) {

@@ -33,6 +33,7 @@ public class RegistroVisitanteRepositoryImpl implements RegistroVisitanteReposit
         model.setFechaHoraEntrada(FechaTexto.aTexto(entity.getFechaHoraEntrada()));
         model.setFechaHoraSalida(FechaTexto.aTexto(entity.getFechaHoraSalida()));
         model.setIdVisitaAutorizada(entity.getVisitaAutorizadaId() == null ? null : entity.getVisitaAutorizadaId().toString());
+        model.setAutorizadoPor(entity.getAutorizadoPor());
         model.setIdRegistradoPor(entity.getRegistradoPorUsuarioId() == null ? null : entity.getRegistradoPorUsuarioId().toString());
         return model;
     }
@@ -45,6 +46,7 @@ public class RegistroVisitanteRepositoryImpl implements RegistroVisitanteReposit
         entity.setFechaHoraEntrada(FechaTexto.aFecha(model.getFechaHoraEntrada()));
         entity.setFechaHoraSalida(FechaTexto.aFecha(model.getFechaHoraSalida()));
         entity.setVisitaAutorizadaId(model.getIdVisitaAutorizada() == null ? null : UUID.fromString(model.getIdVisitaAutorizada()));
+        entity.setAutorizadoPor(model.getAutorizadoPor());
         entity.setRegistradoPorUsuarioId(model.getIdRegistradoPor() == null ? null : UUID.fromString(model.getIdRegistradoPor()));
         return entity;
     }

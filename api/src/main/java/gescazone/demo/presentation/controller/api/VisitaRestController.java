@@ -52,6 +52,12 @@ public class VisitaRestController {
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
+    /** Libro de portería: nombres de quienes viven en un apartamento (consulta puntual). */
+    @GetMapping("/apartamento/{numero}/habitantes")
+    public ResponseEntity<VisitaService.Habitantes> habitantes(@PathVariable String numero) {
+        return ResponseEntity.ok(visitaService.habitantes(numero));
+    }
+
     @GetMapping("/dentro")
     public ResponseEntity<List<VisitaService.Visita>> dentro() {
         return ResponseEntity.ok(visitaService.dentro());
@@ -79,7 +85,7 @@ public class VisitaRestController {
                 texto(datos, "celular"), texto(datos, "numeroApartamento"),
                 Boolean.TRUE.equals(datos.get("conVehiculo")),
                 texto(datos, "placa"), texto(datos, "numeroParqueadero"),
-                texto(datos, "idAutorizacion"), authentication.getName());
+                texto(datos, "idAutorizacion"), authentication.getName(), texto(datos, "autorizadoPor"));
         return ResponseEntity.status(HttpStatus.CREATED).body(visitaService.registrarIngreso(ingreso));
     }
 

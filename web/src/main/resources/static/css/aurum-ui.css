@@ -625,3 +625,7 @@ li.gsz-vacio { list-style: none; border: 1px dashed var(--gsz-border); border-ra
 .gsz-paq-quien { color: var(--gsz-ink-muted); }
 /* En modo oscuro las tarjetas ya son azul noche: avatar y número de apartamento pasan a azul líder. */
 .dark .gsz-visita-avatar, .dark .gsz-apto { background: var(--aurum-noche); box-shadow: inset 0 0 0 1px var(--gsz-filo); }
+/* Libro de portería: quién vive en el apartamento (solo nombres) */
+.gsz-habitantes { margin: -4px 0 0; font-size: 13px; line-height: 1.5; color: var(--gsz-ink-muted); }
+.gsz-habitantes:empty { display: none; }
+.gsz-habitantes b { color: var(--gsz-ink); }

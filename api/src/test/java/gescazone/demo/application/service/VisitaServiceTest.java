@@ -42,6 +42,7 @@ class VisitaServiceTest {
     @Mock private VehiculoRepository vehiculoRepository;
     @Mock private VisitaAutorizadaService visitaAutorizadaService;
     @Mock private gescazone.demo.domain.repository.UsuarioRepository usuarioRepository;
+    @Mock private gescazone.demo.domain.repository.UsuarioApartamentoRepository usuarioApartamentoRepository;
 
     @InjectMocks
     private VisitaService visitaService;
@@ -82,7 +83,7 @@ class VisitaServiceTest {
     }
 
     private VisitaService.Ingreso aPie(String doc, String nombre, String apellido) {
-        return new VisitaService.Ingreso(doc, nombre, apellido, null, "301", false, null, null);
+        return new VisitaService.Ingreso(doc, nombre, apellido, null, "301", false, null, null, "Elena Vásquez");
     }
 
     @Test
@@ -146,7 +147,7 @@ class VisitaServiceTest {
         when(apartamentoRepository.findByNumero("999")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> visitaService.registrarIngreso(
-                new VisitaService.Ingreso("1001", "Luis", "Gómez", null, "999", false, null, null)))
+                new VisitaService.Ingreso("1001", "Luis", "Gómez", null, "999", false, null, null, "Elena Vásquez")))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -162,7 +163,7 @@ class VisitaServiceTest {
         when(registroParqueaderoRepository.findByFechaHoraSalidaIsNull()).thenReturn(List.of());
 
         String resultado = visitaService.registrarIngreso(
-                new VisitaService.Ingreso("1001", null, null, null, "301", true, "abc-123", null));
+                new VisitaService.Ingreso("1001", null, null, null, "301", true, "abc-123", null, "Elena Vásquez"));
 
         assertThat(resultado).contains("P-03").contains("ABC123");
         verify(registroParqueaderoRepository).save(argThat(r ->
@@ -177,7 +178,7 @@ class VisitaServiceTest {
         when(registroParqueaderoRepository.findByFechaHoraSalidaIsNull()).thenReturn(List.of());
 
         assertThatThrownBy(() -> visitaService.registrarIngreso(
-                new VisitaService.Ingreso("1001", null, null, null, "301", true, "ABC123", null)))
+                new VisitaService.Ingreso("1001", null, null, null, "301", true, "ABC123", null, "Elena Vásquez")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("No hay parqueaderos libres");
     }
@@ -190,7 +191,7 @@ class VisitaServiceTest {
         when(registroParqueaderoRepository.findByFechaHoraSalidaIsNull()).thenReturn(List.of(adentro));
 
         assertThatThrownBy(() -> visitaService.registrarIngreso(
-                new VisitaService.Ingreso("1001", null, null, null, "301", true, "ABC 123", null)))
+                new VisitaService.Ingreso("1001", null, null, null, "301", true, "ABC 123", null, "Elena Vásquez")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("ya está dentro");
     }
@@ -236,12 +237,54 @@ class VisitaServiceTest {
 
         // Portería no escribe nada: solo elige la autorización
         String resultado = visitaService.registrarIngreso(new VisitaService.Ingreso(
-                null, null, null, null, null, false, null, null, "aut-1", "200000001"));
+                null, null, null, null, null, false, null, null, "aut-1", "200000001", null));
 
-        assertThat(resultado).contains("Carla Mejía").contains("301").contains("autorizado por Elena Vásquez");
+        assertThat(resultado).contains("Carla Mejía").contains("301").contains("autorizó Elena Vásquez");
         verify(residenteRepository).save(argThat(r -> "5551234".equals(r.getNumeroDocumento())));
         verify(registroVisitanteRepository).save(argThat(r ->
                 "aut-1".equals(r.getIdVisitaAutorizada()) && "func-1".equals(r.getIdRegistradoPor())));
+    }
+
+    @Test
+    void habitantes_soloNombresDePropietariosActivos() {
+        var elena = new gescazone.demo.domain.model.UsuarioModel();
+        elena.setNombre("Elena");
+        elena.setApellido("Vásquez");
+        elena.setActivo(true);
+        var inactivo = new gescazone.demo.domain.model.UsuarioModel();
+        inactivo.setNombre("Ex");
+        inactivo.setApellido("Dueño");
+        inactivo.setActivo(false);
+        when(usuarioApartamentoRepository.findUsuarioIdsByApartamento("apto-1")).thenReturn(java.util.List.of("u1", "u2"));
+        when(usuarioRepository.findById("u1")).thenReturn(Optional.of(elena));
+        when(usuarioRepository.findById("u2")).thenReturn(Optional.of(inactivo));
+
+        var h = visitaService.habitantes(" 301 ");
+
+        assertThat(h.numeroApartamento()).isEqualTo("301");
+        assertThat(h.propietarios()).containsExactly("Elena Vásquez");
+    }
+
+    @Test
+    void ingresoSinAutorizacionPrevia_exigeQuienAutorizo() {
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.of(visitante("res-1", true)));
+
+        assertThatThrownBy(() -> visitaService.registrarIngreso(
+                new VisitaService.Ingreso("1001", null, null, null, "301", false, null, null, " ")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("quién autorizó");
+        verifyNoInteractions(registroVisitanteRepository);
+    }
+
+    @Test
+    void ingresoSinAutorizacionPrevia_guardaQuienAutorizo() {
+        when(residenteRepository.findByNumeroDocumento("1001")).thenReturn(Optional.of(visitante("res-1", true)));
+
+        String r = visitaService.registrarIngreso(
+                new VisitaService.Ingreso("1001", null, null, null, "301", false, null, null, " Pedro (hijo) "));
+
+        assertThat(r).contains("autorizó Pedro (hijo)");
+        verify(registroVisitanteRepository).save(argThat(reg -> "Pedro (hijo)".equals(reg.getAutorizadoPor())));
     }
 
     @Test
@@ -251,7 +294,7 @@ class VisitaServiceTest {
         when(visitaAutorizadaService.vigenteParaIngreso("aut-1")).thenReturn(sinDocumento);
 
         assertThatThrownBy(() -> visitaService.registrarIngreso(new VisitaService.Ingreso(
-                null, null, null, null, null, false, null, null, "aut-1", null)))
+                null, null, null, null, null, false, null, null, "aut-1", null, null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("pídeselo");
     }
@@ -261,7 +304,7 @@ class VisitaServiceTest {
         when(residenteRepository.findByNumeroDocumento("5551234")).thenReturn(Optional.of(visitante("res-1", true)));
         when(visitaAutorizadaService.vigenteParaDocumento("5551234", "apto-1")).thenReturn(Optional.of(autorizacion()));
 
-        visitaService.registrarIngreso(new VisitaService.Ingreso("5551234", null, null, null, "301", false, null, null));
+        visitaService.registrarIngreso(new VisitaService.Ingreso("5551234", null, null, null, "301", false, null, null, "Elena Vásquez"));
 
         verify(registroVisitanteRepository).save(argThat(r -> "aut-1".equals(r.getIdVisitaAutorizada())));
     }

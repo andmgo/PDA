@@ -37,8 +37,9 @@ public class SesionUsuario {
         this.permisos = resultado.permisos() != null ? resultado.permisos() : List.of();
     }
 
-    /** Refresca rol y permisos sin cambiar el token (ver CuentaActivaFilter). */
+    /** Refresca rol, permisos y token renovado (ver CuentaActivaFilter). */
     public void actualizar(LoginResultado actual) {
+        if (actual.token() != null && !actual.token().isBlank()) this.jwt = actual.token();
         this.nombre = actual.nombre();
         this.apellido = actual.apellido();
         this.nombreRol = actual.nombreRol();

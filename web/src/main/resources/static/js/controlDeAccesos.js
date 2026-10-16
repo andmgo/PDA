@@ -94,7 +94,7 @@ function estadoVisitante(html, clase) {
 function alEscribirDocumento() {
     clearTimeout(busquedaVisitante);
     const doc = document.getElementById('docVisitante').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (autorizacionElegida && autorizacionElegida.numeroDocumento !== doc) autorizacionElegida = null;
+    if (autorizacionElegida && autorizacionElegida.numeroDocumento !== doc) { autorizacionElegida = null; liberarAutorizadoPor(); }
     if (doc.length < 5) { estadoVisitante(''); return; }
     busquedaVisitante = setTimeout(async () => {
         const autorizada = await pedir(`/api/accesos/visitas/autorizada/${doc}`).catch(() => null);
@@ -137,11 +137,14 @@ async function registrarIngreso(event) {
             conVehiculo: modoIngreso === 'vehiculo',
             placa: valor('placaVisitante'),
             numeroParqueadero: valor('parqueaderoVisitante'),
-            idAutorizacion: autorizacionElegida ? autorizacionElegida.id : null
+            idAutorizacion: autorizacionElegida ? autorizacionElegida.id : null,
+            autorizadoPor: valor('autorizadoPor')
         });
         autorizacionElegida = null;
         aviso('ingresoAviso', mensaje, false);
         document.getElementById('ingresoForm').reset();
+        liberarAutorizadoPor();
+        mostrarHabitantes(null);
         estadoVisitante('');
         elegirModo(document.querySelector('[data-modo="pie"]'));
         document.getElementById('docVisitante').focus();
@@ -267,6 +270,41 @@ function pintarEsperados() {
     }).join('');
 }
 
+// ── Libro de portería: quién vive en el apartamento (solo nombres) ─────────
+
+let busquedaHabitantes = null;
+
+function liberarAutorizadoPor() {
+    const autorizo = document.getElementById('autorizadoPor');
+    autorizo.readOnly = false;
+}
+
+function mostrarHabitantes(h) {
+    const info = document.getElementById('habitantesInfo');
+    const lista = document.getElementById('habitantesApto');
+    if (!h) { info.textContent = ''; lista.innerHTML = ''; return; }
+    lista.innerHTML = h.propietarios.map(n => `<option value="${esc(n)}"></option>`).join('');
+    info.innerHTML = h.propietarios.length
+        ? `Viven en el <b>${esc(h.numeroApartamento)}</b>: ${h.propietarios.map(esc).join(', ')}`
+        : `El <b>${esc(h.numeroApartamento)}</b> no tiene propietarios registrados: confirma con quien esté en el apartamento.`;
+}
+
+async function cargarHabitantes(numero) {
+    try {
+        mostrarHabitantes(await pedir(`/api/accesos/visitas/apartamento/${encodeURIComponent(numero)}/habitantes`));
+    } catch (e) {
+        mostrarHabitantes(null);
+    }
+}
+
+function alEscribirApartamento() {
+    clearTimeout(busquedaHabitantes);
+    const numero = document.getElementById('aptoVisitante').value.trim();
+    if (!autorizacionElegida) liberarAutorizadoPor();
+    if (!numero) { mostrarHabitantes(null); return; }
+    busquedaHabitantes = setTimeout(() => cargarHabitantes(numero), 350);
+}
+
 function usarAutorizacionPorId(id) {
     const a = esperados.find(x => x.id === id);
     if (a) usarAutorizacion(a, true);
@@ -283,6 +321,11 @@ function usarAutorizacion(a, desdeLista) {
     campo('nombreVisitante', a.nombreVisitante);
     campo('apellidoVisitante', a.apellidoVisitante);
     campo('aptoVisitante', a.numeroApartamento);
+    // Con visita autorizada, el que da el paso es el propietario que la creó.
+    const autorizo = document.getElementById('autorizadoPor');
+    autorizo.value = a.autorizadaPor || '';
+    autorizo.readOnly = true;
+    cargarHabitantes(a.numeroApartamento);
     if (a.placa) {
         elegirModo(document.querySelector('[data-modo="vehiculo"]'));
         document.getElementById('placaVisitante').value = a.placa;
@@ -409,6 +452,7 @@ function confirmarCerrarSesion(event) {
 
 window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('docVisitante').addEventListener('input', alEscribirDocumento);
+    document.getElementById('aptoVisitante').addEventListener('input', alEscribirApartamento);
     cargarEsperados();
     setInterval(cargarEsperados, 60000);
     document.getElementById('placaVisitante').addEventListener('input', e => {

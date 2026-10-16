@@ -74,4 +74,10 @@ public class RegistroParqueaderoVisitanteEntity {
 
     public UUID getRegistradoPorUsuarioId() { return registradoPorUsuarioId; }
     public void setRegistradoPorUsuarioId(UUID registradoPorUsuarioId) { this.registradoPorUsuarioId = registradoPorUsuarioId; }
+
+    @Column(name = "autorizado_por")
+    private String autorizadoPor;
+
+    public String getAutorizadoPor() { return autorizadoPor; }
+    public void setAutorizadoPor(String autorizadoPor) { this.autorizadoPor = autorizadoPor; }
 }

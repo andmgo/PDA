@@ -50,6 +50,13 @@
               <label class="gsz-campo"><span>Apartamento</span><input type="text" id="aptoVisitante" maxlength="10" required placeholder="Ej: 301" /></label>
               <label class="gsz-campo"><span>Celular <em>(opcional)</em></span><input type="text" id="celularVisitante" inputmode="tel" maxlength="15" placeholder="300 000 0000" /></label>
             </div>
+            <p id="habitantesInfo" class="gsz-habitantes" aria-live="polite"></p>
+            <label class="gsz-campo">
+              <span>¿Quién autorizó el ingreso?</span>
+              <input type="text" id="autorizadoPor" list="habitantesApto" maxlength="150" required autocomplete="off"
+                     placeholder="Residente que dio el paso" />
+              <datalist id="habitantesApto"></datalist>
+            </label>
 
             <div class="gsz-campo">
               <span>¿Cómo llega?</span>
