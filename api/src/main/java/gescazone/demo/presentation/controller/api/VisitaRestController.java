@@ -1,6 +1,7 @@
 package gescazone.demo.presentation.controller.api;
 
 import gescazone.demo.application.exception.ValidationException;
+import gescazone.demo.application.service.LectorPlacaService;
 import gescazone.demo.application.service.VisitaAutorizadaService;
 import gescazone.demo.application.service.VisitaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,15 @@ public class VisitaRestController {
 
     @Autowired
     private VisitaAutorizadaService visitaAutorizadaService;
+
+    @Autowired
+    private LectorPlacaService lectorPlacaService;
+
+    /** Lector de placas (Fase 8): residente, visitante dentro, autorizada o desconocida. */
+    @GetMapping("/placa/{placa}")
+    public ResponseEntity<LectorPlacaService.Lectura> placa(@PathVariable String placa) {
+        return ResponseEntity.ok(lectorPlacaService.consultar(placa));
+    }
 
     /** Visitas que los propietarios autorizaron para hoy (Fase 6). */
     @GetMapping("/esperadas")
