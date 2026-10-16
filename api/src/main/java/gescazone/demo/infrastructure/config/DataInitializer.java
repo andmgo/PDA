@@ -9,9 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +34,9 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JdbcTemplate jdbc;
 
     private RolModel rol(String nombre) {
         RolModel r = new RolModel();
@@ -240,5 +246,12 @@ public class DataInitializer implements CommandLineRunner {
         adicionales.add(usuario("300000100", "Norberto",  "Ospina",    "norberto.ospina@gmail.com",      "pro100", "Propietario", "CC"));
 
         adicionales.forEach(this::guardar);
+
+        // ── Conjunto de demostración (una sola vez, con la base vacía) ────────
+        Integer apartamentos = jdbc.queryForObject("SELECT count(*) FROM apartamentos", Integer.class);
+        if (apartamentos != null && apartamentos == 0) {
+            jdbc.execute(new ClassPathResource("db/demo/conjunto-demo.sql").getContentAsString(StandardCharsets.UTF_8));
+            log.info("Conjunto de demostración creado (apartamentos, propietarios, salones, parqueaderos, cartera)");
+        }
     }
 }

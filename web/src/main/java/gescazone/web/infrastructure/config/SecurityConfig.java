@@ -149,6 +149,10 @@ public class SecurityConfig {
                     request.setAttribute("codigo",  403);
                     request.setAttribute("mensaje", "No tienes permisos para acceder a esta sección.");
                     request.setAttribute("ruta",    request.getRequestURI());
+                    // Sin el código de estado, el controlador de errores de Spring
+                    // responde 500 ("status 999") en vez de la página de acceso denegado.
+                    request.setAttribute(jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE, 403);
+                    response.setStatus(403);
                     request.getRequestDispatcher("/error").forward(request, response);
                 })
             );

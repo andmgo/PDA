@@ -1,0 +1,88 @@
+# Despliegue en Render (Blueprint): base de datos + API + web.
+# Render → New → Blueprint → elegir este repositorio. Ver docs/DESPLIEGUE.md.
+#
+# Plan gratis: los servicios se duermen tras 15 min sin uso (el primer acceso
+# tarda ~1 min) y la base gratis vence a los 30 días. Para uso real, subir a
+# planes pagados cambiando "plan" abajo.
+#
+# En el plan gratis la web no puede llamar a la API por la red privada: usa
+# su URL pública (API_BASE_URL). Si Render le asignó otra URL a la API
+# (porque el nombre ya existía), corregir API_BASE_URL y APP_CORS_ALLOWED_ORIGINS.
+
+databases:
+  - name: aurum-db
+    plan: free
+    region: oregon
+    databaseName: gescazone
+    user: aurum
+
+services:
+  - type: web
+    name: aurum-condominios-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - api/**
+        - Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aurum-db
+          property: connectionString
+      - key: DB_USER
+        fromDatabase:
+          name: aurum-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: aurum-db
+          property: password
+      # "dev" carga los datos de demostración (usuarios de prueba). Para un
+      # conjunto real: prod.
+      - key: SPRING_PROFILES_ACTIVE
+        value: dev
+      - key: JWT_SECRET
+        generateValue: true
+      - key: INTERNAL_API_KEY
+        generateValue: true
+      - key: APP_CORS_ALLOWED_ORIGINS
+        value: https://aurum-condominios-web.onrender.com
+      # Secretos: Render los pide al crear el Blueprint (no van en el repo).
+      - key: WOMPI_PUBLIC_KEY
+        sync: false
+      - key: WOMPI_INTEGRITY_SECRET
+        sync: false
+      - key: WOMPI_EVENTS_SECRET
+        sync: false
+      - key: WOMPI_PRIVATE_KEY
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+
+  - type: web
+    name: aurum-condominios-web
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile.web
+    dockerContext: .
+    autoDeployTrigger: commit
+    buildFilter:
+      paths:
+        - web/**
+        - Dockerfile.web
+    envVars:
+      - key: API_BASE_URL
+        value: https://aurum-condominios-api.onrender.com
+      - key: INTERNAL_API_KEY
+        fromService:
+          name: aurum-condominios-api
+          type: web
+          envVarKey: INTERNAL_API_KEY
