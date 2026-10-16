@@ -4,7 +4,9 @@ import gescazone.demo.application.exception.NotFoundException;
 import gescazone.demo.domain.model.UsuarioModel;
 import gescazone.demo.domain.model.RolModel;
 import gescazone.demo.domain.model.TipoDocumentoModel;
+import gescazone.demo.application.service.PermisoService;
 import gescazone.demo.application.service.UsuarioService;
+import gescazone.demo.domain.model.NivelPermiso;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,9 @@ public class UsuarioRestController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private PermisoService permisoService;
+
     @GetMapping("/todos")
     public ResponseEntity<List<Map<String, Object>>> obtenerTodos() {
         return ResponseEntity.ok(usuarioService.consultarTodos()
@@ -29,7 +34,17 @@ public class UsuarioRestController {
     }
 
     @GetMapping("/{numeroDocumento}")
-    public ResponseEntity<Map<String, Object>> obtenerPorDocumento(@PathVariable String numeroDocumento) {
+    public ResponseEntity<Map<String, Object>> obtenerPorDocumento(@PathVariable String numeroDocumento,
+                                                                   Authentication authentication) {
+        // Cada quien ve sus datos; los de otros, solo quien administra usuarios.
+        // Antes bastaba USUARIOS ver (lo tienen los propietarios): cualquiera
+        // podía consultar el correo de otra persona con su documento.
+        if (!numeroDocumento.equals(authentication.getName())) {
+            UsuarioModel solicitante = usuarioService.consultar(authentication.getName());
+            boolean administra = solicitante != null && solicitante.getRol() != null
+                    && permisoService.tienePermiso(solicitante.getRol().getNombreRol(), "USUARIOS", NivelPermiso.EDITAR);
+            if (!administra) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         UsuarioModel usuario = usuarioService.consultar(numeroDocumento);
         if (usuario == null)
             return ResponseEntity.notFound().build();

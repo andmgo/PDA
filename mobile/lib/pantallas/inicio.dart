@@ -9,6 +9,7 @@ import 'lector_placas.dart';
 import 'mis_visitas.dart';
 import 'paquetes.dart';
 import 'porteria.dart';
+import 'reservas.dart';
 
 /// Inicio según los PERMISOS del rol (los mismos de "Roles y permisos" en la
 /// web), no según el nombre del rol: un rol nuevo como VIGILANTE con permiso
@@ -21,8 +22,17 @@ class PantallaInicio extends StatefulWidget {
   /// Se llama cuando el API devuelve permisos distintos a los guardados.
   final void Function(Sesion)? alActualizarSesion;
 
+  /// Si la sección también es una pestaña de la barra inferior, cambia a ella
+  /// (true) en vez de abrir otra copia encima.
+  final bool Function(String clave)? alIrAPestana;
+
   const PantallaInicio(
-      {super.key, required this.api, required this.sesion, required this.alCerrarSesion, this.alActualizarSesion});
+      {super.key,
+      required this.api,
+      required this.sesion,
+      required this.alCerrarSesion,
+      this.alActualizarSesion,
+      this.alIrAPestana});
 
   @override
   State<PantallaInicio> createState() => _PantallaInicioState();
@@ -44,6 +54,12 @@ class _PantallaInicioState extends State<PantallaInicio> {
   bool get _paquetes => _s.puedeVer('PAQUETES');
   bool get _visitas => _s.puedeVer('VISITAS');
   bool get _misPaquetesPermiso => _s.puedeVer('MIS_PAQUETES');
+
+  /// Pestaña de la barra inferior si existe; si no, abre la pantalla encima.
+  Future<void> _abrirSeccion(String clave, Widget Function() pantalla) async {
+    if (widget.alIrAPestana?.call(clave) == true) return;
+    await _abrir(pantalla());
+  }
 
   /// Abre una pantalla y al volver refresca el inicio (pudo cambiar quién está dentro).
   Future<void> _abrir(Widget pantalla) async {
@@ -292,7 +308,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
             icono: Icons.event_available_outlined,
             titulo: 'Mis visitas',
             subtitulo: 'Autorizar visitantes',
-            alTocar: () => _abrir(PantallaMisVisitas(api: widget.api))),
+            alTocar: () => _abrirSeccion('visitas', () => PantallaMisVisitas(api: widget.api))),
       if (_misPaquetesPermiso)
         TarjetaAccion(
             icono: Icons.markunread_mailbox_outlined,
@@ -304,7 +320,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
             icono: Icons.how_to_reg_outlined,
             titulo: 'Control de accesos',
             subtitulo: 'Ingreso de visitantes',
-            alTocar: () => _abrir(PantallaPorteria(api: widget.api))),
+            alTocar: () => _abrirSeccion('porteria', () => PantallaPorteria(api: widget.api))),
         TarjetaAccion(
             icono: Icons.document_scanner_outlined,
             titulo: 'Lector de placas',
@@ -318,11 +334,11 @@ class _PantallaInicioState extends State<PantallaInicio> {
             subtitulo: 'Portería',
             alTocar: () => _abrir(PantallaPaquetes(api: widget.api))),
       if (_s.puedeVer('RESERVAS'))
-        const TarjetaAccion(
+        TarjetaAccion(
             icono: Icons.calendar_month_outlined,
             titulo: 'Reservas',
             subtitulo: 'Salón social',
-            proximamente: 'próxima fase'),
+            alTocar: () => _abrirSeccion('reservas', () => PantallaReservas(api: widget.api))),
     ];
     return LayoutBuilder(builder: (context, c) {
       final columnas = c.maxWidth > 560 ? 3 : 2;

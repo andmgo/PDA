@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'datos/api.dart';
 import 'datos/sesion.dart';
-import 'pantallas/inicio.dart';
+import 'pantallas/principal.dart';
 import 'pantallas/login.dart';
 import 'tema/aurum_tema.dart';
 import 'widgets/marca.dart';
@@ -85,7 +85,7 @@ class _AurumAppState extends State<AurumApp> {
       pantalla = PantallaLogin(
           key: ValueKey(_avisoLogin), api: widget.api, alIniciarSesion: _iniciarSesion, aviso: _avisoLogin);
     } else {
-      pantalla = PantallaInicio(
+      pantalla = PantallaPrincipal(
           key: ValueKey(_sesion!.token),
           api: widget.api,
           sesion: _sesion!,

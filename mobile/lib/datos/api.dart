@@ -74,6 +74,8 @@ class Api {
   Future<dynamic> put(String ruta, [Object? cuerpo]) =>
       _enviar(() => _cliente.put(_uri(ruta), headers: _cabeceras(json: true), body: jsonEncode(cuerpo ?? {})));
 
+  Future<dynamic> delete(String ruta) => _enviar(() => _cliente.delete(_uri(ruta), headers: _cabeceras()));
+
   Uri _uri(String ruta) => Uri.parse('$urlApi$ruta');
 
   Map<String, String> _cabeceras({bool json = false}) => {
