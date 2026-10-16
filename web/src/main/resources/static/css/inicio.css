@@ -1,5 +1,5 @@
 /* ============================================================
-   inicio.html — rediseño aprobado por el usuario (propuesta en
+   inicio.html — panel de control (2026-10-16; antes: rediseño aprobado en
    Artifact) tras encontrar la versión anterior "desordenada, con
    mucha información". Usa los tokens de gescazone-theme.css
    (incluye variantes de modo oscuro) — este archivo solo define
@@ -38,158 +38,203 @@
 }
 .gsz-inicio-hero .gsz-date span::first-letter { text-transform: uppercase; }
 
-/* ── Accesos rápidos ── */
-.gsz-quick-grid {
+/* ══ Panel de inicio (2026-10-16): resumen de hoy + accesos agrupados +
+   información compacta. Un solo lenguaje de íconos (oro sobre azul noche),
+   sin fondos de colores por módulo. ══ */
+
+.gsz-seccion-cabeza { margin: 0 0 12px; }
+.gsz-seccion-cabeza .gsz-kicker { margin: 0; }
+
+/* ── Resumen de hoy ── */
+.gsz-kpis {
     display: grid;
-    /* 190px: con 8 accesos (administrador) a 150px los nombres se partían palabra por palabra */
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
 }
-.gsz-quick-tile {
+.gsz-kpi {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "titulo icono" "valor icono" "sub sub";
+    align-items: start;
+    gap: 2px 12px;
+    padding: 18px 20px 16px;
+    border-radius: 16px;
     background: var(--gsz-surface);
     border: 1px solid var(--gsz-border);
-    border-radius: 14px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    box-shadow: 0 1px 2px rgba(30, 42, 74, .04), 0 10px 26px -18px rgba(30, 42, 74, .35);
     text-decoration: none;
     color: var(--gsz-ink);
-    box-shadow: 0 1px 2px rgba(23,53,110,.04), 0 8px 24px -12px rgba(23,53,110,.12);
-    transition: transform .15s ease;
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
-.gsz-quick-tile:hover { transform: translateY(-2px); }
-.gsz-quick-tile .qi {
-    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
+/* Filo dorado a la izquierda: detalle de marca, no un color de estado */
+.gsz-kpi::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 18px; bottom: 18px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--aurum-oro);
 }
-.gsz-quick-tile .qi svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
-.gsz-quick-tile .ql { font-size: 13.5px; font-weight: 700; }
-.gsz-quick-tile .qs { font-size: 11.5px; color: var(--gsz-ink-muted); font-weight: 500; }
+.gsz-kpi:hover { transform: translateY(-2px); border-color: var(--aurum-oro); }
+.gsz-kpi-titulo {
+    grid-area: titulo;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gsz-ink-muted);
+}
+.gsz-kpi-valor {
+    grid-area: valor;
+    margin-top: 6px;
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -.02em;
+    color: var(--gsz-ink);
+    font-variant-numeric: tabular-nums;
+}
+.gsz-kpi-texto .gsz-kpi-valor { font-size: 26px; padding-top: 6px; text-transform: capitalize; }
+.gsz-kpi-cero .gsz-kpi-valor { color: var(--gsz-ink-faint); }
+.gsz-kpi-sub {
+    grid-area: sub;
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: var(--gsz-ink-faint);
+}
+.gsz-kpi-icono,
+.gsz-acc-icono {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: var(--aurum-noche);
+    color: var(--aurum-oro-claro);
+}
+.gsz-kpi-icono { grid-area: icono; width: 42px; height: 42px; }
+.gsz-kpi-icono svg,
+.gsz-acc-icono svg,
+.gsz-acc-flecha svg,
+.gsz-info h2 svg,
+.gsz-mini-icono svg {
+    width: 20px; height: 20px;
+    fill: none; stroke: currentColor; stroke-width: 1.9;
+    stroke-linecap: round; stroke-linejoin: round;
+}
 
-/* ── Tarjetas ── */
-.gsz-card {
+/* ── Accesos + información ── */
+.gsz-dash {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 22px;
+    align-items: start;
+}
+.gsz-acc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+.gsz-acc-grupo {
+    padding: 16px 14px 10px;
+    border-radius: 16px;
     background: var(--gsz-surface);
     border: 1px solid var(--gsz-border);
-    border-radius: 16px;
-    box-shadow: 0 1px 2px rgba(23,53,110,.04), 0 8px 24px -12px rgba(23,53,110,.12);
 }
-.gsz-card-head {
+.gsz-acc-titulo {
+    margin: 0 6px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--gsz-gold-ink);
+}
+.gsz-acc {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 18px 20px 0;
+    gap: 14px;
+    padding: 10px 8px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--gsz-ink);
+    transition: background .15s ease;
 }
-.gsz-card-head h2 {
-    margin: 0;
+.gsz-acc + .gsz-acc { border-top: 1px solid var(--gsz-border); border-radius: 0 0 12px 12px; }
+.gsz-acc:hover { background: var(--gsz-surface-2); }
+.gsz-acc-icono { width: 40px; height: 40px; flex-shrink: 0; }
+.gsz-acc-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.gsz-acc-texto b { font-size: 14.5px; font-weight: 700; color: var(--gsz-ink); }
+.gsz-acc-texto small { font-size: 12.5px; color: var(--gsz-ink-faint); }
+.gsz-acc-flecha { color: var(--gsz-ink-faint); transition: transform .15s ease, color .15s ease; }
+.gsz-acc-flecha svg { width: 18px; height: 18px; }
+.gsz-acc:hover .gsz-acc-flecha { color: var(--aurum-oro); transform: translateX(3px); }
+
+.gsz-dash-lateral { display: flex; flex-direction: column; gap: 14px; }
+.gsz-info {
+    padding: 18px 20px 12px;
+    border-radius: 16px;
+    background: var(--gsz-surface);
+    border: 1px solid var(--gsz-border);
+}
+.gsz-info h2 {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 8px;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--gsz-ink);
 }
-.gsz-card-head svg { width: 16px; height: 16px; stroke: var(--gsz-ink-faint); stroke-width: 2.1; fill: none; }
-.gsz-card-body { padding: 14px 20px 20px; }
-
-.gsz-grid-2col { display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; align-items: start; }
-@media (max-width: 880px) { .gsz-grid-2col { grid-template-columns: 1fr; } }
-
-.gsz-stack { display: flex; flex-direction: column; gap: 18px; }
-
-/* Paleta de marca: los íconos decorativos van todos en oro (como los
-   pilares del imagotipo), no un color distinto por tarjeta — se pisan
-   aquí los style="" inline de inicio.html (rojo, verde, violeta...). */
-.gsz-quick-tile .qi,
-.gsz-about-row .badge,
-.gsz-amenity-row .badge {
-    background: var(--gsz-gold-soft) !important;
-    color: var(--gsz-gold-ink) !important;
-}
-.gsz-contact-row .badge {
-    background: var(--aurum-noche) !important;
-    color: var(--aurum-oro-claro) !important;
-}
-.dark .gsz-contact-row .badge { background: var(--aurum-noche) !important; box-shadow: inset 0 0 0 1px var(--gsz-filo); }
-
-/* argon-dashboard-tailwind.css también define una clase .badge (con
-   padding y font-size en em) — encogía los SVG de estas filas a unos
-   pocos píxeles. Se neutraliza aquí. */
-.gsz-about-row .badge,
-.gsz-amenity-row .badge,
-.gsz-contact-row .badge {
-    padding: 0;
-    font-size: inherit;
-    line-height: 1;
-}
-
-/* Sobre el conjunto — filas compactas, no párrafos largos */
-.gsz-about-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 11px 0;
-    border-bottom: 1px solid var(--gsz-border);
-}
-.gsz-about-row:first-child { padding-top: 0; }
-.gsz-about-row:last-child { border-bottom: none; padding-bottom: 0; }
-.gsz-about-row .badge {
-    width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-}
-.gsz-about-row .badge svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
-.gsz-about-row .at { font-size: 13.5px; font-weight: 700; margin: 0 0 2px; color: var(--gsz-ink); }
-.gsz-about-row .ad { font-size: 12.5px; color: var(--gsz-ink-muted); margin: 0; line-height: 1.5; }
-
-/* Áreas comunes — lista compacta */
-.gsz-amenity-row {
+.gsz-info h2 svg { color: var(--gsz-gold-ink); width: 18px; height: 18px; }
+.gsz-lista { list-style: none; margin: 0; padding: 0; }
+.gsz-lista li {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--gsz-border);
-}
-.gsz-amenity-row:last-child { border-bottom: none; }
-.gsz-amenity-row .badge {
-    width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-}
-.gsz-amenity-row .badge svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round; }
-.gsz-amenity-row .an { font-size: 13.5px; font-weight: 600; flex: 1; color: var(--gsz-ink); }
-.gsz-amenity-row .ah { font-size: 12px; color: var(--gsz-ink-muted); text-align: right; }
-
-/* Normas — dos columnas de líneas cortas */
-.gsz-rules-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 20px;
-}
-@media (max-width: 560px) { .gsz-rules-grid { grid-template-columns: 1fr; } }
-.gsz-rule {
-    display: flex;
-    align-items: flex-start;
-    gap: 9px;
-    font-size: 12.5px;
+    padding: 9px 0;
+    font-size: 13px;
     color: var(--gsz-ink-muted);
-    line-height: 1.5;
 }
-.gsz-rule svg { width: 14px; height: 14px; stroke: var(--gsz-ink-faint); stroke-width: 2.2; flex-shrink: 0; margin-top: 2px; }
-.gsz-rule b { color: var(--gsz-ink); font-weight: 600; }
-
-/* Contactos */
-.gsz-contact-row {
-    display: flex;
+.gsz-lista li + li { border-top: 1px solid var(--gsz-border); }
+.gsz-lista b { display: block; font-size: 13.5px; color: var(--gsz-ink); }
+.gsz-lista small { display: block; font-size: 12px; color: var(--gsz-ink-faint); line-height: 1.45; overflow-wrap: anywhere; }
+.gsz-mini-icono {
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--gsz-border);
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px; height: 30px;
+    border-radius: 9px;
+    background: var(--gsz-gold-soft);
+    color: var(--gsz-gold-ink);
 }
-.gsz-contact-row:last-child { border-bottom: none; }
-.gsz-contact-row .badge {
-    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; color: #fff;
+.gsz-mini-icono svg { width: 16px; height: 16px; }
+.gsz-contactos .gsz-mini-icono { background: var(--aurum-noche); color: var(--aurum-oro-claro); }
+.gsz-hor-nombre { flex: 1; color: var(--gsz-ink); font-weight: 600; }
+.gsz-hor-hora { font-size: 12.5px; color: var(--gsz-ink-muted); }
+.gsz-normas b { display: inline; }
+
+/* Modo oscuro: íconos "hundidos" con filo dorado, como la app */
+.dark .gsz-kpi-icono,
+.dark .gsz-acc-icono,
+.dark .gsz-contactos .gsz-mini-icono { background: var(--gsz-hundido); box-shadow: inset 0 0 0 1px var(--gsz-filo-dorado); }
+.dark .gsz-mini-icono { background: var(--gsz-hundido); }
+.dark .gsz-kpi { box-shadow: none; }
+
+@media (max-width: 1100px) {
+    .gsz-dash { grid-template-columns: 1fr; }
+    .gsz-dash-lateral { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 }
-.gsz-contact-row .badge svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.gsz-contact-row .cn { font-size: 13px; font-weight: 700; color: var(--gsz-ink); }
-.gsz-contact-row .cd { font-size: 11.5px; color: var(--gsz-ink-muted); }
-/* En celular, dos accesos por fila (con 190px quedaba uno solo). */
-@media (max-width: 520px) {
-    .gsz-quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 680px) {
+    .gsz-acc-grid { grid-template-columns: 1fr; }
+    .gsz-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .gsz-kpi { padding: 14px 14px 12px; grid-template-areas: "titulo titulo" "valor icono" "sub sub"; }
+    .gsz-kpi-icono { width: 34px; height: 34px; align-self: end; }
+    .gsz-kpi-valor { font-size: 28px; }
+    .gsz-kpi-texto .gsz-kpi-valor { font-size: 20px; }
+    .gsz-kpi-titulo { font-size: 10.5px; letter-spacing: .1em; }
+    .gsz-page { padding: 16px 12px 40px; gap: 18px; }
 }
+.gsz-dash-principal { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+/* Títulos de una o dos líneas: misma altura para que los números queden alineados */
+.gsz-kpi-titulo { min-height: 2.9em; line-height: 1.45; }

@@ -46,181 +46,151 @@
                 </button>
             </header>
 
-            <!-- Accesos rápidos -->
-            <!--/* Mismo orden y mismos permisos que el menú lateral. */-->
-            <div class="gsz-quick-grid">
-                <a class="gsz-quick-tile" th:if="${@sesionUsuario.tienePermiso('VISITAS', false)}" th:href="@{/misVisitas}">
-                    <div class="qi" style="background:var(--gsz-green-soft); color:var(--gsz-green);">
-                        <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.2 2.8-5 5.5-5 1.3 0 2.5.4 3.4 1.1"/><path d="M15 17.5l2 2 4-4.5"/></svg>
+            <div class="gsz-dash">
+                <!-- Columna principal: resumen de hoy + accesos agrupados como el menú -->
+                <div class="gsz-dash-principal">
+                <!-- Resumen de hoy: indicadores según los permisos del rol (inicio.js los llena) -->
+                <section class="gsz-resumen" aria-label="Resumen de hoy">
+                    <div class="gsz-seccion-cabeza">
+                        <p class="gsz-kicker">Resumen de hoy</p>
                     </div>
-                    <div><div class="ql">Mis visitas</div><div class="qs">Autorizar visitantes</div></div>
-                </a>
-                <a class="gsz-quick-tile" th:if="${@sesionUsuario.tienePermiso('MIS_PAQUETES', false)}" th:href="@{/misPaquetes}">
-                    <div class="qi" style="background:var(--gsz-green-soft); color:var(--gsz-green);">
-                        <svg viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4-8.5 4-8.5-4z"/><path d="M3.5 8v8l8.5 4 8.5-4V8"/><path d="M12 12v8"/></svg>
+                    <div class="gsz-kpis">
+                    <a class="gsz-kpi" th:if="${@sesionUsuario.tienePermiso('CONTROL_ACCESOS', false)}" th:href="@{/controlDeAccesos}" data-kpi="/api/accesos/visitas/dentro" data-tipo="largo">
+                        <span class="gsz-kpi-icono"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></span>
+                        <span class="gsz-kpi-titulo">Dentro del conjunto</span>
+                        <span class="gsz-kpi-valor">—</span>
+                        <span class="gsz-kpi-sub">visitantes en este momento</span>
+                    </a>
+                    <a class="gsz-kpi" th:if="${@sesionUsuario.tienePermiso('CONTROL_ACCESOS', false)}" th:href="@{/controlDeAccesos}" data-kpi="/api/accesos/visitas/esperadas" data-tipo="esperados">
+                        <span class="gsz-kpi-icono"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><path d="M15 14.5c2.2.2 3.8 1.7 4.5 4.5"/></svg></span>
+                        <span class="gsz-kpi-titulo">Esperados hoy</span>
+                        <span class="gsz-kpi-valor">—</span>
+                        <span class="gsz-kpi-sub">autorizados por propietarios</span>
+                    </a>
+                    <a class="gsz-kpi" th:if="${@sesionUsuario.tienePermiso('PAQUETES', false)}" th:href="@{/paquetes}" data-kpi="/api/paquetes/pendientes" data-tipo="largo">
+                        <span class="gsz-kpi-icono"><svg viewBox="0 0 24 24"><path d="M3.5 9 12 5l8.5 4v8l-8.5 4-8.5-4z"/><path d="M12 13v8"/><path d="M3.5 9 12 13l8.5-4"/><path d="M12 1.5v5"/><path d="M10 4.5l2 2 2-2"/></svg></span>
+                        <span class="gsz-kpi-titulo">Paquetes por entregar</span>
+                        <span class="gsz-kpi-valor">—</span>
+                        <span class="gsz-kpi-sub">en recepción</span>
+                    </a>
+                    <a class="gsz-kpi" th:if="${@sesionUsuario.tienePermiso('MIS_PAQUETES', false)}" th:href="@{/misPaquetes}" data-kpi="/api/paquetes/mios" data-tipo="pendientes">
+                        <span class="gsz-kpi-icono"><svg viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4-8.5 4-8.5-4z"/><path d="M3.5 8v8l8.5 4 8.5-4V8"/><path d="M12 12v8"/></svg></span>
+                        <span class="gsz-kpi-titulo">Mis paquetes</span>
+                        <span class="gsz-kpi-valor">—</span>
+                        <span class="gsz-kpi-sub">esperándote en portería</span>
+                    </a>
+                    <a class="gsz-kpi" th:if="${@sesionUsuario.tienePermiso('VISITAS', false)}" th:href="@{/misVisitas}" data-kpi="/api/visitas-autorizadas/mias" data-tipo="vigentes">
+                        <span class="gsz-kpi-icono"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.2 2.8-5 5.5-5 1.3 0 2.5.4 3.4 1.1"/><path d="M15 17.5l2 2 4-4.5"/></svg></span>
+                        <span class="gsz-kpi-titulo">Mis visitas de hoy</span>
+                        <span class="gsz-kpi-valor">—</span>
+                        <span class="gsz-kpi-sub">autorizadas para entrar</span>
+                    </a>
+                    <a class="gsz-kpi" th:if="${@sesionUsuario.tienePermiso('RESERVAS', false)}" th:href="@{/reservas}" data-kpi="/api/reservas/mias" data-tipo="proxima">
+                        <span class="gsz-kpi-icono"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/><path d="M8.5 14l2 2 4-4"/></svg></span>
+                        <span class="gsz-kpi-titulo">Próxima reserva</span>
+                        <span class="gsz-kpi-valor">—</span>
+                        <span class="gsz-kpi-sub">salón social</span>
+                    </a>
                     </div>
-                    <div><div class="ql">Mis paquetes</div><div class="qs">Por recoger</div></div>
-                </a>
-                <a class="gsz-quick-tile" th:if="${@sesionUsuario.tienePermiso('CONTROL_ACCESOS', false)}" th:href="@{/controlDeAccesos}">
-                    <div class="qi" style="background:var(--gsz-red-soft); color:var(--gsz-red);">
-                        <svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>
-                    </div>
-                    <div><div class="ql">Control de accesos</div><div class="qs">Visitantes</div></div>
-                </a>
-                <a class="gsz-quick-tile" th:if="${@sesionUsuario.tienePermiso('PAQUETES', false)}" th:href="@{/paquetes}">
-                    <div class="qi" style="background:var(--gsz-amber-soft); color:var(--gsz-amber);">
-                        <svg viewBox="0 0 24 24"><path d="M3.5 9 12 5l8.5 4v8l-8.5 4-8.5-4z"/><path d="M12 13v8"/><path d="M3.5 9 12 13l8.5-4"/><path d="M12 1.5v5"/><path d="M10 4.5l2 2 2-2"/></svg>
-                    </div>
-                    <div><div class="ql">Recepción de paquetes</div><div class="qs">Portería</div></div>
-                </a>
-                <a class="gsz-quick-tile" th:if="${@sesionUsuario.tienePermiso('RESERVAS', false)}" th:href="@{/reservas}">
-                    <div class="qi" style="background:var(--gsz-cyan-soft); color:var(--gsz-cyan);">
-                        <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/><path d="M8.5 14l2 2 4-4"/></svg>
-                    </div>
-                    <div><div class="ql">Reservas</div><div class="qs">Salón social</div></div>
-                </a>
-                <a class="gsz-quick-tile" th:if="${@sesionUsuario.tienePermiso('PAGOS_Y_CARTERA', false)}" th:href="@{/pagosYCartera}">
-                    <div class="qi" style="background:var(--gsz-green-soft); color:var(--gsz-green);">
-                        <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="17" cy="14" r="1.4" fill="currentColor" stroke="none"/></svg>
-                    </div>
-                    <div><div class="ql">Pagos y cartera</div><div class="qs">Estado de cuenta</div></div>
-                </a>
-                <a class="gsz-quick-tile" th:if="${@sesionUsuario.tienePermiso('GESTION_DATOS', false)}" th:href="@{/gestionDeDatos}">
-                    <div class="qi" style="background:var(--gsz-violet-soft); color:var(--gsz-violet);">
-                        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
-                    </div>
-                    <div><div class="ql">Gestión de datos</div><div class="qs">Aptos y residentes</div></div>
-                </a>
-                <a class="gsz-quick-tile" th:href="@{/profile}">
-                    <div class="qi" style="background:var(--gsz-neutral-soft); color:var(--gsz-neutral);">
-                        <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.3"/><path d="M5 20c1-3.8 4-5.8 7-5.8s6 2 7 5.8"/></svg>
-                    </div>
-                    <div><div class="ql">Mi perfil</div><div class="qs">Datos y clave</div></div>
-                </a>
-            </div>
+                </section>
 
-            <div class="gsz-grid-2col">
-                <!-- Columna izquierda -->
-                <div class="gsz-stack">
-
-                    <div class="gsz-card">
-                        <div class="gsz-card-head">
-                            <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
-                            <h2>Sobre el conjunto</h2>
-                        </div>
-                        <div class="gsz-card-body">
-                            <div class="gsz-about-row">
-                                <div class="badge" style="background:var(--gsz-blue-soft); color:var(--gsz-blue);">
-                                    <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/></svg>
-                                </div>
-                                <div><p class="at">Terrazas de Calicanto</p><p class="ad">Áreas comunes pensadas para la comodidad y bienestar de todas las familias.</p></div>
-                            </div>
-                            <div class="gsz-about-row">
-                                <div class="badge" style="background:var(--gsz-red-soft); color:var(--gsz-red);">
-                                    <svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg>
-                                </div>
-                                <div><p class="at">Seguridad 24/7</p><p class="ad">Vigilancia permanente, cámaras y control de acceso con registro de visitantes.</p></div>
-                            </div>
-                            <div class="gsz-about-row">
-                                <div class="badge" style="background:var(--gsz-amber-soft); color:var(--gsz-amber);">
-                                    <svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><path d="M14.8 14.5c2 .3 3.5 1.8 3.9 4.5"/></svg>
-                                </div>
-                                <div><p class="at">Comunidad activa</p><p class="ad">Eventos y espacios de recreación que fortalecen la convivencia entre vecinos.</p></div>
-                            </div>
-                            <div class="gsz-about-row">
-                                <div class="badge" style="background:var(--gsz-violet-soft); color:var(--gsz-violet);">
-                                    <svg viewBox="0 0 24 24"><path d="M4 19V7l8-4 8 4v12"/><path d="M9 19v-6h6v6"/></svg>
-                                </div>
-                                <div><p class="at">Administración transparente</p><p class="ad">Consulta pagos, estados de cuenta y solicitudes cuando quieras.</p></div>
-                            </div>
-                        </div>
+                    <section class="gsz-accesos" aria-label="Accesos">
+                    <div class="gsz-seccion-cabeza">
+                        <p class="gsz-kicker">Accesos</p>
                     </div>
-
-                    <div class="gsz-card">
-                        <div class="gsz-card-head">
-                            <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/></svg>
-                            <h2>Áreas comunes y horarios</h2>
-                        </div>
-                        <div class="gsz-card-body">
-                            <div class="gsz-amenity-row">
-                                <div class="badge" style="background:var(--gsz-blue-soft); color:var(--gsz-blue);"><svg viewBox="0 0 24 24"><path d="M3 17c1.3-1 2.5-1 3.8 0s2.5 1 3.7 0 2.5-1 3.8 0 2.5 1 3.7 0"/><path d="M3 12c1.3-1 2.5-1 3.8 0s2.5 1 3.7 0 2.5-1 3.8 0 2.5 1 3.7 0"/><path d="M6 8V5.5A1.5 1.5 0 0 1 7.5 4h0A1.5 1.5 0 0 1 9 5.5V8"/></svg></div>
-                                <div class="an">Piscina</div><div class="ah gsz-mono">7:00–20:00</div>
-                            </div>
-                            <div class="gsz-amenity-row">
-                                <div class="badge" style="background:var(--gsz-green-soft); color:var(--gsz-green);"><svg viewBox="0 0 24 24"><path d="M4 12h3M17 12h3"/><rect x="7" y="9.5" width="10" height="5" rx="1"/><path d="M2 10v4M22 10v4"/></svg></div>
-                                <div class="an">Gimnasio</div><div class="ah gsz-mono">6:00–22:00</div>
-                            </div>
-                            <div class="gsz-amenity-row">
-                                <div class="badge" style="background:var(--gsz-cyan-soft); color:var(--gsz-cyan);"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8.5 14l2 2 4-4"/></svg></div>
-                                <div class="an">Salón social</div><div class="ah">Con reserva</div>
-                            </div>
-                            <div class="gsz-amenity-row">
-                                <div class="badge" style="background:var(--gsz-amber-soft); color:var(--gsz-amber);"><svg viewBox="0 0 24 24"><path d="M12 3c1 2.5-1 3.5-1 5.5a2 2 0 0 0 4 0c1.2 1 2 2.7 2 4.5a5 5 0 0 1-10 0c0-3 2-4.5 2-6.5s1.5-2.5 3-3.5z"/></svg></div>
-                                <div class="an">Zona BBQ</div><div class="ah gsz-mono">7:00–22:00</div>
-                            </div>
-                            <div class="gsz-amenity-row">
-                                <div class="badge" style="background:var(--gsz-violet-soft); color:var(--gsz-violet);"><svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V14M8 22l4-8 4 8M8.5 12.5 5 15M15.5 12.5 19 15"/></svg></div>
-                                <div class="an">Parque infantil</div><div class="ah gsz-mono">7:00–19:00</div>
-                            </div>
-                            <div class="gsz-amenity-row">
-                                <div class="badge" style="background:var(--gsz-red-soft); color:var(--gsz-red);"><svg viewBox="0 0 24 24"><path d="M4 16v-4l2-4h12l2 4v4"/><path d="M4 16h16v2.5a1 1 0 0 1-1 1h-1.5a1 1 0 0 1-1-1V17h-9v1.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><circle cx="7.5" cy="16" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="16" r="1.1" fill="currentColor" stroke="none"/></svg></div>
-                                <div class="an">Parqueadero</div><div class="ah">Acceso 24/7</div>
-                            </div>
-                        </div>
+                    <div class="gsz-acc-grid">
+                    <section class="gsz-acc-grupo" th:if="${@sesionUsuario.tienePermiso('VISITAS', false) or @sesionUsuario.tienePermiso('MIS_PAQUETES', false)}">
+                        <p class="gsz-acc-titulo">Mi hogar</p>
+                        <a class="gsz-acc" th:if="${@sesionUsuario.tienePermiso('VISITAS', false)}" th:href="@{/misVisitas}">
+                            <span class="gsz-acc-icono"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-3.2 2.8-5 5.5-5 1.3 0 2.5.4 3.4 1.1"/><path d="M15 17.5l2 2 4-4.5"/></svg></span>
+                            <span class="gsz-acc-texto"><b>Mis visitas</b><small>Autoriza a quien te visita</small></span>
+                            <span class="gsz-acc-flecha"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+                        </a>
+                        <a class="gsz-acc" th:if="${@sesionUsuario.tienePermiso('MIS_PAQUETES', false)}" th:href="@{/misPaquetes}">
+                            <span class="gsz-acc-icono"><svg viewBox="0 0 24 24"><path d="M3.5 8 12 4l8.5 4-8.5 4-8.5-4z"/><path d="M3.5 8v8l8.5 4 8.5-4V8"/><path d="M12 12v8"/></svg></span>
+                            <span class="gsz-acc-texto"><b>Mis paquetes</b><small>Lo que llegó para ti</small></span>
+                            <span class="gsz-acc-flecha"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+                        </a>
+                    </section>
+                    <section class="gsz-acc-grupo" th:if="${@sesionUsuario.tienePermiso('CONTROL_ACCESOS', false) or @sesionUsuario.tienePermiso('PAQUETES', false)}">
+                        <p class="gsz-acc-titulo">Portería</p>
+                        <a class="gsz-acc" th:if="${@sesionUsuario.tienePermiso('CONTROL_ACCESOS', false)}" th:href="@{/controlDeAccesos}">
+                            <span class="gsz-acc-icono"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></span>
+                            <span class="gsz-acc-texto"><b>Control de accesos</b><small>Ingresos, salidas y esperados</small></span>
+                            <span class="gsz-acc-flecha"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+                        </a>
+                        <a class="gsz-acc" th:if="${@sesionUsuario.tienePermiso('PAQUETES', false)}" th:href="@{/paquetes}">
+                            <span class="gsz-acc-icono"><svg viewBox="0 0 24 24"><path d="M3.5 9 12 5l8.5 4v8l-8.5 4-8.5-4z"/><path d="M12 13v8"/><path d="M3.5 9 12 13l8.5-4"/><path d="M12 1.5v5"/><path d="M10 4.5l2 2 2-2"/></svg></span>
+                            <span class="gsz-acc-texto"><b>Recepción de paquetes</b><small>Registra y entrega paquetes</small></span>
+                            <span class="gsz-acc-flecha"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+                        </a>
+                    </section>
+                    <section class="gsz-acc-grupo" th:if="${@sesionUsuario.tienePermiso('RESERVAS', false) or @sesionUsuario.tienePermiso('PAGOS_Y_CARTERA', false)}">
+                        <p class="gsz-acc-titulo">Comunidad</p>
+                        <a class="gsz-acc" th:if="${@sesionUsuario.tienePermiso('RESERVAS', false)}" th:href="@{/reservas}">
+                            <span class="gsz-acc-icono"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/><path d="M8.5 14l2 2 4-4"/></svg></span>
+                            <span class="gsz-acc-texto"><b>Reservas</b><small>Salón social</small></span>
+                            <span class="gsz-acc-flecha"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+                        </a>
+                        <a class="gsz-acc" th:if="${@sesionUsuario.tienePermiso('PAGOS_Y_CARTERA', false)}" th:href="@{/pagosYCartera}">
+                            <span class="gsz-acc-icono"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="17" cy="14" r="1.4" fill="currentColor" stroke="none"/></svg></span>
+                            <span class="gsz-acc-texto"><b>Pagos y cartera</b><small>Estado de cuenta</small></span>
+                            <span class="gsz-acc-flecha"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+                        </a>
+                    </section>
+                    <section class="gsz-acc-grupo" th:if="${@sesionUsuario.tienePermiso('GESTION_DATOS', false)}">
+                        <p class="gsz-acc-titulo">Administración</p>
+                        <a class="gsz-acc" th:if="${@sesionUsuario.tienePermiso('GESTION_DATOS', false)}" th:href="@{/gestionDeDatos}">
+                            <span class="gsz-acc-icono"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span>
+                            <span class="gsz-acc-texto"><b>Gestión de datos</b><small>Apartamentos, usuarios y residentes</small></span>
+                            <span class="gsz-acc-flecha"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+                        </a>
+                        <a class="gsz-acc" th:if="${@sesionUsuario.tienePermiso('GESTION_DATOS', true)}" th:href="@{/rolesYPermisos}">
+                            <span class="gsz-acc-icono"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 19 4"/><path d="M16 7l2.5 2.5"/><path d="M14 9l2 2"/></svg></span>
+                            <span class="gsz-acc-texto"><b>Roles y permisos</b><small>Qué puede hacer cada rol</small></span>
+                            <span class="gsz-acc-flecha"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+                        </a>
+                    </section>
                     </div>
-
+                    </section>
                 </div>
 
-                <!-- Columna derecha -->
-                <div class="gsz-stack">
-
-                    <div class="gsz-card">
-                        <div class="gsz-card-head">
-                            <svg viewBox="0 0 24 24" fill="none"><path d="M6 4h9l3 3v13H6z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
-                            <h2>Normas de convivencia</h2>
-                        </div>
-                        <div class="gsz-card-body">
-                            <div class="gsz-rules-grid">
-                                <div class="gsz-rule"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4l2.5 2.5"/></svg><span><b>Silencio</b> de 10 PM a 7 AM.</span></div>
-                                <div class="gsz-rule"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg><span><b>Residuos</b> separados: lun / miér / vie.</span></div>
-                                <div class="gsz-rule"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="10" r="2"/><circle cx="15" cy="10" r="2"/><path d="M5 18c0-2.5 2-4 4-4h6c2 0 4 1.5 4 4"/></svg><span><b>Mascotas</b> con correa y desechos recogidos.</span></div>
-                                <div class="gsz-rule"><svg viewBox="0 0 24 24" fill="none"><path d="M4 16v-4l2-4h12l2 4v4"/><path d="M4 16h16v2.5a1 1 0 0 1-1 1h-1.5a1 1 0 0 1-1-1V17h-9v1.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/></svg><span><b>Parqueo</b> solo en tu espacio, máx. 10 km/h.</span></div>
-                                <div class="gsz-rule"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8.5" r="2.8"/><path d="M3.5 18c.8-3 2.6-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><circle cx="17.5" cy="9.5" r="2"/><path d="M14.8 18c.5-2.3 1.8-3.6 3.9-3.6"/></svg><span><b>Visitantes</b> se registran en portería.</span></div>
-                            </div>
-                        </div>
+                <!-- Información del conjunto, compacta -->
+                <div class="gsz-dash-lateral" role="complementary" aria-label="Información del conjunto">
+                    <div class="gsz-info">
+                        <h2><svg viewBox="0 0 24 24"><path d="M4 5.5c0-1 .8-1.5 1.6-1.3l3 .8c.6.15 1 .7 1 1.3v2c0 .6-.4 1.1-1 1.2l-1.2.3c.8 2.3 2.6 4.1 4.9 4.9l.3-1.2c.1-.6.6-1 1.2-1h2c.6 0 1.15.4 1.3 1l.8 3c.2.8-.3 1.6-1.3 1.6C10.4 19.9 4.1 13.6 4 5.5z"/></svg>Contactos</h2>
+                        <ul class="gsz-lista gsz-contactos">
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 19c.9-3.4 3.6-5.2 7-5.2s6.1 1.8 7 5.2"/></svg></span><div><b>Administración</b><small>admin@aurumcondominios.com<br>+57 300 123 4567</small></div></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></span><div><b>Portería</b><small>porteria@aurumcondominios.com<br>+57 300 765 4321</small></div></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24"><path d="M4 10.5 8 7h3l1 3h4l1-3h3l4 3.5V15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M11 11v4M9 13h4"/></svg></span><div><b>Emergencias</b><small>Policía 123<br>Bomberos 119</small></div></li>
+                        </ul>
                     </div>
-
-                    <div class="gsz-card">
-                        <div class="gsz-card-head">
-                            <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5c0-1 .8-1.5 1.6-1.3l3 .8c.6.15 1 .7 1 1.3v2c0 .6-.4 1.1-1 1.2l-1.2.3c.8 2.3 2.6 4.1 4.9 4.9l.3-1.2c.1-.6.6-1 1.2-1h2c.6 0 1.15.4 1.3 1l.8 3c.2.8-.3 1.6-1.3 1.6C10.5 20.6 3.4 13.5 4 5.5z"/></svg>
-                            <h2>Contactos</h2>
-                        </div>
-                        <div class="gsz-card-body">
-                            <div class="gsz-contact-row">
-                                <div class="badge" style="background:var(--gsz-blue);"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 19c.9-3.4 3.6-5.2 7-5.2s6.1 1.8 7 5.2"/></svg></div>
-                                <div><div class="cn">Administración</div><div class="cd">admin@aurumcondominios.com · +57 300 123 4567</div></div>
-                            </div>
-                            <div class="gsz-contact-row">
-                                <div class="badge" style="background:var(--gsz-green);"><svg viewBox="0 0 24 24"><path d="M12 3.5 19 6v6c0 5-3 8-7 8.5-4-.5-7-3.5-7-8.5V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></svg></div>
-                                <div><div class="cn">Portería</div><div class="cd">porteria@aurumcondominios.com · +57 300 765 4321</div></div>
-                            </div>
-                            <div class="gsz-contact-row">
-                                <div class="badge" style="background:var(--gsz-red);"><svg viewBox="0 0 24 24"><path d="M4 10.5 8 7h3l1 3h4l1-3h3l4 3.5V15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M11 11v4M9 13h4"/></svg></div>
-                                <div><div class="cn">Emergencias</div><div class="cd">Policía 123 · Bomberos 119</div></div>
-                            </div>
-                        </div>
+                    <div class="gsz-info">
+                        <h2><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4l2.5 2.5"/></svg>Horarios</h2>
+                        <ul class="gsz-lista gsz-horarios">
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24"><path d="M3 17c1.3-1 2.5-1 3.8 0s2.5 1 3.7 0 2.5-1 3.8 0 2.5 1 3.7 0"/><path d="M3 12c1.3-1 2.5-1 3.8 0s2.5 1 3.7 0 2.5-1 3.8 0 2.5 1 3.7 0"/><path d="M6 8V5.5A1.5 1.5 0 0 1 7.5 4h0A1.5 1.5 0 0 1 9 5.5V8"/></svg></span><span class="gsz-hor-nombre">Piscina</span><span class="gsz-hor-hora gsz-mono">7:00–20:00</span></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24"><path d="M4 12h3M17 12h3"/><rect x="7" y="9.5" width="10" height="5" rx="1"/><path d="M2 10v4M22 10v4"/></svg></span><span class="gsz-hor-nombre">Gimnasio</span><span class="gsz-hor-hora gsz-mono">6:00–22:00</span></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8.5 14l2 2 4-4"/></svg></span><span class="gsz-hor-nombre">Salón social</span><span class="gsz-hor-hora">Con reserva</span></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24"><path d="M12 3c1 2.5-1 3.5-1 5.5a2 2 0 0 0 4 0c1.2 1 2 2.7 2 4.5a5 5 0 0 1-10 0c0-3 2-4.5 2-6.5s1.5-2.5 3-3.5z"/></svg></span><span class="gsz-hor-nombre">Zona BBQ</span><span class="gsz-hor-hora gsz-mono">7:00–22:00</span></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24"><circle cx="12" cy="6" r="2.3"/><path d="M12 8.3V14M8 22l4-8 4 8M8.5 12.5 5 15M15.5 12.5 19 15"/></svg></span><span class="gsz-hor-nombre">Parque infantil</span><span class="gsz-hor-hora gsz-mono">7:00–19:00</span></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24"><path d="M4 16v-4l2-4h12l2 4v4"/><path d="M4 16h16v2.5a1 1 0 0 1-1 1h-1.5a1 1 0 0 1-1-1V17h-9v1.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><circle cx="7.5" cy="16" r="1.1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="16" r="1.1" fill="currentColor" stroke="none"/></svg></span><span class="gsz-hor-nombre">Parqueadero</span><span class="gsz-hor-hora gsz-mono">Acceso 24/7</span></li>
+                        </ul>
                     </div>
-
+                    <div class="gsz-info">
+                        <h2><svg viewBox="0 0 24 24"><path d="M6 4h9l3 3v13H6z"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>Normas de convivencia</h2>
+                        <ul class="gsz-lista gsz-normas">
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4l2.5 2.5"/></svg></span><span><b>Silencio</b> de 10 PM a 7 AM.</span></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></span><span><b>Residuos</b> separados: lun / miér / vie.</span></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="10" r="2"/><circle cx="15" cy="10" r="2"/><path d="M5 18c0-2.5 2-4 4-4h6c2 0 4 1.5 4 4"/></svg></span><span><b>Mascotas</b> con correa y desechos recogidos.</span></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24" fill="none"><path d="M4 16v-4l2-4h12l2 4v4"/><path d="M4 16h16v2.5a1 1 0 0 1-1 1h-1.5a1 1 0 0 1-1-1V17h-9v1.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/></svg></span><span><b>Parqueo</b> solo en tu espacio, máx. 10 km/h.</span></li>
+                            <li><span class="gsz-mini-icono"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8.5" r="2.8"/><path d="M3.5 18c.8-3 2.6-4.6 5.5-4.6s4.7 1.6 5.5 4.6"/><circle cx="17.5" cy="9.5" r="2"/><path d="M14.8 18c.5-2.3 1.8-3.6 3.9-3.6"/></svg></span><span><b>Visitantes</b> se registran en portería.</span></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-
         </div>
     </main>
 
-    <!-- ✅ Con rutas Thymeleaf correctas -->
-    <script th:src="@{/js/plugins/perfect-scrollbar.min.js}" async></script>
-    <script th:src="@{/js/argon-dashboard-tailwind.js}" async></script>
-
-    <script th:src="@{/js/inicio.js(v=2)}"></script>
+    <script th:src="@{/js/inicio.js(v=3)}"></script>
 </body>
 </html>
