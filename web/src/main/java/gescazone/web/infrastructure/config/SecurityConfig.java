@@ -70,7 +70,9 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/", "/login", "/registro", "/registro/completar-google", "/logout",
                     "/css/**", "/js/**", "/img/**", "/fonts/**",
-                    "/favicon.ico", "/error"
+                    "/favicon.ico", "/error",
+                    // PWA: manifiesto, service worker y página sin conexión
+                    "/manifest.json", "/sw.js", "/offline.html"
                 ).permitAll()
 
                 .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()

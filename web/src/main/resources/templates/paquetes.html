@@ -5,6 +5,14 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- PWA: instalable como aplicación (manifest + service worker, ver static/sw.js) -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1E2A4A" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Aurum" />
+    <script src="/js/pwa.js" defer></script>
     <link rel="apple-touch-icon" sizes="180x180" th:href="@{/img/aurum-apple-touch.png}" />
     <link rel="icon" type="image/png" sizes="96x96" th:href="@{/img/aurum-favicon.png}" />
     <title>Aurum Condominios - Recepción de paquetes</title>

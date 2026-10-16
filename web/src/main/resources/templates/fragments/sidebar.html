@@ -161,6 +161,15 @@
         </a>
       </li>
 
+      <!-- INSTALAR APLICACIÓN (PWA) - solo aparece si el navegador lo permite, ver js/pwa.js -->
+      <li class="mt-0.5 w-full" data-pwa-instalar hidden>
+        <a href="#"
+           class="dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors">
+          <span class="gsz-icon-badge gsz-badge-neutral"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M12 7v7"/><path d="M9.2 11.4 12 14.2l2.8-2.8"/><path d="M10.5 18.5h3"/></svg></span>
+          <span class="gsz-nav-label ml-1 duration-300 opacity-100 pointer-events-none ease">Instalar aplicación</span>
+        </a>
+      </li>
+
       <!-- CERRAR SESIÓN - TODOS -->
       <li class="mt-0.5 w-full">
         <a th:href="@{/logout}"

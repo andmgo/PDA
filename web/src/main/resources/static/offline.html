@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1E2A4A" />
+    <title>Sin conexión · Aurum Condominios</title>
+    <link rel="icon" type="image/png" href="/img/pwa/icono-192.png" />
+    <style>
+        :root { --noche: #1E2A4A; --oro: #D4A843; --oro-claro: #F0C96A; --blanco: #F8F7F4; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
+            padding: 24px; background: var(--noche); color: var(--blanco);
+            background-image: radial-gradient(circle at 50% 30%, rgba(212, 168, 67, .16), transparent 60%);
+            font-family: Montserrat, "Segoe UI", Roboto, Arial, sans-serif; text-align: center;
+        }
+        main { max-width: 420px; }
+        img { width: 96px; height: auto; margin-bottom: 28px; }
+        .kicker { font-size: 12px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--oro-claro); margin: 0 0 10px; }
+        h1 { font-size: 26px; font-weight: 800; margin: 0 0 12px; }
+        p { line-height: 1.6; opacity: .85; margin: 0 0 28px; }
+        button {
+            font: inherit; font-weight: 700; color: var(--noche); border: 0; border-radius: 12px; padding: 14px 28px; cursor: pointer;
+            background: linear-gradient(120deg, #F0C96A 0%, #D4A843 55%, #B88A2C 100%);
+        }
+        button:focus-visible { outline: 3px solid var(--oro-claro); outline-offset: 3px; }
+    </style>
+</head>
+<body>
+<main>
+    <img src="/img/aurum-isotipo.png" alt="Aurum Condominios" />
+    <p class="kicker">Sin conexión</p>
+    <h1>No hay conexión a internet</h1>
+    <p>Revisa tu wifi o tus datos móviles. Apenas vuelva la conexión, Aurum se abre donde lo dejaste.</p>
+    <button type="button" onclick="location.reload()">Reintentar</button>
+</main>
+<script>
+    window.addEventListener('online', () => location.reload());
+</script>
+</body>
+</html>

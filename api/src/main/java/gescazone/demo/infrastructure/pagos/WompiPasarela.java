@@ -53,7 +53,9 @@ public class WompiPasarela implements PasarelaPagos {
         this.llavePublica = llavePublica.trim();
         this.secretoIntegridad = secretoIntegridad.trim();
         this.secretoEventos = secretoEventos.trim();
-        this.llavePrivada = llavePrivada.trim();
+        // El archivo de ejemplo trae "prv_test_PEGA_AQUI": mientras no se pegue
+        // la llave real se trabaja sin ella (consultar por id funciona igual).
+        this.llavePrivada = llavePrivada.contains("PEGA_AQUI") ? "" : llavePrivada.trim();
         String api = this.llavePublica.startsWith("pub_prod_") ? "https://production.wompi.co/v1" : "https://sandbox.wompi.co/v1";
         this.cliente = RestClient.builder().baseUrl(api).build();
     }
