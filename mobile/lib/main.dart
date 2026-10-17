@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'datos/api.dart';
+import 'datos/apariencia.dart';
 import 'datos/sesion.dart';
 import 'pantallas/principal.dart';
 import 'pantallas/login.dart';
 import 'tema/aurum_tema.dart';
 import 'widgets/marca.dart';
 
-void main() {
-  runApp(AurumApp(api: Api(), almacen: AlmacenSesion()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // El modo claro/oscuro elegido se lee antes de pintar, para no parpadear.
+  final apariencia = Apariencia(const FlutterSecureStorage());
+  await apariencia.cargar();
+  runApp(AurumApp(api: Api(), almacen: AlmacenSesion(), apariencia: apariencia));
 }
 
 class AurumApp extends StatefulWidget {
   final Api api;
   final AlmacenSesion almacen;
+  final Apariencia? apariencia;
 
-  const AurumApp({super.key, required this.api, required this.almacen});
+  const AurumApp({super.key, required this.api, required this.almacen, this.apariencia});
 
   @override
   State<AurumApp> createState() => _AurumAppState();
@@ -26,6 +34,7 @@ class _AurumAppState extends State<AurumApp> {
   Sesion? _sesion;
   bool _restaurando = true;
   String? _avisoLogin;
+  late final Apariencia _apariencia = widget.apariencia ?? Apariencia();
 
   @override
   void initState() {
@@ -93,16 +102,22 @@ class _AurumAppState extends State<AurumApp> {
           alActualizarSesion: _actualizarSesion);
     }
 
-    return MaterialApp(
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: _apariencia,
+      builder: (context, modo, _) => MaterialApp(
       title: 'Aurum Condominios',
       debugShowCheckedModeBanner: false,
       theme: temaAurum(Brightness.light),
       darkTheme: temaAurum(Brightness.dark),
+      themeMode: modo,
+      themeAnimationDuration: const Duration(milliseconds: 280),
+      builder: (context, hijo) => AparienciaAurum(apariencia: _apariencia, child: hijo!),
       // Calendarios y textos del sistema en español, sin importar el idioma del teléfono.
       locale: const Locale('es', 'CO'),
       supportedLocales: const [Locale('es', 'CO'), Locale('es')],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       home: AnimatedSwitcher(duration: const Duration(milliseconds: 250), child: pantalla),
+    ),
     );
   }
 }

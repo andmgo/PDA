@@ -17,6 +17,10 @@ class Aurum {
   static const gris = Color(0xFF4A4A4A); // texto
   static const grisTenue = Color(0xFF8B8F9C);
   static const borde = Color(0xFFE8E4DA);
+  /// Borde de tarjetas en modo claro: más tenue que [borde]; la separación
+  /// la da una sombra azul noche muy suave.
+  static const bordeSuave = Color(0xFFEDE9E1);
+  static const sombra = Color(0x1A1E2A4A);
   static const rojoEstado = Color(0xFFB23A3A); // solo destructivo / error crítico
 
   // Modo oscuro. Antes las tarjetas eran azul noche y los rellenos azul
@@ -71,9 +75,9 @@ ThemeData temaAurum(Brightness brillo) {
 
   final bordeCampo = OutlineInputBorder(
     borderRadius: BorderRadius.circular(12),
-    borderSide: BorderSide(color: esquema.outline, width: 1.2),
+    borderSide: BorderSide(color: oscuro ? Aurum.filoOscuro : Aurum.borde, width: 1),
   );
-  final tituloBarra = GoogleFonts.montserrat(fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -.2, color: Aurum.blanco);
+  final tituloBarra = GoogleFonts.montserrat(fontSize: 19, fontWeight: FontWeight.w700, letterSpacing: -.3, color: Aurum.blanco);
   final etiquetaPequena = GoogleFonts.montserrat(fontSize: 11.5, fontWeight: FontWeight.w600, letterSpacing: .1);
 
   return ThemeData(
@@ -89,6 +93,10 @@ ThemeData temaAurum(Brightness brillo) {
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
       titleTextStyle: tituloBarra,
+      toolbarHeight: 60,
+      titleSpacing: 20,
+      // Filo dorado tenue bajo la barra (como el borde de la barra lateral de la web).
+      shape: Border(bottom: BorderSide(color: Aurum.oro.withValues(alpha: .28))),
       iconTheme: const IconThemeData(color: Aurum.blanco),
       actionsIconTheme: const IconThemeData(color: Aurum.oroClaro),
     ),
@@ -104,10 +112,11 @@ ThemeData temaAurum(Brightness brillo) {
       backgroundColor: Aurum.noche,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
-      height: 68,
-      indicatorColor: Aurum.hundido,
-      indicatorShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Aurum.filoDorado)),
+      height: 66,
+      // Sin "pastilla" detrás del ícono: la pestaña activa se marca solo con
+      // el oro del ícono y del texto (más sobrio).
+      indicatorColor: Colors.transparent,
+      indicatorShape: const RoundedRectangleBorder(),
       iconTheme: WidgetStateProperty.resolveWith((estado) => IconThemeData(
           size: 23,
           color: estado.contains(WidgetState.selected) ? Aurum.oroClaro : Aurum.blanco.withValues(alpha: .62))),
@@ -175,14 +184,21 @@ ThemeData temaAurum(Brightness brillo) {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     ),
     cardTheme: CardThemeData(
-      elevation: 0,
+      elevation: oscuro ? 0 : 1.5,
+      shadowColor: Aurum.sombra,
       margin: EdgeInsets.zero,
       color: oscuro ? Aurum.tarjetaOscura : Colors.white,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: esquema.outline),
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: oscuro ? Aurum.filoOscuro : Aurum.bordeSuave),
       ),
+    ),
+    listTileTheme: ListTileThemeData(
+      iconColor: oscuro ? Aurum.oroClaro : Aurum.oroTexto,
+      titleTextStyle: GoogleFonts.montserrat(
+          fontSize: 15, fontWeight: FontWeight.w600, color: oscuro ? Aurum.blanco : Aurum.noche),
+      subtitleTextStyle: GoogleFonts.montserrat(fontSize: 12.5, color: Aurum.grisTenue),
     ),
     dialogTheme: DialogThemeData(
       backgroundColor: oscuro ? Aurum.tarjetaOscura : Colors.white,

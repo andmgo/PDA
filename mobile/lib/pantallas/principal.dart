@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../datos/api.dart';
 import '../datos/sesion.dart';
+import '../tema/aurum_tema.dart';
 import 'inicio.dart';
 import 'mis_visitas.dart';
 import 'perfil.dart';
@@ -99,7 +100,10 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
               _visitadas.contains(p.clave) ? KeyedSubtree(key: ValueKey(p.clave), child: _pantalla(p.clave)) : const SizedBox(),
           ],
         ),
-        bottomNavigationBar: NavigationBar(
+        // Filo dorado tenue sobre la barra inferior (como el borde de la web).
+        bottomNavigationBar: DecoratedBox(
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: Aurum.oro.withValues(alpha: .28)))),
+          child: NavigationBar(
           selectedIndex: indice,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           onDestinationSelected: (i) => setState(() {
@@ -110,6 +114,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             for (final p in pestanas)
               NavigationDestination(icon: Icon(p.icono), selectedIcon: Icon(p.iconoActivo), label: p.texto),
           ],
+        ),
         ),
       ),
     );

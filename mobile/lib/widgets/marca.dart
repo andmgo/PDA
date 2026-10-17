@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../datos/apariencia.dart';
 import '../tema/aurum_tema.dart';
 
 /// Logotipo: isotipo + la palabra "AURUM" como IMAGEN (nunca texto, para
@@ -18,15 +19,35 @@ class LogoAurum extends StatelessWidget {
       children: [
         Image.asset('assets/marca/aurum-palabra.png', height: alto * .36, semanticLabel: 'Aurum'),
         SizedBox(height: alto * .12),
-        Text('CONDOMINIOS',
-            style: GoogleFonts.montserrat(
-                fontSize: alto * .2, fontWeight: FontWeight.w600, letterSpacing: alto * .07, color: Aurum.blanco)),
+        Text(
+          'CONDOMINIOS',
+          style: GoogleFonts.montserrat(
+            fontSize: alto * .2,
+            fontWeight: FontWeight.w600,
+            letterSpacing: alto * .07,
+            color: Aurum.blanco,
+          ),
+        ),
       ],
     );
     final isotipo = Image.asset('assets/marca/aurum-isotipo.png', height: alto, semanticLabel: 'Aurum Condominios');
     return vertical
-        ? Column(mainAxisSize: MainAxisSize.min, children: [isotipo, SizedBox(height: alto * .3), palabra])
-        : Row(mainAxisSize: MainAxisSize.min, children: [isotipo, SizedBox(width: alto * .28), palabra]);
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              isotipo,
+              SizedBox(height: alto * .3),
+              palabra,
+            ],
+          )
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              isotipo,
+              SizedBox(width: alto * .28),
+              palabra,
+            ],
+          );
   }
 }
 
@@ -56,11 +77,25 @@ class EncabezadoAurum extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Aurum.noche,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: oscuro ? Aurum.filoOscuro : Colors.transparent),
+        boxShadow: oscuro ? null : const [BoxShadow(color: Color(0x331E2A4A), blurRadius: 24, offset: Offset(0, 10))],
       ),
       child: Stack(
         children: [
+          // Brillo dorado radial muy tenue (el único "degradado" que admite el
+          // azul noche según el manual de marca).
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(.75, -.9),
+                  radius: 1.1,
+                  colors: [Aurum.oro.withValues(alpha: .16), Aurum.oro.withValues(alpha: 0)],
+                ),
+              ),
+            ),
+          ),
           // Marca de agua: centrada en la altura y completa (antes iba con
           // bottom negativo y la mitad inferior del isotipo quedaba recortada).
           Positioned(
@@ -86,13 +121,24 @@ class EncabezadoAurum extends StatelessWidget {
                 const SizedBox(height: 8),
                 DefaultTextStyle(
                   style: GoogleFonts.montserrat(
-                      fontSize: 28, fontWeight: FontWeight.w800, letterSpacing: -.5, color: Aurum.blanco, height: 1.15),
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -.6,
+                    color: Aurum.blanco,
+                    height: 1.15,
+                  ),
                   child: titulo,
                 ),
                 if (descripcion != null) ...[
                   const SizedBox(height: 6),
-                  Text(descripcion!,
-                      style: GoogleFonts.montserrat(fontSize: 14, color: Aurum.blanco.withValues(alpha: .74), height: 1.45)),
+                  Text(
+                    descripcion!,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      color: Aurum.blanco.withValues(alpha: .74),
+                      height: 1.45,
+                    ),
+                  ),
                 ],
                 if (pie != null) ...[const SizedBox(height: 14), pie!],
               ],
@@ -113,12 +159,15 @@ class Rotulo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final oscuro = Theme.of(context).brightness == Brightness.dark;
-    return Text(texto.toUpperCase(),
-        style: GoogleFonts.montserrat(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 2.4,
-            color: color ?? (oscuro ? Aurum.oroClaro : Aurum.oroTexto)));
+    return Text(
+      texto.toUpperCase(),
+      style: GoogleFonts.montserrat(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 2.4,
+        color: color ?? (oscuro ? Aurum.oroClaro : Aurum.oroTexto),
+      ),
+    );
   }
 }
 
@@ -129,10 +178,10 @@ class TextoOro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ShaderMask(
-        shaderCallback: (r) => Aurum.degradadoOro.createShader(r),
-        blendMode: BlendMode.srcIn,
-        child: Text(texto),
-      );
+    shaderCallback: (r) => Aurum.degradadoOro.createShader(r),
+    blendMode: BlendMode.srcIn,
+    child: Text(texto),
+  );
 }
 
 /// Número de apartamento: etiqueta azul noche con texto oro (como la web).
@@ -143,38 +192,63 @@ class ChipApto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: Aurum.noche,
-          borderRadius: BorderRadius.circular(8),
-          border: Theme.of(context).brightness == Brightness.dark ? Border.all(color: Aurum.filoOscuro) : null,
-        ),
-        child: Text(numero,
-            style: GoogleFonts.ibmPlexMono(fontSize: 13, fontWeight: FontWeight.w600, color: Aurum.oroClaro)),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    decoration: BoxDecoration(
+      color: Aurum.noche,
+      borderRadius: BorderRadius.circular(8),
+      border: Theme.of(context).brightness == Brightness.dark ? Border.all(color: Aurum.filoOscuro) : null,
+    ),
+    child: Text(
+      numero,
+      style: GoogleFonts.ibmPlexMono(fontSize: 13, fontWeight: FontWeight.w600, color: Aurum.oroClaro),
+    ),
+  );
 }
 
-/// Placa de vehículo: amarilla con borde azul noche, como una placa real.
+/// Placa de vehículo: etiqueta sobria con ícono de carro y la placa en
+/// letra monoespaciada (antes era un bloque amarillo intenso).
 class ChipPlaca extends StatelessWidget {
   final String placa;
   const ChipPlaca(this.placa, {super.key});
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+  Widget build(BuildContext context) {
+    final oscuro = Theme.of(context).brightness == Brightness.dark;
+    // scaleDown: en filas angostas (portería a 320 px) se reduce en vez de desbordarse.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(7, 3, 9, 3),
         decoration: BoxDecoration(
-          color: Aurum.oroClaro,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: Aurum.noche, width: 1.5),
+          color: oscuro ? Aurum.hundido : Aurum.oroSuave,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: oscuro ? Aurum.filoOscuro : const Color(0xFFEBDDB5)),
         ),
-        child: Text(placa,
-            style: GoogleFonts.ibmPlexMono(
-                fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.2, color: Aurum.noche)),
-      );
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.directions_car_filled_outlined, size: 14, color: oscuro ? Aurum.oroClaro : Aurum.oroTexto),
+            const SizedBox(width: 6),
+            Text(
+              placa,
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.1,
+                color: oscuro ? Aurum.blanco : Aurum.noche,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-/// Acceso a un módulo. Si [proximamente] es true se ve, pero indica en qué
-/// fase llega (la app se arma por fases, igual que la web).
+/// Acceso a un módulo, como fila de una lista (ícono, título, descripción y
+/// flecha). Van agrupadas en una tarjeta con [GrupoAcciones]. Si
+/// [proximamente] no es null se ve, pero indica en qué fase llega.
 class TarjetaAccion extends StatelessWidget {
   final IconData icono;
   final String titulo;
@@ -196,65 +270,129 @@ class TarjetaAccion extends StatelessWidget {
     final tema = Theme.of(context);
     final oscuro = tema.brightness == Brightness.dark;
     final deshabilitada = proximamente != null;
-    return Card(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: deshabilitada
-            ? () => ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text('$titulo llega a la app en la $proximamente.')))
-            : alTocar,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+    return InkWell(
+      onTap: deshabilitada
+          ? () => ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('$titulo llega a la app en la $proximamente.')))
+          : alTocar,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: oscuro ? Aurum.hundido : Aurum.oroSuave,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: oscuro ? Aurum.filoOscuro : const Color(0xFFF1E4C3)),
+              ),
+              child: Icon(icono, size: 21, color: oscuro ? Aurum.oroClaro : Aurum.oroTexto),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: oscuro ? Aurum.hundido : Aurum.oroSuave,
-                      borderRadius: BorderRadius.circular(12),
-                      border: oscuro ? Border.all(color: Aurum.filoOscuro) : null,
+                  Text(
+                    titulo,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: tema.colorScheme.onSurface,
                     ),
-                    child: Icon(icono, size: 22, color: oscuro ? Aurum.oroClaro : Aurum.oroTexto),
                   ),
-                  const SizedBox(width: 8),
-                  // Flexible + scaleDown: en celulares angostos la tarjeta mide
-                  // ~150 px y ícono + etiqueta no cabían ("right overflowed").
-                  if (deshabilitada)
-                    Flexible(
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: tema.colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(99),
-                              border: Border.all(color: tema.colorScheme.outline),
-                            ),
-                            child: Text('Próximamente',
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 10, fontWeight: FontWeight.w700, color: Aurum.grisTenue)),
-                          ),
-                        ),
-                      ),
-                    ),
+                  const SizedBox(height: 2),
+                  Text(subtitulo, style: GoogleFonts.montserrat(fontSize: 12.5, color: Aurum.grisTenue)),
                 ],
               ),
-              const SizedBox(height: 14),
-              Text(titulo,
-                  style: GoogleFonts.montserrat(
-                      fontSize: 15, fontWeight: FontWeight.w700, color: tema.colorScheme.onSurface)),
-              const SizedBox(height: 2),
-              Text(subtitulo, style: GoogleFonts.montserrat(fontSize: 12.5, color: Aurum.grisTenue)),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            if (deshabilitada)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: tema.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(99),
+                  border: Border.all(color: tema.colorScheme.outline),
+                ),
+                child: Text(
+                  'Próximamente',
+                  style: GoogleFonts.montserrat(fontSize: 10, fontWeight: FontWeight.w700, color: Aurum.grisTenue),
+                ),
+              )
+            else
+              Icon(Icons.chevron_right_rounded, color: oscuro ? Aurum.oroClaro.withValues(alpha: .7) : Aurum.grisTenue),
+          ],
         ),
       ),
+    );
+  }
+}
+
+/// Tarjeta que agrupa filas ([TarjetaAccion] u otras) separadas por una
+/// línea fina, como una lista de ajustes.
+class GrupoAcciones extends StatelessWidget {
+  final List<Widget> filas;
+  const GrupoAcciones({super.key, required this.filas});
+
+  @override
+  Widget build(BuildContext context) {
+    final linea = Theme.of(context).brightness == Brightness.dark ? Aurum.filoOscuro : Aurum.bordeSuave;
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          for (var i = 0; i < filas.length; i++) ...[
+            if (i > 0) Divider(height: 1, thickness: 1, indent: 72, color: linea),
+            filas[i],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Selector de apariencia: Sistema · Claro · Oscuro (se guarda en el teléfono).
+class SelectorApariencia extends StatelessWidget {
+  const SelectorApariencia({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final apariencia = AparienciaAurum.of(context);
+    if (apariencia == null) return const SizedBox.shrink();
+    return SizedBox(
+      width: double.infinity,
+      child: SegmentedButton<ThemeMode>(
+        showSelectedIcon: false,
+        segments: const [
+          // Solo texto: con ícono, "Sistema" y "Oscuro" se partían en celulares angostos.
+          ButtonSegment(value: ThemeMode.system, label: Text('Sistema', maxLines: 1)),
+          ButtonSegment(value: ThemeMode.light, label: Text('Claro', maxLines: 1)),
+          ButtonSegment(value: ThemeMode.dark, label: Text('Oscuro', maxLines: 1)),
+        ],
+        selected: {apariencia.value},
+        onSelectionChanged: (s) => apariencia.elegir(s.first),
+      ),
+    );
+  }
+}
+
+/// Botón rápido luna/sol (como el de la web): cambia entre claro y oscuro.
+class BotonApariencia extends StatelessWidget {
+  final Color color;
+  const BotonApariencia({super.key, this.color = Aurum.blanco});
+
+  @override
+  Widget build(BuildContext context) {
+    final apariencia = AparienciaAurum.of(context);
+    if (apariencia == null) return const SizedBox.shrink();
+    final oscuro = Theme.of(context).brightness == Brightness.dark;
+    return IconButton(
+      tooltip: oscuro ? 'Modo claro' : 'Modo oscuro',
+      onPressed: () => apariencia.alternar(Theme.of(context).brightness),
+      icon: Icon(oscuro ? Icons.light_mode_outlined : Icons.dark_mode_outlined, color: color),
     );
   }
 }
@@ -273,20 +411,28 @@ class SeccionAurum extends StatelessWidget {
     final tema = Theme.of(context);
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Rotulo(rotulo),
-            const SizedBox(height: 4),
-            Row(children: [
-              Flexible(
-                child: Text(titulo,
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    titulo,
                     style: GoogleFonts.montserrat(
-                        fontSize: 18, fontWeight: FontWeight.w800, color: tema.colorScheme.onSurface)),
-              ),
-              if (contador != null) ...[const SizedBox(width: 8), contador!],
-            ]),
+                      fontSize: 17.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -.2,
+                      color: tema.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                if (contador != null) ...[const SizedBox(width: 8), contador!],
+              ],
+            ),
             const SizedBox(height: 14),
             hijo,
           ],
@@ -306,12 +452,18 @@ class Contador extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
       decoration: BoxDecoration(
-          color: oscuro ? Aurum.hundido : Aurum.oroSuave,
-          borderRadius: BorderRadius.circular(99),
-          border: oscuro ? Border.all(color: Aurum.filoOscuro) : null),
-      child: Text('$valor',
-          style: GoogleFonts.montserrat(
-              fontSize: 12.5, fontWeight: FontWeight.w700, color: oscuro ? Aurum.oroClaro : Aurum.oroTexto)),
+        color: oscuro ? Aurum.hundido : Aurum.oroSuave,
+        borderRadius: BorderRadius.circular(99),
+        border: oscuro ? Border.all(color: Aurum.filoOscuro) : null,
+      ),
+      child: Text(
+        '$valor',
+        style: GoogleFonts.montserrat(
+          fontSize: 12.5,
+          fontWeight: FontWeight.w700,
+          color: oscuro ? Aurum.oroClaro : Aurum.oroTexto,
+        ),
+      ),
     );
   }
 }
@@ -335,9 +487,12 @@ class AvisoAurum extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: Border(left: BorderSide(color: error ? Aurum.oro : (oscuro ? Aurum.oroClaro : Aurum.lider), width: 3)),
       ),
-      child: contenido ??
-          Text(texto,
-              style: GoogleFonts.montserrat(fontSize: 13, height: 1.4, color: oscuro ? Aurum.blanco : Aurum.noche)),
+      child:
+          contenido ??
+          Text(
+            texto,
+            style: GoogleFonts.montserrat(fontSize: 13, height: 1.4, color: oscuro ? Aurum.blanco : Aurum.noche),
+          ),
     );
   }
 }
@@ -355,9 +510,13 @@ class EtiquetaEstado extends StatelessWidget {
     final fondo = destacada
         ? Aurum.noche
         : apagada
-            ? Theme.of(context).colorScheme.surfaceContainerHighest
-            : (oscuro ? Aurum.hundido : Aurum.oroSuave);
-    final color = destacada ? Aurum.oroClaro : apagada ? Aurum.grisTenue : (oscuro ? Aurum.oroClaro : Aurum.oroTexto);
+        ? Theme.of(context).colorScheme.surfaceContainerHighest
+        : (oscuro ? Aurum.hundido : Aurum.oroSuave);
+    final color = destacada
+        ? Aurum.oroClaro
+        : apagada
+        ? Aurum.grisTenue
+        : (oscuro ? Aurum.oroClaro : Aurum.oroTexto);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
       decoration: BoxDecoration(
@@ -365,8 +524,10 @@ class EtiquetaEstado extends StatelessWidget {
         borderRadius: BorderRadius.circular(99),
         border: oscuro && !apagada ? Border.all(color: destacada ? Aurum.filoDorado : Aurum.filoOscuro) : null,
       ),
-      child: Text(texto.toUpperCase(),
-          style: GoogleFonts.montserrat(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: .6, color: color)),
+      child: Text(
+        texto.toUpperCase(),
+        style: GoogleFonts.montserrat(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: .6, color: color),
+      ),
     );
   }
 }
@@ -390,9 +551,14 @@ class AvatarIniciales extends StatelessWidget {
         color: apagado ? Aurum.grisTenue : Aurum.noche,
         border: oscuro && !apagado ? Border.all(color: Aurum.oroClaro.withValues(alpha: .35)) : null,
       ),
-      child: Text(iniciales,
-          style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.w800, fontSize: 13, color: apagado ? Aurum.blanco : Aurum.oroClaro)),
+      child: Text(
+        iniciales,
+        style: GoogleFonts.montserrat(
+          fontWeight: FontWeight.w800,
+          fontSize: 13,
+          color: apagado ? Aurum.blanco : Aurum.oroClaro,
+        ),
+      ),
     );
   }
 }
@@ -404,15 +570,19 @@ class EstadoVacio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        child: Center(
-          child: Column(children: [
-            Icon(icono, size: 30, color: Aurum.oro),
-            const SizedBox(height: 8),
-            Text(texto,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.montserrat(fontSize: 13.5, color: Aurum.grisTenue)),
-          ]),
-        ),
-      );
+    padding: const EdgeInsets.symmetric(vertical: 18),
+    child: Center(
+      child: Column(
+        children: [
+          Icon(icono, size: 30, color: Aurum.oro),
+          const SizedBox(height: 8),
+          Text(
+            texto,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.montserrat(fontSize: 13.5, color: Aurum.grisTenue),
+          ),
+        ],
+      ),
+    ),
+  );
 }

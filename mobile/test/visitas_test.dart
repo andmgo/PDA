@@ -132,6 +132,8 @@ void main() {
       ])));
 
       await tester.scrollUntilVisible(find.byType(FilledButton), 200, scrollable: find.byType(Scrollable).first);
+      await tester.ensureVisible(find.byType(FilledButton));
+      await tester.pumpAndSettle();
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
       expect(find.text('Obligatorio'), findsNWidgets(2)); // nombre y apellido
@@ -141,6 +143,8 @@ void main() {
       await tester.enterText(find.widgetWithText(TextFormField, 'Apellido'), 'Ospina');
       await tester.enterText(find.widgetWithText(TextFormField, 'Placa (si viene en carro)'), 'hjk45f');
       await tester.scrollUntilVisible(find.byType(FilledButton), 200, scrollable: find.byType(Scrollable).first);
+      await tester.ensureVisible(find.byType(FilledButton));
+      await tester.pumpAndSettle();
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
@@ -160,6 +164,8 @@ void main() {
       await tester.enterText(find.widgetWithText(TextFormField, 'Nombre'), 'Ana');
       await tester.enterText(find.widgetWithText(TextFormField, 'Apellido'), 'Gil');
       await tester.scrollUntilVisible(find.byType(FilledButton), 200, scrollable: find.byType(Scrollable).first);
+      await tester.ensureVisible(find.byType(FilledButton));
+      await tester.pumpAndSettle();
       await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
       expect(find.text('Solo puedes autorizar visitas a tus apartamentos'), findsOneWidget);

@@ -142,20 +142,31 @@ class _PantallaInicioState extends State<PantallaInicio> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
             children: [
               EncabezadoAurum(
-                rotulo: 'Terrazas de Calicanto · ${_s.rolLegible}',
+                rotulo: 'Terrazas de Calicanto',
                 titulo: Wrap(children: [const Text('Hola, '), TextoOro(_s.nombre)]),
                 descripcion: 'Tu conjunto, en un solo lugar.',
-                accion: IconButton(
-                  tooltip: 'Cerrar sesión',
-                  onPressed: _confirmarSalir,
-                  icon: const Icon(Icons.logout_rounded, color: Aurum.blanco),
-                ),
+                accion: Row(mainAxisSize: MainAxisSize.min, children: [
+                  const BotonApariencia(),
+                  IconButton(
+                    tooltip: 'Cerrar sesión',
+                    onPressed: _confirmarSalir,
+                    icon: const Icon(Icons.logout_rounded, color: Aurum.blanco),
+                  ),
+                ]),
                 pie: Row(children: [
                   const Icon(Icons.calendar_today_outlined, size: 15, color: Aurum.oroClaro),
                   const SizedBox(width: 8),
+                  // El rol va aquí (antes en el rótulo, que se partía junto a los botones).
                   Flexible(
-                    child: Text(_hoy(),
-                        style: GoogleFonts.montserrat(fontSize: 13, color: Aurum.blanco.withValues(alpha: .65))),
+                    child: Text.rich(
+                      TextSpan(children: [
+                        TextSpan(text: _hoy()),
+                        TextSpan(
+                            text: '  ·  ${_s.rolLegible}',
+                            style: const TextStyle(color: Aurum.oroClaro, fontWeight: FontWeight.w600)),
+                      ]),
+                      style: GoogleFonts.montserrat(fontSize: 13, color: Aurum.blanco.withValues(alpha: .65)),
+                    ),
                   ),
                 ]),
               ),
@@ -340,15 +351,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
             subtitulo: 'Salón social',
             alTocar: () => _abrirSeccion('reservas', () => PantallaReservas(api: widget.api))),
     ];
-    return LayoutBuilder(builder: (context, c) {
-      final columnas = c.maxWidth > 560 ? 3 : 2;
-      final ancho = (c.maxWidth - (columnas - 1) * 12) / columnas;
-      return Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: [for (final t in tarjetas) SizedBox(width: ancho, child: t)],
-      );
-    });
+    return GrupoAcciones(filas: tarjetas);
   }
 
   static String _hoy() {
@@ -356,7 +359,8 @@ class _PantallaInicioState extends State<PantallaInicio> {
     const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre',
       'octubre', 'noviembre', 'diciembre'];
     final h = DateTime.now();
-    final texto = '${dias[h.weekday - 1]}, ${h.day} de ${meses[h.month - 1]} de ${h.year}';
+    // Sin el año: así cabe en una línea junto al rol.
+    final texto = '${dias[h.weekday - 1]}, ${h.day} de ${meses[h.month - 1]}';
     return texto[0].toUpperCase() + texto.substring(1);
   }
 }

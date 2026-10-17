@@ -172,6 +172,12 @@ class _PantallaPerfilState extends State<PantallaPerfil> {
             ),
           ],
           const SizedBox(height: 14),
+          const SeccionAurum(
+            rotulo: 'Preferencias',
+            titulo: 'Apariencia',
+            hijo: SelectorApariencia(),
+          ),
+          const SizedBox(height: 14),
           SeccionAurum(
             rotulo: 'Seguridad',
             titulo: 'Cambiar contraseña',
